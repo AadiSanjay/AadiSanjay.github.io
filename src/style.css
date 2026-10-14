@@ -5,19 +5,16 @@
   --ink: #1d1b19;
   --muted: #a39a89;
 
-  --case: #111112;
+  /* site chrome stays red samurai; the board itself re-skins per build */
   --alpha: #b3222e;
   --alpha-side: #7a1620;
   --mod: #3a3a3c;
   --mod-side: #232325;
-  --accent: #e8ca66;
-  --accent-side: #b3963d;
   --legend: #f2c94c;
 
   --u: min(54px, calc((100vw - 56px) / 16.7));
   --travel: 4px;
   --press: cubic-bezier(0.3, 0, 0.2, 1) 70ms;
-  --stem: #c8323c;
 
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
@@ -205,6 +202,7 @@ kbd {
   padding: calc(var(--u) * 0.22);
   background: var(--case);
   border-radius: calc(var(--u) * 0.18);
+  transition: background 300ms;
   box-shadow:
     0 1px 0 #2c2c2e inset,
     0 30px 50px -25px #000;
@@ -217,7 +215,7 @@ kbd {
 .cap {
   --top: var(--alpha);
   --side: var(--alpha-side);
-  --ink: var(--legend);
+  --ink: var(--alpha-ink);
 
   position: relative;
   width: calc(var(--u) * var(--w));
@@ -234,12 +232,13 @@ kbd {
 .cap-mod {
   --top: var(--mod);
   --side: var(--mod-side);
+  --ink: var(--mod-ink);
 }
 
 .cap-accent {
   --top: var(--accent);
   --side: var(--accent-side);
-  --ink: #2a2622;
+  --ink: var(--accent-ink);
 }
 
 /* the skirt */
@@ -258,6 +257,7 @@ kbd {
   inset: 8% 13% 22% 13%;
   border-radius: calc(var(--u) * 0.08);
   background: linear-gradient(170deg, color-mix(in srgb, var(--top), #fff 10%), var(--top) 60%);
+  transition-property: transform, filter, background;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -300,8 +300,8 @@ kbd {
   width: calc(var(--u) * 0.09);
   height: calc(var(--u) * 0.09);
   border-radius: 50%;
-  background: var(--legend);
-  box-shadow: 0 0 6px var(--legend);
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
 }
 
 .cap.down .top,
@@ -321,12 +321,12 @@ kbd {
 }
 
 .board[data-layer='fn'] .cap.has-fn .top {
-  outline: 2px solid var(--legend);
+  outline: 2px solid var(--ink);
   outline-offset: 1px;
 }
 
 .cap[aria-pressed='true'] .top {
-  outline: 2px solid var(--legend);
+  outline: 2px solid var(--ink);
 }
 
 .cap:focus-visible {
@@ -363,52 +363,51 @@ kbd {
   font-size: 0.8rem;
 }
 
-.switches {
+.builds {
   display: flex;
-  gap: 0.9rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.switches legend {
+.builds legend {
   float: left;
   margin-right: 0.4rem;
   color: var(--muted);
 }
 
-.switches label {
+.builds label {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   cursor: pointer;
 }
 
-.switches input {
+.builds input {
   position: absolute;
   opacity: 0;
 }
 
-/* a little cross-shaped switch stem */
-.stem {
-  width: 12px;
-  height: 12px;
-  background: currentColor;
-  clip-path: polygon(38% 0, 62% 0, 62% 38%, 100% 38%, 100% 62%, 62% 62%, 62% 100%, 38% 100%, 38% 62%, 0 62%, 0 38%, 38% 38%);
-  opacity: 0.5;
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #ffffff30;
 }
 
-.switches input:checked + .stem {
-  opacity: 1;
+.builds input:checked + .swatch {
+  box-shadow: 0 0 0 2px var(--legend);
 }
 
-.switches input:checked ~ .name {
+.builds input:checked ~ .name {
   color: var(--legend);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.switches input:focus-visible ~ .name {
+.builds input:focus-visible ~ .name {
   outline: 1px solid var(--paper);
 }
 

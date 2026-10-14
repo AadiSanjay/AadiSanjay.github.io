@@ -1,4 +1,4 @@
-// my board: 65% with an ins/del/pgup/pgdn column on the right.
+// my red samurai board: a gamakay ck68, 65% with an ins/del/pgup/pgdn column on the right.
 // each key is [event.code, legend, width in units, shifted legend]
 const k = (code, label, w = 1, shifted) => ({ code, label, w, shifted });
 const letters = (s) => [...s].map((c) => k(`Key${c}`, c));

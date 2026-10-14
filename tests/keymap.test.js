@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildKeymap, resolve } from '../src/keymap.js';
-import { loadSwitch, DEFAULT_SWITCH } from '../src/switches.js';
+import { loadBuild, DEFAULT_BUILD, buildIds } from '../src/builds.js';
 import { rows } from '../src/layout.js';
 
 const project = (id, key) => ({ id, key, short: id, title: id, blurb: '', tags: [], links: [] });
@@ -18,6 +18,13 @@ describe('resolve', () => {
 
   it('falls through to base for keys fn leaves empty', () => {
     expect(resolve(keymap, 'fn', 'KeyS')).toEqual({ type: 'project', id: 'sched' });
+  });
+
+  it('shift + number picks each build in order', () => {
+    buildIds.forEach((id, i) => {
+      expect(resolve(keymap, 'fn', `Digit${i + 1}`)).toEqual({ type: 'build', id });
+    });
+    expect(resolve(keymap, 'fn', `Digit${buildIds.length + 1}`)).toBeNull();
   });
 
   it('returns null for keys nothing is mapped to', () => {
@@ -48,18 +55,18 @@ describe('layout', () => {
   });
 });
 
-describe('loadSwitch', () => {
+describe('loadBuild', () => {
   const store = (value) => ({ getItem: () => value });
 
-  it('loads a saved switch', () => {
-    expect(loadSwitch(store('clicky'))).toBe('clicky');
+  it('loads a saved build', () => {
+    expect(loadBuild(store('olivia'))).toBe('olivia');
   });
 
   it('falls back on garbage, prototype keys, or nothing saved', () => {
-    expect(loadSwitch(store('blue-ish'))).toBe(DEFAULT_SWITCH);
-    expect(loadSwitch(store('toString'))).toBe(DEFAULT_SWITCH);
-    expect(loadSwitch(store(null))).toBe(DEFAULT_SWITCH);
-    expect(loadSwitch(null)).toBe(DEFAULT_SWITCH);
+    expect(loadBuild(store('blue-ish'))).toBe(DEFAULT_BUILD);
+    expect(loadBuild(store('toString'))).toBe(DEFAULT_BUILD);
+    expect(loadBuild(store(null))).toBe(DEFAULT_BUILD);
+    expect(loadBuild(null)).toBe(DEFAULT_BUILD);
   });
 
   it('falls back when storage throws', () => {
@@ -68,6 +75,6 @@ describe('loadSwitch', () => {
         throw new Error('SecurityError');
       },
     };
-    expect(loadSwitch(broken)).toBe(DEFAULT_SWITCH);
+    expect(loadBuild(broken)).toBe(DEFAULT_BUILD);
   });
 });

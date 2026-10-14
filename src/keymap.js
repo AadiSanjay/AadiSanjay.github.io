@@ -1,3 +1,5 @@
+import { buildIds } from './builds.js';
+
 const RESERVED = new Set(['Escape', 'ShiftLeft', 'ShiftRight', 'Fn']);
 
 // two layers, like qmk. base = projects, fn = everything else.
@@ -14,10 +16,10 @@ export function buildKeymap(content) {
     KeyC: { type: 'section', id: 'contact' },
     KeyE: { type: 'section', id: 'experience' },
     KeyR: { type: 'section', id: 'resume' },
-    Digit1: { type: 'switch', id: 'linear' },
-    Digit2: { type: 'switch', id: 'tactile' },
-    Digit3: { type: 'switch', id: 'clicky' },
   };
+  buildIds.forEach((id, i) => {
+    fn[`Digit${i + 1}`] = { type: 'build', id };
+  });
 
   return { base, fn };
 }

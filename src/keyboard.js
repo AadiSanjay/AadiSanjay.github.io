@@ -1,6 +1,6 @@
 import { rows, capColor } from './layout.js';
 import { buildKeymap, resolve } from './keymap.js';
-import { switches, loadSwitch, saveSwitch } from './switches.js';
+import { builds, buildIds, loadBuild, saveBuild } from './builds.js';
 import { getPref, setPref } from './prefs.js';
 
 const SHIFTS = new Set(['ShiftLeft', 'ShiftRight']);
@@ -9,7 +9,7 @@ const MODIFIERS = new Set([...SHIFTS, 'ControlLeft', 'ControlRight', 'AltLeft', 
 export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const board = root.querySelector('[data-board]');
   const display = root.querySelector('[data-display]');
-  const picker = root.querySelector('[data-switches]');
+  const picker = root.querySelector('[data-builds]');
   const soundBtn = root.querySelector('[data-sound]');
   const list = root.querySelector('[data-list]');
   const listBtn = root.querySelector('[data-list-toggle]');
@@ -21,14 +21,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   let shiftHeld = false;
   let fnLatched = false;
-  let switchId = loadSwitch(storage);
+  let buildId = loadBuild(storage);
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
 
   function describe(action) {
     if (!action || action.type === 'close') return '';
     if (action.type === 'project') return projects.get(action.id).short;
-    if (action.type === 'switch') return switches[action.id].label.toLowerCase();
+    if (action.type === 'build') return builds[action.id].name.toLowerCase();
     return action.id;
   }
 
@@ -126,10 +126,17 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
-    } else if (action.type === 'switch') {
-      setSwitch(action.id);
-      const s = switches[action.id];
-      showCard({ kicker: '[shift] switch', title: `${s.label} switches`, body: `${s.note}. type something.` });
+    } else if (action.type === 'build') {
+      setBuild(action.id);
+      const b = builds[action.id];
+      showCard({
+        kicker: `[shift] build ${buildIds.indexOf(action.id) + 1}/${buildIds.length}`,
+        title: b.name,
+        status: `${b.case} · ${b.switches} · ${b.keycaps}`,
+        body: `${b.note} type something.`,
+        stack: b.mods,
+        links: [{ label: 'PNW Keyboards on Etsy', href: 'https://www.etsy.com/shop/PNWKeyboards' }],
+      });
     } else {
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
     }
@@ -147,7 +154,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   // --- input ---
   function tap(code) {
-    sound.play(switchId);
+    sound.play(buildId);
     pulse(code);
     if (code === 'Fn') {
       fnLatched = !fnLatched;
@@ -180,7 +187,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     }
 
     cap.classList.add('down');
-    sound.play(switchId);
+    sound.play(buildId);
     if (MODIFIERS.has(e.code)) return;
     if (act(e.code)) e.preventDefault();
   }
@@ -208,27 +215,31 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   win.addEventListener('keyup', onKeyUp);
   win.addEventListener('blur', releaseAll);
 
-  // --- switch picker ---
-  function setSwitch(id) {
-    switchId = id;
-    saveSwitch(storage, id);
-    root.dataset.switch = id;
-    root.style.setProperty('--travel', switches[id].travel);
-    root.style.setProperty('--press', switches[id].ease);
-    root.style.setProperty('--stem', switches[id].stem);
+  // --- build picker: re-skins the board in that build's colorway ---
+  const cssName = (key) => key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+
+  function setBuild(id) {
+    buildId = id;
+    saveBuild(storage, id);
+    root.dataset.build = id;
+    for (const [key, value] of Object.entries(builds[id].colors)) {
+      board.style.setProperty(`--${cssName(key)}`, value);
+    }
     for (const input of picker.querySelectorAll('input')) input.checked = input.value === id;
   }
 
-  for (const [id, s] of Object.entries(switches)) {
+  buildIds.forEach((id, i) => {
+    const b = builds[id];
     const label = document.createElement('label');
-    label.innerHTML = `<input type="radio" name="switch"><span class="stem"></span><span class="name"></span>`;
+    label.innerHTML = `<input type="radio" name="build"><span class="swatch" aria-hidden="true"></span><span class="name"></span>`;
     label.querySelector('input').value = id;
-    label.querySelector('.stem').style.background = s.stem;
-    label.querySelector('.name').textContent = s.label;
-    label.querySelector('input').addEventListener('change', () => setSwitch(id));
+    label.querySelector('.swatch').style.background = `linear-gradient(135deg, ${b.colors.alpha} 50%, ${b.colors.mod} 50%)`;
+    label.querySelector('.name').textContent = b.name;
+    label.title = `shift + ${i + 1}`;
+    label.querySelector('input').addEventListener('change', () => run({ type: 'build', id }));
     picker.append(label);
-  }
-  setSwitch(switchId);
+  });
+  setBuild(buildId);
 
   // --- sound + list toggles ---
   function setSound(on) {
@@ -268,7 +279,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   return {
     tap,
-    setSwitch,
+    setBuild,
     get layer() {
       return layer();
     },

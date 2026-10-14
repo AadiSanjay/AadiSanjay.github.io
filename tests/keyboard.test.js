@@ -54,7 +54,7 @@ beforeEach(() => {
     <main id="desk">
       <div data-display><p class="idle">type a key</p></div>
       <div data-board></div>
-      <fieldset data-switches></fieldset>
+      <fieldset data-builds></fieldset>
       <button data-sound></button>
       <button data-list-toggle></button>
       <section data-list hidden><ul></ul></section>
@@ -73,7 +73,7 @@ describe('typing on the keyboard', () => {
     expect(showing()).toBe('sched');
     expect(display().querySelector('h2').textContent).toBe('Scheduler');
     expect(e.defaultPrevented).toBe(true);
-    expect(sound.play).toHaveBeenCalledWith('linear');
+    expect(sound.play).toHaveBeenCalledWith('red-samurai');
   });
 
   it('shows the cap going down and coming back up', () => {
@@ -206,28 +206,41 @@ describe('clicking caps', () => {
   });
 });
 
-describe('switch picker', () => {
-  it('picking a switch changes the sound and is remembered', () => {
+describe('build picker', () => {
+  const board = () => root.querySelector('[data-board]');
+
+  it('picking a build re-skins the board, changes the sound, and is remembered', () => {
     mount();
-    root.querySelector('input[value="clicky"]').click();
-    press('KeyS');
-    expect(sound.play).toHaveBeenLastCalledWith('clicky');
-    expect(storage.data.get('switch')).toBe('clicky');
-    expect(root.dataset.switch).toBe('clicky');
+    root.querySelector('input[value="olivia"]').click();
+    expect(board().style.getPropertyValue('--alpha')).toBe('#f2ede7');
+    expect(board().style.getPropertyValue('--alpha-ink')).toBe('#2b2b2b');
+    expect(showing()).toBe('olivia');
+    press('KeyF');
+    expect(sound.play).toHaveBeenLastCalledWith('olivia');
+    expect(storage.data.get('build')).toBe('olivia');
   });
 
-  it('shift+number picks a switch from the keyboard', () => {
+  it('shift+number picks a build from the keyboard and shows its specs', () => {
     mount();
     press('ShiftLeft', { shiftKey: true });
     press('Digit2', { shiftKey: true });
-    expect(root.dataset.switch).toBe('tactile');
-    expect(root.querySelector('input[value="tactile"]').checked).toBe(true);
+    expect(root.dataset.build).toBe('blue-samurai');
+    expect(root.querySelector('input[value="blue-samurai"]').checked).toBe(true);
+    expect(display().querySelector('h2').textContent).toBe('Blue Samurai');
+    expect(display().querySelector('.status').textContent).toContain('Gamakay LK67');
   });
 
-  it('starts with the saved switch', () => {
-    storage = memoryStorage({ switch: 'tactile' });
+  it('starts with the saved build', () => {
+    storage = memoryStorage({ build: 'matcha' });
     mount();
-    expect(root.querySelector('input[value="tactile"]').checked).toBe(true);
+    expect(root.querySelector('input[value="matcha"]').checked).toBe(true);
+    expect(board().style.getPropertyValue('--case')).toBe('#e9e6df');
+  });
+
+  it('a saved build that no longer exists falls back to the default', () => {
+    storage = memoryStorage({ build: 'sold-and-gone' });
+    mount();
+    expect(root.dataset.build).toBe('red-samurai');
   });
 
   it('still works when storage is broken', () => {
@@ -240,8 +253,8 @@ describe('switch picker', () => {
       },
     };
     mount();
-    expect(() => kb.setSwitch('clicky')).not.toThrow();
-    expect(root.dataset.switch).toBe('clicky');
+    expect(() => kb.setBuild('wob-white')).not.toThrow();
+    expect(root.dataset.build).toBe('wob-white');
   });
 });
 

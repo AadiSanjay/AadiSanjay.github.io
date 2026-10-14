@@ -1,14 +1,14 @@
-import { switches } from './switches.js';
+import { builds } from './builds.js';
 
-// plays recordings of my boards when a switch has them, otherwise synthesizes a press
+// plays recordings of my boards when a build has them, otherwise synthesizes a press
 export function createSound() {
   let ctx = null;
   let noise = null;
   let enabled = true;
-  const recordings = {}; // switch id -> AudioBuffer[] once loaded, null if loading failed
+  const recordings = {}; // build id -> AudioBuffer[] once loaded, null if loading failed
 
   async function load(id) {
-    const urls = switches[id].samples ?? [];
+    const urls = builds[id].samples ?? [];
     if (!urls.length) return;
     recordings[id] = [];
     try {
@@ -70,23 +70,18 @@ export function createSound() {
     osc.stop(at + 0.08);
   }
 
-  function play(switchId) {
+  function play(buildId) {
     if (!enabled) return;
     if (!ctx && !setup()) return;
     if (ctx.state === 'suspended') ctx.resume();
 
     const wobble = 0.94 + Math.random() * 0.12; // no two presses sound identical
-    if (!(switchId in recordings)) load(switchId);
-    if (recordings[switchId]?.length) return playRecording(recordings[switchId], wobble);
+    if (!(buildId in recordings)) load(buildId);
+    if (recordings[buildId]?.length) return playRecording(recordings[buildId], wobble);
 
-    const s = switches[switchId].sound;
-    let t = ctx.currentTime;
+    const s = builds[buildId].sound;
+    const t = ctx.currentTime;
 
-    if (s.bump) {
-      burst(t, { type: 'lowpass', freq: 600, gain: 0.25, decay: 0.02 });
-      t += 0.014;
-    }
-    if (s.click) burst(t, { type: 'bandpass', freq: 4200 * wobble, q: 6, gain: 1.4, decay: 0.012 });
     thump(t, s.thump * wobble);
     burst(t, { type: 'lowpass', freq: s.body * wobble, gain: 0.9, decay: 0.045 });
   }
