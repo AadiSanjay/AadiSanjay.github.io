@@ -353,6 +353,7 @@ kbd {
   width: min(42%, 17rem);
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: top left; /* the timer pill lives in that corner */
   margin: 0 1.6rem 0.5rem 1rem; /* right: room for the close button */
   border-radius: 6px;
   box-shadow: 0 0 0 1px #0000001a;
@@ -949,6 +950,7 @@ kbd {
   border-radius: 12px 12px 0 0;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: top left;
   background: #ffffff0a;
 }
 
