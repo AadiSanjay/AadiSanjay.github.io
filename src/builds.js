@@ -80,13 +80,13 @@ export const builds = {
       accent: '#a9cfe3', accentSide: '#7ea7bd', accentInk: '#22323c',
     },
   },
-  poppy: {
-    name: 'P Poppy',
+  olivia: {
+    name: 'Olivia',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
-    keycaps: 'P Poppy PBT',
+    keycaps: 'Olivia-style PBT',
     mods: ['lubed switches', 'lubed stabs'],
-    note: 'Cream and pink, and built the same way as the Blue Samurai.',
+    note: 'Same core build as the Blue Samurai, so it sounds the same: deep and smooth.',
     link: SHOP,
     sound: { thump: 125, body: 1400 },
     // same build as the blue samurai, and I don't have a separate recording of it
