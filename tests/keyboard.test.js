@@ -94,12 +94,18 @@ describe('typing on the keyboard', () => {
     expect(sound.play).not.toHaveBeenCalled();
   });
 
-  it('an unmapped key wiggles, plays, and leaves the page alone', () => {
+  it('a key that does nothing (tab) wiggles, plays, and leaves the page alone', () => {
     mount();
-    const e = press('KeyQ', { key: 'q' });
-    expect(cap('KeyQ').classList.contains('nope')).toBe(true);
-    expect(e.defaultPrevented).toBe(false); // e.g. tab still tabs
+    const e = press('Tab', { key: 'Tab' });
+    expect(cap('Tab').classList.contains('nope')).toBe(true);
+    expect(e.defaultPrevented).toBe(false); // tab still tabs
     expect(sound.play).toHaveBeenCalledTimes(1);
+  });
+
+  it('a key that types a letter does not wiggle like an error', () => {
+    mount();
+    press('KeyQ', { key: 'q' });
+    expect(cap('KeyQ').classList.contains('nope')).toBe(false);
   });
 
   it('typing a letter while a project card is open goes back to typing', () => {
@@ -108,6 +114,16 @@ describe('typing on the keyboard', () => {
     press('KeyQ', { key: 'q' });
     expect(showing()).toBe('');
     expect(display().querySelector('.echo').textContent).toBe('q');
+  });
+
+  it('every card has a close button that goes back to the idle screen', () => {
+    mount();
+    press('KeyS');
+    const close = display().querySelector('button.close');
+    expect(close.getAttribute('aria-label')).toBe('Close');
+    close.click();
+    expect(showing()).toBe('');
+    expect(display().querySelector('.idle')).not.toBeNull();
   });
 
   it('esc goes back to the idle screen', () => {

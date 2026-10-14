@@ -166,6 +166,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       line.textContent = typed;
       card.querySelector('.body').after(line);
     }
+    // esc closes cards, but phones have no esc and mouse users won't guess it
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'close';
+    close.setAttribute('aria-label', 'Close');
+    close.textContent = '×';
+    close.addEventListener('click', () => run({ type: 'close' }));
+    card.prepend(close);
     display.replaceChildren(card);
   }
 
@@ -231,8 +239,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function act(code, char) {
     const action = resolve(keymap, layer(), code);
     if (!action) {
-      nope(code);
-      echo(char);
+      // typing a character is a fine thing to do; only wiggle keys that really do nothing
+      if (char === 'Backspace' || char?.length === 1) echo(char);
+      else nope(code);
       return false;
     }
     run(action);
