@@ -31,6 +31,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   let shiftKeyDown = false; // we saw a real shift keydown
   let shiftInferred = false; // shift only known from event.shiftKey
   let fnLatched = false;
+  let cardOpener = null;
   let buildId = loadBuild(storage);
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
@@ -173,9 +174,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     close.setAttribute('aria-label', 'Close');
     close.textContent = '×';
     close.addEventListener('click', () => run({ type: 'close' }));
+    // remember what opened the card, so closing it can hand focus back there
+    if (!display.contains(document.activeElement)) cardOpener = document.activeElement;
     card.prepend(close);
     display.replaceChildren(card);
   }
+
+  // name the layer key the way you reached it: fn if you tapped fn (phones have no shift), else shift
+  const layerKey = () => (fnLatched ? 'fn' : 'shift');
 
   // the key that triggers an action on the shift layer, e.g. 'A' for about
   function fnKey(action) {
@@ -200,12 +206,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
-      showCard({ kicker: `[shift + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
+      showCard({ kicker: `[${layerKey()} + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
     } else if (action.type === 'build') {
       setBuild(action.id);
       const b = builds[action.id];
       showCard({
-        kicker: `[shift + ${buildIds.indexOf(action.id) + 1}] build`,
+        kicker: `[${layerKey()} + ${buildIds.indexOf(action.id) + 1}] build`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
         body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : 'No recording of this one, so the sound is approximated.')}`,
@@ -215,8 +221,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         compact: true,
       });
     } else {
+      // if focus was inside the card (its close button or a link), keyboard users keep their place
+      const hadFocus = display.contains(document.activeElement);
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
       typed = '';
+      if (hadFocus && cardOpener?.isConnected && cardOpener !== document.body) cardOpener.focus({ preventScroll: true });
     }
   }
 

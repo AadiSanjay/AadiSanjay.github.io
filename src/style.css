@@ -69,7 +69,9 @@ kbd {
 
 .nav {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  white-space: nowrap; /* keep each link's ↗ on its own line */
   margin-bottom: 2.5rem;
   font-family: var(--mono);
   font-size: 0.8rem;
@@ -243,7 +245,7 @@ kbd {
 
 .card .echo:empty::before {
   content: 'type something…';
-  color: #1d1b1966;
+  color: #1d1b1999;
 }
 
 /* build cards: tags and the button share a row to leave room for the typing line */

@@ -126,6 +126,25 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.idle')).not.toBeNull();
   });
 
+  it('closing a card with the button gives focus back to the key that opened it', () => {
+    mount();
+    cap('KeyS').focus();
+    cap('KeyS').click();
+    display().querySelector('button.close').click();
+    expect(document.activeElement).toBe(cap('KeyS'));
+  });
+
+  it('esc from a link inside a card also gives focus back', () => {
+    mount();
+    cap('KeyS').focus();
+    cap('KeyS').click();
+    const link = display().querySelector('a.btn');
+    link.focus();
+    link.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape', bubbles: true }));
+    expect(showing()).toBe('');
+    expect(document.activeElement).toBe(cap('KeyS'));
+  });
+
   it('esc goes back to the idle screen', () => {
     mount();
     press('KeyS');
@@ -378,6 +397,13 @@ describe('the fn layer', () => {
     press('ShiftLeft', { shiftKey: true });
     press('KeyE', { shiftKey: true });
     expect(display().querySelector('.body').textContent).toBe('Dev at Acme (2026)');
+  });
+
+  it('a card opened through fn says fn, not shift', () => {
+    mount();
+    cap('Fn').click();
+    cap('KeyA').click();
+    expect(display().querySelector('.kicker').textContent).toBe('[fn + A] about');
   });
 
   it('clicking fn applies to the next key only', () => {
