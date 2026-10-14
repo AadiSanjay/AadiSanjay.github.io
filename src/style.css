@@ -27,13 +27,7 @@
   --travel: 4px;
   --press: cubic-bezier(0.3, 0, 0.2, 1) 70ms;
 
-  /* scrollbars: the original brass thumb on a warm dark track (it shows when you scroll or hover
-     the edge), and a coordinated light version on the white panels */
-  --scroll-track: #221e1a;
-  --scroll-thumb: #b3963d;
-  --scroll-thumb-hover: #d4b04f;
-  --panel-track: #f1ece2;
-  --panel-thumb: #a08a5c;
+  --thumb: #8a7245; /* scrollbar: brass, 4:1 on the paper */
 
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
@@ -57,46 +51,17 @@
   box-sizing: border-box;
 }
 
-/* real, native scrollbars, just recolored: no js, no hijacking */
+/* the browser's own scrollbar, just recolored: a thin brass thumb, no track */
 html {
-  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
-  scrollbar-width: auto;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-h) + 8px); /* jump links land below the sticky nav */
 }
 
-.card-inner {
-  scrollbar-color: var(--panel-thumb) var(--panel-track);
-  scrollbar-width: auto;
-}
-
-/* safari (and older chrome) don't support scrollbar-color yet */
-::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--scroll-track);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--scroll-thumb);
-  border: 3px solid var(--scroll-track);
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scroll-thumb-hover);
-}
-
-.card-inner::-webkit-scrollbar-track {
-  background: var(--panel-track);
-}
-
-.card-inner::-webkit-scrollbar-thumb {
-  background: var(--panel-thumb);
-  border-color: var(--panel-track);
+html,
+.card-inner,
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumb) transparent;
 }
 
 body {
