@@ -25,7 +25,7 @@ export const content = {
     },
     {
       id: 'capsule',
-      key: 'KeyF',
+      key: 'KeyC',
       short: 'capsule',
       title: 'Capsule',
       status: 'iOS app · first version December 2026',
