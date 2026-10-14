@@ -15,7 +15,8 @@ From 2022 until I left for college in August 2026 I built and sold custom mechan
 - **← / → browse projects**, and a fixed bar at the bottom lists the shortcuts that work (generated from the keymap) next to which build you're typing on.
 - **Try my other builds** (picker, or shift + 1-6) re-skins the board in that build's keycap colorway, switches to its sound, and shows a spec card: case, switches, keycaps, mods. The choice is remembered.
 - **Sounds are recorded from my own boards**, separately for key presses and releases. Clips are cut from my sound-test videos with an FFT-based tool that measures each board's tone and keeps its most typical presses (see [`tools/`](tools/)). Olivia has no recording, so it uses a Web Audio synth and its card says so.
-- **Dead keys echo** what you type on the idle screen. Typing `hire` opens contact.
+- **You can always type.** Keys that don't open anything type into a line on the idle screen (and on build cards, so you can try a board's sound); held keys repeat, and typing on any other card steps back to the typing line. Typing `hire` opens contact.
+- **Cards** close with Esc or their × button (phones have no Esc), and focus goes back to whatever opened them. On each project card below the board, the key badge is a button that presses that key on the board.
 - **A plain version is always there.** The projects are also short cards below the board, generated from the same `src/content.js`, and the resume is one click away, so recruiters can skim and keyboard-averse visitors aren't stuck.
 - **The "now typing on" label** at the bottom of the screen follows whichever build you pick.
 
@@ -36,10 +37,10 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-72 tests in `tests/`:
+103 tests in `tests/`:
 
 - `keymap.test.js`: layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
-- `keyboard.test.js`: the real DOM in jsdom. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
+- `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
 - `sections.test.js`: the role lines and short project cards render from `content.js`; click-to-copy email, including when the clipboard is blocked.
 
 ## CI/CD

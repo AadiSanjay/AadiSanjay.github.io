@@ -231,7 +231,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   let typed = '';
   function echo(char) {
-    if (char !== 'Backspace' && char.length !== 1) return;
+    if (char !== 'Backspace' && char?.length !== 1) return;
     // typing always works: build cards have their own line, and any other card steps aside for it
     if (!display.querySelector('.echo')) run({ type: 'close' });
     if (char === 'Backspace') typed = typed.slice(0, -1);
@@ -398,7 +398,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   // once the page has settled, fetch every build's recordings so switching builds sounds right
   // from the first press (they're small: ~320 KB for all of them)
-  const whenIdle = win.requestIdleCallback ?? ((f) => win.setTimeout(f, 1500));
+  const whenIdle = win.requestIdleCallback?.bind(win) ?? ((f) => win.setTimeout(f, 1500));
   whenIdle(() => buildIds.forEach((id) => sound.preload?.(id)));
 
   // --- sound toggle ---
