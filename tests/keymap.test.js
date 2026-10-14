@@ -87,11 +87,17 @@ describe('builds', () => {
   });
 });
 
+describe('builds', () => {
+  it('P Poppy plays the Blue Samurai recordings', () => {
+    expect(builds.poppy.samples).toEqual(builds['blue-samurai'].samples);
+  });
+});
+
 describe('loadBuild', () => {
   const store = (value) => ({ getItem: () => value });
 
   it('loads a saved build', () => {
-    expect(loadBuild(store('olivia'))).toBe('olivia');
+    expect(loadBuild(store('poppy'))).toBe('poppy');
   });
 
   it('falls back on garbage, prototype keys, or nothing saved', () => {

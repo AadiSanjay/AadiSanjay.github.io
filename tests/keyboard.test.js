@@ -522,7 +522,7 @@ describe('typing works on every build', () => {
   it('what you typed carries over when you switch builds', () => {
     mount();
     typeWord('xy');
-    root.querySelector('input[value="olivia"]').click();
+    root.querySelector('input[value="poppy"]').click();
     typeWord('z');
     root.querySelector('input[value="matcha"]').click();
     expect(line()).toBe('xyz');
@@ -591,14 +591,14 @@ describe('build picker', () => {
 
   it('picking a build re-skins the board, changes the sound, and is remembered', () => {
     mount();
-    root.querySelector('input[value="olivia"]').click();
+    root.querySelector('input[value="poppy"]').click();
     expect(board().style.getPropertyValue('--alpha')).toBe('#f2ede7');
     expect(board().style.getPropertyValue('--alpha-ink')).toBe('#2b2b2b');
-    expect(showing()).toBe('olivia');
+    expect(showing()).toBe('poppy');
     press('KeyF');
-    expect(sound.play).toHaveBeenLastCalledWith('olivia');
-    expect(storage.data.get('build')).toBe('olivia');
-    expect(display().textContent).toContain('approximated'); // no recording of olivia yet
+    expect(sound.play).toHaveBeenLastCalledWith('poppy');
+    expect(storage.data.get('build')).toBe('poppy');
+    expect(display().textContent).toContain('that board’s recording'); // shares the blue samurai's sound
   });
 
   it('fetches every build\'s recordings once the page is idle', () => {
