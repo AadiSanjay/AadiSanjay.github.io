@@ -6,7 +6,7 @@ Due: technical checkpoint **Thu Oct 15**, final links **Fri Oct 16** (both 11:59
 - [x] Creative interactive feature with observable, testable behavior
 - [x] Automated tests: normal use + an edge case
 - [x] GitHub Actions runs checks + tests + build on every PR
-- [ ] Branch protection on `main`: require the CI `check` to pass before merging
+- [x] Branch protection on `main`: require the CI `check` to pass before merging (enforced for non-admins)
 - [x] Auto-deploy verified `main` to the live site (GitHub Pages)
 - [ ] Evidence: a **failed** check on a PR, the **fixed passing** run, and a **main deployment** (screenshot + links)
 - [x] README: setup, tests, deployment, material AI use + limitations

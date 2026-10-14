@@ -49,7 +49,7 @@ npm run build      # production build into dist/
 ## CI/CD
 
 - **`.github/workflows/ci.yml`** runs lint → tests → build on every pull request and every push to `main`.
-- **Branch protection on `main`** requires the `check` job to pass before a PR can merge.
+- **Branch protection on `main`** requires the `check` job to pass before a PR can merge. It's enforced for everyone except repo admins, so as the owner I can still override it (GitHub's branch API shows `required_status_checks: ["check"]`, `enforcement_level: "non_admins"`).
 - **`.github/workflows/deploy.yml`** runs only after CI succeeds on `main`, rebuilds that exact commit, and deploys it to GitHub Pages. (For a `<user>.github.io` repo it builds with base `/`, otherwise `/<repo>/`.)
 
 ## Project layout
