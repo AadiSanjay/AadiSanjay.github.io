@@ -67,11 +67,11 @@ export const builds = {
     },
   },
   white: {
-    name: 'White',
-    short: 'white',
+    name: 'BoW',
+    short: 'bow',
     case: 'Gamakay LK67',
     switches: 'Akko CS Silver, Krytox 205g0',
-    keycaps: 'white PBT with blue accents',
+    keycaps: 'BoW PBT (black on white)',
     mods: ['tempest tape mod', 'neoprene foam', 'lubed stabs'],
     note: 'The tape mod makes it poppy.',
     link: SHOP,
@@ -79,9 +79,10 @@ export const builds = {
     samples: clips('white', 6, 2),
     colors: {
       case: '#eceae5',
-      alpha: '#f6f5f2', alphaSide: '#d0cfc9', alphaInk: '#3b3b3b',
-      mod: '#ebeae6', modSide: '#c6c5bf', modInk: '#3b3b3b',
-      accent: '#a9cfe3', accentSide: '#7ea7bd', accentInk: '#22323c',
+      // black legends on white caps, mods a shade greyer, no accent color
+      alpha: '#f7f6f3', alphaSide: '#d3d1cb', alphaInk: '#141414',
+      mod: '#e6e4df', modSide: '#bfbdb6', modInk: '#141414',
+      accent: '#e6e4df', accentSide: '#bfbdb6', accentInk: '#141414',
     },
   },
   olivia: {
