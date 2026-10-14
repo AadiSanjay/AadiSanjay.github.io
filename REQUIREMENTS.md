@@ -3,7 +3,7 @@
 Due: technical checkpoint **Thu Oct 15**, final links **Fri Oct 16** (both 11:59 PM Central). Present **Sat Oct 17** (~3 min).
 
 - [ ] Public GitHub repo with the site code and workflow files
-- [ ] Creative interactive feature with observable, testable behavior
+- [x] Creative interactive feature with observable, testable behavior
 - [x] Automated tests: normal use + an edge case
 - [x] GitHub Actions runs checks + tests + build on every PR
 - [ ] Branch protection on `main`: require the CI `check` to pass before merging

@@ -4,21 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aadi Sanjay</title>
+    <meta name="description" content="Aadi Sanjay's projects, on a keyboard." />
   </head>
   <body>
-    <main>
-      <header>
+    <main id="desk" class="desk">
+      <header class="intro">
         <h1>Aadi Sanjay</h1>
-        <p>under construction.</p>
+        <p>TODO: one line about you. school, what you build.</p>
       </header>
 
-      <section id="work" aria-labelledby="work-title">
-        <h2 id="work-title">Work</h2>
-        <div data-filters role="group" aria-label="Filter projects"></div>
-        <ul data-grid></ul>
-        <p data-empty hidden>
-          Nothing here yet. <button type="button" data-reset>Show everything</button>
+      <div class="display" data-display aria-live="polite">
+        <p class="idle">
+          type a key with a <span class="dot" aria-hidden="true"></span> to open a project.<br />
+          hold <kbd>shift</kbd> (or click <kbd>fn</kbd>) for about, contact, resume, and switches.
         </p>
+      </div>
+
+      <div class="board" data-board role="group" aria-label="My keyboard. Keys marked with a dot open projects."></div>
+
+      <div class="controls">
+        <fieldset class="switches" data-switches>
+          <legend>switches</legend>
+        </fieldset>
+        <button type="button" data-sound aria-pressed="true">sound: on</button>
+        <button type="button" data-list-toggle aria-expanded="false" aria-controls="work-list">just show me a list</button>
+      </div>
+
+      <section id="work-list" class="work-list" data-list hidden>
+        <h2>Work</h2>
+        <ul></ul>
       </section>
     </main>
     <script type="module" src="/src/main.js"></script>

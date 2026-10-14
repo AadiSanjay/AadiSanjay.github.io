@@ -6,7 +6,15 @@ My personal website. Built with plain HTML/CSS/JS and [Vite](https://vite.dev); 
 
 ## Interactive feature
 
-_TODO: describe the final feature._ Right now: a project gallery filtered by tag, with an empty state and a reset.
+The homepage is a drawing of my actual keyboard (65%, red/charcoal/yellow keycaps). Typing on your real keyboard presses the drawn keys:
+
+- keys with a dot open a project
+- holding **shift** (or clicking **fn**) switches to a second layer, like QMK firmware: about, contact, resume, and switch types
+- the **switch picker** (linear / tactile / clicky) changes the sound and how the caps move, and is remembered between visits
+- unmapped keys wiggle; browser shortcuts (cmd/ctrl+anything) and form fields are left alone
+- on phones the board is too small to read, so a plain project list opens by default
+
+Sounds are synthesized with the Web Audio API for now.
 
 ## Setup
 
@@ -23,7 +31,10 @@ npm run lint     # eslint
 npm run build    # production build into dist/
 ```
 
-Tests live in `tests/`. They cover normal use (filtering by a tag, showing everything) and edge cases (a tag with no projects shows the empty state, reset restores everything, project text is never parsed as HTML).
+Tests live in `tests/`:
+
+- `keymap.test.js` - layer resolution, fn falling through to base, duplicate/reserved key validation, the layout really is 16u wide with 68 keys, saved switch prefs (including garbage and storage that throws)
+- `keyboard.test.js` - the real DOM in jsdom: pressing/clicking keys opens projects, unmapped keys, esc, key-repeat not spamming sound, browser shortcuts ignored, shift layer + releasing on window blur, one-shot fn, switch picker persistence, sound/list toggles, project text never parsed as HTML
 
 ## CI/CD
 

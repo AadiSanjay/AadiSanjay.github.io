@@ -1,20 +1,415 @@
-/* intentionally bare -- the real look comes once the concept is picked */
+/* colors picked off my board */
+:root {
+  --desk: #191613;
+  --paper: #f1e8d4;
+  --ink: #1d1b19;
+  --muted: #a39a89;
+
+  --case: #111112;
+  --alpha: #b3222e;
+  --alpha-side: #7a1620;
+  --mod: #3a3a3c;
+  --mod-side: #232325;
+  --accent: #e8ca66;
+  --accent-side: #b3963d;
+  --legend: #f2c94c;
+
+  --u: min(54px, calc((100vw - 56px) / 16.7));
+  --travel: 4px;
+  --press: cubic-bezier(0.3, 0, 0.2, 1) 70ms;
+  --stem: #c8323c;
+
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: system-ui, sans-serif;
-  max-width: 44rem;
-  margin: 3rem auto;
-  padding: 0 1rem;
+  margin: 0;
+  background: var(--desk);
+  color: var(--paper);
+  font-family: var(--sans);
   line-height: 1.5;
 }
 
-[data-filters] button[aria-pressed='true'] {
-  font-weight: bold;
-  text-decoration: underline;
+a {
+  color: var(--legend);
 }
 
-[data-grid] {
-  list-style: none;
+kbd {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  padding: 0.05em 0.4em;
+  border-radius: 4px;
+  background: var(--mod);
+  color: var(--legend);
+  box-shadow: 0 2px 0 var(--mod-side);
+}
+
+.desk {
+  max-width: calc(var(--u) * 16.7 + 32px);
+  margin: 0 auto;
+  padding: 3rem 16px 4rem;
+}
+
+.intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  letter-spacing: -0.02em;
+}
+
+.intro p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+/* ---- display ---- */
+
+.display {
+  min-height: 11rem;
+  margin: 2rem 0 1.5rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+.idle {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--legend);
+}
+
+.card {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  animation: rise 160ms ease-out;
+}
+
+.card .kicker {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--alpha);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card h2 {
+  margin: 0.15rem 0 0.3rem;
+  font-size: 1.5rem;
+}
+
+.card .body {
+  margin: 0;
+}
+
+.card .tags {
+  display: flex;
+  gap: 0.4rem;
   padding: 0;
-  display: grid;
+  margin: 0.6rem 0 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.card .tags li {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0 0.5rem;
+}
+
+.card .links {
+  display: flex;
   gap: 1rem;
+  margin: 0.6rem 0 0;
+}
+
+.card .links:empty,
+.card .tags:empty {
+  display: none;
+}
+
+.card a {
+  color: var(--alpha);
+  font-weight: 600;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+/* ---- the board ---- */
+
+.board {
+  width: max-content;
+  margin: 0 auto;
+  padding: calc(var(--u) * 0.22);
+  background: var(--case);
+  border-radius: calc(var(--u) * 0.18);
+  box-shadow:
+    0 1px 0 #2c2c2e inset,
+    0 30px 50px -25px #000;
+}
+
+.row {
+  display: flex;
+}
+
+.cap {
+  --top: var(--alpha);
+  --side: var(--alpha-side);
+  --ink: var(--legend);
+
+  position: relative;
+  width: calc(var(--u) * var(--w));
+  height: var(--u);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cap-mod {
+  --top: var(--mod);
+  --side: var(--mod-side);
+}
+
+.cap-accent {
+  --top: var(--accent);
+  --side: var(--accent-side);
+  --ink: #2a2622;
+}
+
+/* the skirt */
+.cap::before {
+  content: '';
+  position: absolute;
+  inset: 4% 4% 4%;
+  border-radius: calc(var(--u) * 0.1);
+  background: var(--side);
+  box-shadow: 0 2px 2px #0006;
+}
+
+/* the dish you actually press */
+.top {
+  position: absolute;
+  inset: 8% 13% 22% 13%;
+  border-radius: calc(var(--u) * 0.08);
+  background: linear-gradient(170deg, color-mix(in srgb, var(--top), #fff 10%), var(--top) 60%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: calc(var(--u) * 0.06) calc(var(--u) * 0.09);
+  transition: transform var(--press), filter 120ms;
+}
+
+.legend {
+  white-space: pre-line;
+  text-align: left;
+  font-size: calc(var(--u) * 0.22);
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+.sub {
+  font-family: var(--mono);
+  font-size: calc(var(--u) * 0.13);
+  line-height: 1;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.sub-fn,
+.board[data-layer='fn'] .sub-base {
+  display: none;
+}
+
+.board[data-layer='fn'] .sub-fn {
+  display: block;
+}
+
+/* project keys get a little dot, like a homing bump */
+.cap.has-base .top::after {
+  content: '';
+  position: absolute;
+  top: 18%;
+  right: 14%;
+  width: calc(var(--u) * 0.09);
+  height: calc(var(--u) * 0.09);
+  border-radius: 50%;
+  background: var(--legend);
+  box-shadow: 0 0 6px var(--legend);
+}
+
+.cap.down .top,
+.cap:active .top {
+  transform: translateY(var(--travel));
+  filter: brightness(0.92);
+}
+
+.cap.down::before,
+.cap:active::before {
+  box-shadow: none;
+}
+
+/* fn layer: light up what you can press, dim the rest */
+.board[data-layer='fn'] .cap:not(.has-fn, .has-base, [data-code='Fn']) .top {
+  filter: brightness(0.45);
+}
+
+.board[data-layer='fn'] .cap.has-fn .top {
+  outline: 2px solid var(--legend);
+  outline-offset: 1px;
+}
+
+.cap[aria-pressed='true'] .top {
+  outline: 2px solid var(--legend);
+}
+
+.cap:focus-visible {
+  outline: none;
+}
+
+.cap:focus-visible .top {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.cap.nope .top {
+  animation: nope 220ms;
+}
+
+@keyframes nope {
+  25% {
+    transform: translate(-2px, var(--travel));
+  }
+  75% {
+    transform: translate(2px, var(--travel));
+  }
+}
+
+/* ---- controls ---- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.75rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.switches {
+  display: flex;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.switches legend {
+  float: left;
+  margin-right: 0.4rem;
+  color: var(--muted);
+}
+
+.switches label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.switches input {
+  position: absolute;
+  opacity: 0;
+}
+
+/* a little cross-shaped switch stem */
+.stem {
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  clip-path: polygon(38% 0, 62% 0, 62% 38%, 100% 38%, 100% 62%, 62% 62%, 62% 100%, 38% 100%, 38% 62%, 0 62%, 0 38%, 38% 38%);
+  opacity: 0.5;
+}
+
+.switches input:checked + .stem {
+  opacity: 1;
+}
+
+.switches input:checked ~ .name {
+  color: var(--legend);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.switches input:focus-visible ~ .name {
+  outline: 1px solid var(--paper);
+}
+
+.controls button {
+  font: inherit;
+  color: var(--paper);
+  background: none;
+  border: 1px solid #ffffff30;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  border-color: var(--legend);
+}
+
+.work-list ul {
+  padding: 0;
+  list-style: none;
+}
+
+.work-list li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #ffffff1a;
+}
+
+.work-list li span {
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top,
+  .card {
+    transition: none;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .display {
+    min-height: 0;
+    margin: 1.5rem 0 1rem;
+  }
 }
