@@ -170,6 +170,7 @@ kbd {
   align-items: center;
   justify-content: center;
   padding: 0 var(--gutter);
+  overflow: clip; /* the trace runs past the caps; never past the screen */
   background: #f4efe5e6;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -290,13 +291,22 @@ kbd {
   font-weight: 800;
 }
 
+/* the specific line first: what I build */
+.what {
+  margin: 1rem 0 0;
+  max-width: 26ch;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
 .quote {
-  margin: 1.1rem 0 0;
-  max-width: 24ch;
+  margin: 0.7rem 0 0;
+  max-width: 30ch;
   font-family: var(--mono);
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--muted);
 }
 
 .roles {
@@ -415,7 +425,6 @@ kbd {
 .stage {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 1.1rem;
   padding: 2rem 0 2.5rem;
   scroll-margin-top: var(--nav-h);
@@ -423,8 +432,7 @@ kbd {
 
 @media (min-width: 1024px) {
   .stage {
-    min-height: calc(100vh - var(--nav-h));
-    padding: 1.5rem 0 2rem;
+    padding: 2rem 0 2.5rem;
   }
 }
 
@@ -438,18 +446,49 @@ kbd {
 /* ---- display: the panel above the board ---- */
 
 .display {
-  /* fixed height so opening a panel never shoves the keyboard down the page */
-  height: 17rem;
+  /* fixed height so opening a panel never shoves the keyboard down the page. the idle text sits at
+     the top, right under the nav; a panel sits at the bottom, against the board */
+  height: 15.5rem;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
-/* beside the sidebar on a smaller laptop the board (and so the panel) is narrower: more lines */
-@media (min-width: 1024px) and (max-width: 1279px) {
+.display > .card {
+  margin-top: auto;
+}
+
+/* wide screens: the panel's title and specs on the left, its text and links on the right. that
+   keeps every panel short, so the space held for it above the board stays small */
+@media (min-width: 1024px) {
   .display {
-    height: 19.5rem;
+    height: 13.5rem; /* the board is narrower beside the sidebar here, so panel text wraps more */
+  }
+
+  .card-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: 0 1.6rem;
+    align-items: start;
+  }
+
+  .card-head .status {
+    margin-bottom: 0;
+  }
+
+  .card-main {
+    padding-top: 0.15rem;
+  }
+
+  .card .card-main .body p:last-child {
+    margin-bottom: 0.3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .display {
+    height: 11rem;
   }
 }
 
@@ -983,7 +1022,7 @@ kbd {
 /* ---- sections below the keyboard ---- */
 
 .section {
-  padding: 4.5rem 0 1rem;
+  padding: 3.5rem 0 1rem;
   border-top: 1px solid var(--line);
 }
 
@@ -996,11 +1035,11 @@ kbd {
   color: var(--ink);
 }
 
-/* ---- project cards: image + title at rest, the details on hover/focus/tap ---- */
+/* ---- project cards: what it is and its links up front; extras over the image on hover ---- */
 
 .projects {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   align-items: start;
   gap: 1.2rem;
 }
@@ -1010,14 +1049,48 @@ kbd {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
+  overflow: hidden;
   scroll-margin-top: calc(var(--nav-h) + 1rem);
   transition: box-shadow 160ms, transform 160ms;
 }
 
+/* the shipped project with users gets the full row: text left, screenshot right */
+.project.featured {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 760px) {
+  .project.featured {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22.5rem); /* 360px keeps the 720px shot sharp at 2x */
+  }
+
+  .project.featured .project-media {
+    grid-column: 2;
+    grid-row: 1;
+    border-bottom: 0;
+    border-left: 1px solid var(--line);
+    aspect-ratio: auto;
+    min-height: 100%;
+  }
+
+  .project.featured .project-body {
+    padding: 1.4rem 1.6rem 1.5rem;
+  }
+
+  .project.featured h3 {
+    font-size: 1.45rem;
+  }
+
+  .project.featured .blurb {
+    font-size: 1rem;
+  }
+}
+
 .project-media {
+  position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 11px 11px 0 0;
   border-bottom: 1px solid var(--line);
   background: #141210;
 }
@@ -1031,8 +1104,78 @@ kbd {
   object-position: top left; /* FocusTicker's pill lives in that corner */
 }
 
-.project-face {
-  padding: 0.95rem 1.2rem 1rem;
+.media-label {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #fffdf9e6;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+/* the extras: how it works and the tags, over the image */
+.project-extras {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding: 1.1rem 1.2rem;
+  background: linear-gradient(to top, #1f1c19f5 55%, #1f1c19c4);
+  color: #efe7d6;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.project-extras .how {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.project-extras .stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+.project-extras .stack li {
+  border: 1px solid #ffffff40;
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+}
+
+.project.open .project-extras {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project .details {
+    display: none;
+  }
+
+  /* :has(:focus-visible): shown when you tab in, but not left showing just because a button was clicked */
+  .project:is(:hover, :has(:focus-visible)) .project-extras {
+    opacity: 1;
+  }
+
+  .project:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 40px -24px #3b2a1a88;
+  }
+}
+
+.project-body {
+  padding: 1rem 1.2rem 1.15rem;
 }
 
 .project-head {
@@ -1053,6 +1196,12 @@ kbd {
   font-family: var(--mono);
   font-size: 0.74rem;
   color: var(--muted);
+}
+
+.project .blurb {
+  margin: 0.7rem 0 0;
+  font-size: 0.93rem;
+  color: var(--text);
 }
 
 .project .press {
@@ -1085,8 +1234,21 @@ kbd {
   box-shadow: none;
 }
 
+.project .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0 4px; /* 4px: room for the buttons' keycap shadow */
+}
+
+.project .btn {
+  padding: 0.38rem 0.8rem 0.42rem;
+  font-size: 0.85rem;
+}
+
 .project .details {
-  margin-top: 0.7rem;
+  display: block;
+  margin-top: 0.9rem;
   padding: 0.2rem 0.7rem;
   font: inherit;
   font-family: var(--mono);
@@ -1096,106 +1258,6 @@ kbd {
   border: 1px solid var(--line);
   border-radius: 999px;
   cursor: pointer;
-}
-
-/* the drawer: a grid row that animates from 0 to its content's height. the text stays in the
-   page (just clipped) so screen readers always get it, and tabbing into it opens it */
-.project-more {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 200ms ease;
-}
-
-.project-text {
-  min-height: 0;
-  overflow: hidden;
-  padding: 0 1.2rem;
-}
-
-.project-text > :first-child {
-  margin-top: 0;
-}
-
-.project-text > :last-child {
-  margin-bottom: 1.2rem;
-}
-
-.project-text > p:not(.links) {
-  margin: 0 0 0.6rem;
-  font-size: 0.92rem;
-  color: var(--text);
-}
-
-.project .project-text > p.how {
-  font-size: 0.86rem;
-  color: var(--muted);
-}
-
-.project .stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  padding: 0;
-  margin: 0.8rem 0 0;
-  list-style: none;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--muted);
-}
-
-.project .stack li {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.05rem 0.55rem;
-}
-
-.project .links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 1.1rem 0 1.4rem;
-}
-
-.project .btn {
-  padding: 0.38rem 0.8rem 0.42rem;
-  font-size: 0.85rem;
-}
-
-.project.open .project-more {
-  grid-template-rows: 1fr;
-}
-
-/* with a mouse: the drawer drops down over whatever is below, so hovering never moves the page */
-@media (hover: hover) and (pointer: fine) {
-  .project .details {
-    display: none;
-  }
-
-  .project-more {
-    position: absolute;
-    left: -1px;
-    right: -1px;
-    top: calc(100% - 12px);
-    padding-top: 11px;
-    background: var(--surface);
-    border: 1px solid transparent;
-    border-top: 0;
-    border-radius: 0 0 12px 12px;
-    z-index: 2;
-  }
-
-  /* :has(:focus-visible): opened by tabbing in, but not left open just because a button was clicked */
-  .project:is(:hover, :has(:focus-visible), .open) {
-    z-index: 5;
-    transform: translateY(-2px);
-    box-shadow: 0 22px 40px -22px #3b2a1a88;
-  }
-
-  .project:is(:hover, :has(:focus-visible), .open) .project-more {
-    grid-template-rows: 1fr;
-    border-color: var(--line);
-    box-shadow: 0 22px 40px -22px #3b2a1a88;
-  }
 }
 
 /* not shipped yet: dashed, so it reads as "coming", not as a card that failed to load */
@@ -1293,7 +1355,7 @@ kbd {
 
 .footer {
   margin-top: 4rem;
-  padding: 1.5rem 0 7rem; /* the fixed bottom bar never covers the last line */
+  padding: 1.5rem 0 4rem;
   border-top: 1px solid var(--line);
   font-size: 0.85rem;
   color: var(--muted);
@@ -1311,18 +1373,22 @@ kbd {
   font-size: 0.78rem;
 }
 
-/* ---- fixed bottom bar: the shortcuts that work + which build you're typing on ---- */
+/* ---- the shortcuts bar: sticky inside the keyboard section, so it rides along the bottom of the
+   screen while you're at the board, rests just under the picker, and never covers the work below ---- */
+
+.stage > .bottom-bar {
+  width: max-content;
+  max-width: 100%;
+}
 
 .bottom-bar {
-  position: fixed;
-  /* centered under the main column, not the whole window */
-  left: calc(var(--sidebar-w) + (100% - var(--sidebar-w)) / 2);
+  position: sticky;
   bottom: 14px;
-  transform: translateX(-50%);
+  align-self: center;
   display: flex;
   align-items: center;
   gap: 1.1rem;
-  max-width: calc(100% - var(--sidebar-w) - 32px);
+  overflow: hidden;
   padding: 0.45rem 1rem;
   border-radius: 999px;
   background: #1f1c19f0;
@@ -1332,14 +1398,13 @@ kbd {
   font-size: 0.72rem;
   white-space: nowrap;
   z-index: 15;
-  transition: opacity 180ms, transform 180ms, visibility 180ms;
+  transition: opacity 180ms, visibility 180ms;
 }
 
-/* only while the board is on screen */
+/* while the build picker is in its spot, so it never sits on top of the picker */
 .bottom-bar.away {
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 10px);
 }
 
 .bottom-bar .hints {
@@ -1369,22 +1434,16 @@ kbd {
 }
 
 /* not enough room for everything: drop the spec, then the shortcuts */
-@media (max-width: 1560px) {
+@media (max-width: 1600px) {
   .now-spec {
     display: none;
   }
 }
 
-/* beside the sidebar, the shortcuts need about 1100px; below the sidebar, about 860px */
-@media (max-width: 1240px) {
+/* the shortcuts need the board's full width (54px keys) */
+@media (max-width: 1279px) {
   .bottom-bar .hints {
     display: none;
-  }
-}
-
-@media (max-width: 1023px) and (min-width: 880px) {
-  .bottom-bar .hints {
-    display: flex;
   }
 }
 
@@ -1417,6 +1476,10 @@ kbd {
     order: 3;
   }
 
+  .stage .bottom-bar {
+    order: 4;
+  }
+
   .idle-title {
     font-size: 1.5rem;
   }
@@ -1432,10 +1495,15 @@ kbd {
     display: none;
   }
 
+  .what {
+    max-width: 40ch;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+
   .quote {
     max-width: none;
-    margin-top: 0.6rem;
-    font-size: 0.8rem;
+    margin-top: 0.4rem;
   }
 
   .roles {

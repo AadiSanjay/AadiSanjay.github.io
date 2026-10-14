@@ -22,16 +22,20 @@ describe('renderSections (the plain version)', () => {
     expect(document.querySelector('#focusticker kbd').textContent).toBe('F');
   });
 
-  // changed on purpose: cards now carry a little more evidence than the panels (a how-it-works
-  // sentence and tags), but still no lists or case studies
-  it('keeps project cards scannable: status, one blurb, at most one how sentence, tags, links', () => {
+  // changed on purpose (twice): the description and links are always on the card; how it works and
+  // the tags are extras that show over the image
+  it('a card always shows its status, one-line description, and links; extras sit over the image', () => {
     const ft = content.projects.find((p) => p.id === 'focusticker');
-    const article = document.querySelector('#focusticker');
-    expect([...article.querySelectorAll('p:not(.status, .links)')].map((p) => p.textContent)).toEqual([ft.body, ft.how]);
-    expect([...article.querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(ft.stack);
-    const links = [...article.querySelectorAll('a.btn')];
+    const card = document.querySelector('#focusticker');
+    const body = card.querySelector('.project-body');
+    expect(body.querySelector('.status').textContent).toBe(ft.status);
+    expect(body.querySelector('.blurb').textContent).toBe(ft.body);
+    const links = [...body.querySelectorAll('a.btn')];
     expect(links.map((a) => a.href)).toEqual(ft.links.map((l) => l.href));
     expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
+    const extras = card.querySelector('.project-media .project-extras');
+    expect(extras.querySelector('.how').textContent).toBe(ft.how);
+    expect([...extras.querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(ft.stack);
   });
 
   it('shows a lazy-loaded screenshot only when a project has one', () => {
@@ -78,29 +82,31 @@ describe('renderSections (the plain version)', () => {
     expect(cases).toEqual(buildIds.map((id) => builds[id].colors.case));
   });
 
-  it('a card shows its image, title, and status up front, and the rest in its drawer', () => {
-    const card = document.querySelector('#focusticker');
-    const face = card.querySelector('.project-face');
-    expect(face.querySelector('h3').textContent).toBe('FocusTicker');
-    expect(face.querySelector('.status')).not.toBeNull();
-    const drawer = card.querySelector('.project-more');
-    expect(drawer.id).toBe('focusticker-more');
-    expect(drawer.querySelector('.how')).not.toBeNull();
-    expect(drawer.querySelectorAll('a.btn')).toHaveLength(2);
+  it('FocusTicker, the shipped one, gets the wide featured card; the others don\'t', () => {
+    expect(document.querySelector('#focusticker').classList.contains('featured')).toBe(true);
+    expect(document.querySelectorAll('.project.featured')).toHaveLength(1);
   });
 
-  it('the details button opens and closes the drawer (touch screens have no hover)', () => {
-    const card = document.querySelector('#capsule');
+  it('Capsule\'s image says it\'s an illustration, right on the image', () => {
+    expect(document.querySelector('#capsule .project-media .media-label').textContent).toBe('illustration');
+    expect(document.querySelector('#focusticker .media-label')).toBeNull(); // a real screenshot
+  });
+
+  it('on touch screens, a button shows and hides the extras', () => {
+    const card = document.querySelector('#focusticker');
     const toggle = card.querySelector('button.details');
-    expect(toggle.getAttribute('aria-controls')).toBe('capsule-more');
+    expect(toggle.textContent).toBe('how it works');
+    expect(toggle.getAttribute('aria-controls')).toBe('focusticker-extras');
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     toggle.click();
     expect(card.classList.contains('open')).toBe(true);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(toggle.textContent).toBe('less');
+    expect(toggle.textContent).toBe('hide');
     toggle.click();
     expect(card.classList.contains('open')).toBe(false);
-    expect(toggle.textContent).toBe('details');
+    expect(toggle.textContent).toBe('how it works');
+    // no how-it-works sentence, so it's just "details" (the tags)
+    expect(document.querySelector('#capsule button.details').textContent).toBe('details');
   });
 
   it('links leaving the site say ↗ and open a new tab; links within it say →', () => {

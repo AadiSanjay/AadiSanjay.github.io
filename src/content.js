@@ -34,6 +34,7 @@ export const content = {
     {
       id: 'focusticker',
       key: 'KeyF',
+      featured: true, // shipped, with users: it gets the wide card
       short: 'ticker', // sub-legends fit 7 characters on a 1u cap
       title: 'FocusTicker',
       image: { src: `${base}shots/focusticker.jpg`, alt: 'FocusTicker’s timer pill floating over the top corner of LinkedIn, showing 02:34 spent on LinkedIn today' },
@@ -55,7 +56,7 @@ export const content = {
       status: 'iOS app · in development · first version December 2026',
       inProgress: true,
       // an illustration, not a screenshot: there's nothing to screenshot yet
-      image: { src: `${base}shots/capsule.svg`, alt: 'Illustration of Swift code for Capsule, still being written in an editor' },
+      image: { src: `${base}shots/capsule.svg`, alt: 'Illustration of Swift code for Capsule, still being written in an editor', illustration: true },
       body: 'A private pocket journal I’m building: write a few lines, add a photo, and seal it like a time capsule until a date you choose.',
       stack: ['Swift', 'SwiftUI', 'SwiftData'],
       links: [],

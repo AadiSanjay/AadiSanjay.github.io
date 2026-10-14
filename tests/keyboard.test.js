@@ -225,11 +225,12 @@ describe('typing on the keyboard', () => {
     kb = mountKeyboard(root, { content: { ...content, projects: [content.projects[0], robot] }, sound, storage });
   };
 
-  it('a project panel adds its one how-it-works sentence after the description', () => {
+  // changed on purpose: the how-it-works sentence moved to the project card, so panels stay short
+  it('a project panel shows what it is, and leaves how it works to the card below', () => {
     withRobotShop();
     press('KeyB');
     const paras = [...display().querySelectorAll('.body p')].map((p) => p.textContent);
-    expect(paras).toEqual(['<img src=x>', 'Gears.']);
+    expect(paras).toEqual(['<img src=x>']);
   });
 
   it('a project that isn\'t software says what it is in the kicker', () => {
@@ -906,5 +907,42 @@ describe('build picker, clicking the build you\'re on', () => {
     new MutationObserver(() => seen.push(showing())).observe(display(), { attributes: true, attributeFilter: ['data-showing'] });
     root.querySelector('input[value="apollo"]').click();
     return Promise.resolve().then(() => expect(seen).toEqual(['apollo']));
+  });
+});
+
+describe('the shortcuts bar never covers the build picker or the keys', () => {
+  it('steps aside while the picker is in the bar\'s spot at the bottom of the screen, and comes back', () => {
+    root.insertAdjacentHTML('beforeend', '<div class="bottom-bar"></div>');
+    let seen;
+    const listeners = {};
+    const win = Object.assign(Object.create(window), {
+      innerHeight: 720,
+      addEventListener: (type, f) => (listeners[type] = f),
+      removeEventListener() {},
+      setTimeout: window.setTimeout.bind(window),
+      requestAnimationFrame: (f) => f(),
+      IntersectionObserver: class {
+        constructor(cb) {
+          seen = cb;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    });
+    kb = mountKeyboard(root, { content, sound, storage, win });
+    const bar = root.querySelector('.bottom-bar');
+    const picker = root.querySelector('[data-builds]');
+    bar.getBoundingClientRect = () => ({ top: 670, bottom: 706, height: 36 }); // stuck to the bottom of a 720px screen
+    let top = 660; // the picker is under it
+    picker.getBoundingClientRect = () => ({ top, bottom: top + 44, height: 44 });
+    seen([{ isIntersecting: true }]);
+    expect(bar.classList.contains('away')).toBe(true);
+    top = 400; // scrolled: the picker is up the screen now, clear of the bar
+    listeners.scroll();
+    expect(bar.classList.contains('away')).toBe(false);
+    // a short screen: the bar is stuck over the keyboard's bottom row
+    root.querySelector('[data-board]').getBoundingClientRect = () => ({ top: 400, bottom: 700, height: 300 });
+    listeners.scroll();
+    expect(bar.classList.contains('away')).toBe(true);
   });
 });

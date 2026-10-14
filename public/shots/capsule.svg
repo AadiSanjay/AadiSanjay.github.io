@@ -37,8 +37,6 @@
   </g>
   <!-- status bar -->
   <path d="M34 392h652v14a14 14 0 0 1-14 14H48a14 14 0 0 1-14-14z" fill="#26221e"/>
-  <text x="56" y="411" class="s" style="font-size:13px">● building Capsule</text>
-  <rect x="216" y="402" width="200" height="6" rx="3" fill="#3a3530"/>
-  <rect x="216" y="402" width="118" height="6" rx="3" fill="#e8ca66"/>
+  <text x="56" y="411" class="s" style="font-size:13px">Capsule · work in progress</text>
   <text x="664" y="411" class="c" style="font-size:13px;text-anchor:end">in development</text>
 </svg>

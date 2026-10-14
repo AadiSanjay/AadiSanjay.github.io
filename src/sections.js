@@ -37,20 +37,35 @@ function media(p) {
     img.alt = p.image.alt;
     img.loading = 'lazy';
     box.append(img);
+    // say so on the image itself, so a drawing never passes for a screenshot
+    if (p.image.illustration) box.append(el('span', 'media-label', 'illustration'));
   }
   return box.childElementCount ? box : null;
 }
 
-// a project card: its image, title, and status at rest. the rest (what it is, how it works, tags,
-// links) lives in a drawer that opens on hover or focus with a mouse, or with the "details"
-// button on touch screens. the drawer's text is always in the page, so screen readers get it all
+// a project card. what it is and its links are always on the card; the extras (how it works, the
+// tags) show over its image on hover or keyboard focus, or with the details button on touch
+// screens. the extras are always in the page, so screen readers get them either way
 function project(p, onKey) {
-  const article = el('article', p.inProgress ? 'project in-progress' : 'project');
+  const article = el('article', ['project', p.inProgress && 'in-progress', p.featured && 'featured'].filter(Boolean).join(' '));
   article.id = p.id;
-  const art = media(p);
-  if (art) article.append(art);
 
-  const face = el('div', 'project-face');
+  const extras = el('div', 'project-extras');
+  extras.id = `${p.id}-extras`;
+  if (p.how) extras.append(el('p', 'how', p.how));
+  if (p.stack?.length) {
+    const tags = el('ul', 'stack');
+    tags.setAttribute('aria-label', p.kind ? 'Skills' : 'Built with');
+    tags.append(...p.stack.map((t) => el('li', null, t)));
+    extras.append(tags);
+  }
+  const art = media(p);
+  if (art) {
+    if (extras.childElementCount) art.append(extras);
+    article.append(art);
+  }
+
+  const body = el('div', 'project-body');
   const head = el('div', 'project-head');
   // the key is a button: it scrolls up and presses that key on the board, which opens this
   // project's panel. it says so, and its name starts with what it shows ("press F")
@@ -60,35 +75,24 @@ function project(p, onKey) {
   press.title = `opens ${p.title} on the keyboard`;
   press.addEventListener('click', () => onKey?.(p.key));
   head.append(el('h3', null, p.title), press);
-  face.append(head, el('p', 'status', p.status));
+  body.append(head, el('p', 'status', p.status), el('p', 'blurb', [p.body].flat()[0]));
+  if (p.links.length) body.append(linkButtons(p.links));
 
-  const more = el('div', 'project-more');
-  more.id = `${p.id}-more`;
-  const text = el('div', 'project-text');
-  text.append(el('p', null, [p.body].flat()[0]));
-  if (p.how) text.append(el('p', 'how', p.how));
-  if (p.stack?.length) {
-    const tags = el('ul', 'stack');
-    tags.setAttribute('aria-label', p.kind ? 'Skills' : 'Built with');
-    tags.append(...p.stack.map((t) => el('li', null, t)));
-    text.append(tags);
+  if (art && extras.childElementCount) {
+    const toggle = el('button', 'details', p.how ? 'how it works' : 'details');
+    const label = toggle.textContent;
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', extras.id);
+    toggle.addEventListener('click', () => {
+      const open = !article.classList.contains('open');
+      article.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? 'hide' : label;
+    });
+    body.append(toggle);
   }
-  if (p.links.length) text.append(linkButtons(p.links));
-  more.append(text);
-
-  const toggle = el('button', 'details', 'details');
-  toggle.type = 'button';
-  toggle.setAttribute('aria-expanded', 'false');
-  toggle.setAttribute('aria-controls', more.id);
-  toggle.addEventListener('click', () => {
-    const open = !article.classList.contains('open');
-    article.classList.toggle('open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = open ? 'less' : 'details';
-  });
-  face.append(toggle);
-
-  article.append(face, more);
+  article.append(body);
   return article;
 }
 

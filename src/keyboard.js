@@ -137,7 +137,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     card.className = compact ? 'card compact' : 'card';
     // the close button gets its own column, and only the content scrolls (when it has to), so the
     // button never scrolls away or sits on top of text
-    card.innerHTML = `<div class="card-inner"><p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p></div>`;
+    // two parts, so wide screens can set them side by side: what it is | what it says and links
+    card.innerHTML = `<div class="card-inner"><div class="card-head"><p class="kicker"></p><h2></h2><p class="status"></p></div><div class="card-main"><div class="body"></div><ul class="stack"></ul><p class="links"></p></div></div>`;
     card.querySelector('.kicker').textContent = kicker;
     card.querySelector('h2').textContent = title;
     card.querySelector('.status').textContent = status ?? '';
@@ -222,9 +223,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      // what it does, plus at most one sentence on how. the screenshot, tags, and the rest live on the
-      // cards below, which keeps panels short enough to never need a scrollbar
-      showCard({ kicker: `[${key}] ${p.kind ?? 'project'}`, ...p, body: [p.body, p.how].flat().filter(Boolean), stack: [] });
+      // what it does and its links. how it works, the screenshot, and the tags live on the cards
+      // below, which keeps panels short enough to never need a scrollbar
+      showCard({ kicker: `[${key}] ${p.kind ?? 'project'}`, ...p, body: [p.body].flat(), stack: [] });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[${layerKey()} + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
@@ -385,13 +386,37 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     updateLayer();
   }
 
-  // the shortcuts bar only makes sense while you can see the board, so it steps aside after
+  // the shortcuts bar only makes sense while you can see the board, so it steps aside after. it's
+  // sticky at the bottom of the screen, so it also steps aside whenever it's on top of the picker
+  // or the keys (short screens)
   const bar = root.querySelector('.bottom-bar') ?? document.querySelector('.bottom-bar');
+  const controls = picker.closest('.controls') ?? picker;
   let boardVisible = true;
+  function updateBar() {
+    if (!bar) return;
+    const b = bar.getBoundingClientRect(); // still laid out while hidden, so this stays accurate
+    const over = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.height > 0 && b.height > 0 && b.top < r.bottom && b.bottom > r.top;
+    };
+    const covering = over(controls) || over(board); // never on top of the picker or the keys
+    bar.classList.toggle('away', !boardVisible || covering);
+  }
+  let barQueued = false;
+  const onScroll = () => {
+    if (barQueued) return;
+    barQueued = true;
+    (win.requestAnimationFrame?.bind(win) ?? ((f) => f()))(() => {
+      barQueued = false;
+      updateBar();
+    });
+  };
+  win.addEventListener('scroll', onScroll, { passive: true });
+  win.addEventListener('resize', onScroll);
   const observer = win.IntersectionObserver
     ? new win.IntersectionObserver(([entry]) => {
         boardVisible = entry.isIntersecting;
-        bar?.classList.toggle('away', !boardVisible);
+        updateBar();
       })
     : null;
   observer?.observe(board);
@@ -488,6 +513,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       win.removeEventListener('keydown', onKeyDown);
       win.removeEventListener('keyup', onKeyUp);
       win.removeEventListener('blur', releaseAll);
+      win.removeEventListener('scroll', onScroll);
+      win.removeEventListener('resize', onScroll);
       observer?.disconnect();
     },
   };
