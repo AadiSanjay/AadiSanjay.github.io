@@ -44,6 +44,17 @@ describe('content.js', () => {
   });
 });
 
+describe('sub-legends', () => {
+  it('fit on a cap: 7 characters at most, so none get cut off mid-word', () => {
+    const shorts = [
+      ...content.projects.map((p) => p.short),
+      ...Object.values(content.sections).map((s) => s.short),
+      ...Object.values(builds).map((b) => b.short),
+    ];
+    for (const s of shorts) expect(s?.length, s).toBeLessThanOrEqual(7);
+  });
+});
+
 describe('buildKeymap', () => {
   it('my real content.js builds a valid keymap', () => {
     expect(() => buildKeymap(content)).not.toThrow();

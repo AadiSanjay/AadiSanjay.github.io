@@ -35,7 +35,7 @@ export const content = {
     {
       id: 'focusticker',
       key: 'KeyF',
-      short: 'focusticker',
+      short: 'ticker', // sub-legends fit 7 characters on a 1u cap
       title: 'FocusTicker',
       image: { src: `${base}shots/focusticker.jpg`, alt: 'FocusTicker’s timer pill floating over the top corner of LinkedIn, showing 02:34 spent on LinkedIn today' },
       // 10 users, 5.0★ from 3 ratings on the listing, Oct 14 2026
@@ -79,6 +79,7 @@ export const content = {
     // placeholder until I write the real one
     about: {
       title: 'About',
+      short: 'about',
       body: [
         'I’m Aadi, a CS + Econ student at UIUC from the Seattle area.',
         'I like building things people actually use: browser extensions, apps, and keyboards.',
@@ -87,17 +88,20 @@ export const content = {
     },
     experience: {
       title: 'Experience',
+      short: 'exp',
       body: jobs.map((j) => `${j.role}, ${j.org} (${j.dates})`),
       jobs,
       links: [],
     },
     education: {
       title: 'Education',
+      short: 'uiuc',
       body: ['B.S. Computer Science + Economics', 'University of Illinois Urbana-Champaign · expected May 2029'],
       links: [],
     },
     contact: {
       title: 'Contact',
+      short: 'contact',
       body: 'Looking for summer 2027 internships. Email is the best way to reach me.',
       links: [
         { label: 'Email', href: 'mailto:aadisanjwa@gmail.com' },
@@ -107,6 +111,7 @@ export const content = {
     },
     resume: {
       title: 'Resume',
+      short: 'resume',
       body: 'Everything else is on here.',
       links: [{ label: 'Open resume (PDF)', href: `${base}resume.pdf` }],
     },

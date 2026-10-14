@@ -559,7 +559,7 @@ kbd {
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  padding: calc(var(--u) * 0.06) calc(var(--u) * 0.09);
+  padding: calc(var(--u) * 0.06) calc(var(--u) * 0.07);
   transition: transform var(--press), filter 120ms;
 }
 
@@ -573,7 +573,7 @@ kbd {
 
 .sub {
   font-family: var(--mono);
-  font-size: calc(var(--u) * 0.13);
+  font-size: calc(var(--u) * 0.14); /* 7 characters fit on a 1u cap */
   line-height: 1;
   opacity: 0.85;
   white-space: nowrap;
@@ -675,7 +675,7 @@ kbd {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1.25rem;
+  gap: 0.75rem 0.9rem;
   margin-top: 1.75rem;
   font-family: var(--mono);
   font-size: 0.8rem;
@@ -684,7 +684,7 @@ kbd {
 .builds {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.9rem;
+  gap: 0.5rem 0.75rem;
   margin: 0;
   padding: 0;
   border: 0;
@@ -692,7 +692,7 @@ kbd {
 
 .builds legend {
   float: left;
-  margin-right: 0.4rem;
+  margin-right: 0.25rem;
   color: var(--muted);
 }
 
@@ -729,14 +729,25 @@ kbd {
   outline: 1px solid var(--paper);
 }
 
+.toggles {
+  display: flex;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
 .controls button {
   font: inherit;
   color: var(--paper);
   background: none;
   border: 1px solid #ffffff30;
   border-radius: 999px;
-  padding: 0.3rem 0.8rem;
+  padding: 0.3rem 0.65rem;
   cursor: pointer;
+}
+
+.controls button[aria-pressed='false'] {
+  color: var(--muted);
+  border-style: dashed;
 }
 
 .controls button:hover {
@@ -746,12 +757,17 @@ kbd {
 /* ---- the plain version ---- */
 
 .section {
-  margin-top: 5rem;
+  margin-top: 4.5rem;
   scroll-margin-top: 2rem;
 }
 
+/* right after the build picker: close enough that the cards start above the fold at 1440x900 */
+#work {
+  margin-top: 2.5rem;
+}
+
 .section h2 {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1rem;
   font-family: var(--mono);
   font-size: 0.85rem;
   font-weight: 500;
@@ -762,13 +778,35 @@ kbd {
 
 .projects {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  align-items: start; /* cards are as tall as their content, no empty space */
   gap: 1rem;
 }
 
+/* the shipped project with a real screenshot gets the full row: text left, screenshot right */
+.project.featured {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 700px) {
+  .project.featured {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22.5rem); /* 360px: the 720px shot stays sharp at 2x */
+    gap: 1.6rem;
+    align-items: start;
+  }
+
+  .project.featured .shot {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    margin: 0;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px #ffffff1a;
+  }
+}
+
 .project {
-  display: flex;
-  flex-direction: column;
   padding: 1.2rem 1.3rem;
   border: 1px solid #ffffff1a;
   border-radius: 12px;
@@ -824,17 +862,21 @@ kbd {
   font-size: 1.2rem;
 }
 
-.project > p:not(.status) {
+.project-text > p:not(.status) {
   margin: 0;
   font-size: 0.95rem;
 }
 
 .project .links {
-  margin-top: auto;
-  padding-top: 1rem;
+  margin-top: 1rem;
 }
 
-.project .how {
+.project .btn {
+  padding: 0.38rem 0.8rem 0.42rem;
+  font-size: 0.85rem;
+}
+
+.project-text > .how {
   margin-top: 0.6rem;
   font-size: 0.88rem;
   color: #d9cfbb;
@@ -1014,7 +1056,7 @@ kbd {
 }
 
 .footer {
-  padding-bottom: 3.5rem; /* room for the now-typing label */
+  padding-bottom: 6rem; /* the fixed bottom bar never covers the last line */
 }
 
 .noscript {

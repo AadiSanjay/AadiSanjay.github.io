@@ -38,12 +38,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
 
-  function describe(action) {
+  // the small second legend on a cap (`short`), or the full name for screen readers
+  function describe(action, full = false) {
     if (!action || action.type === 'close') return '';
-    if (action.type === 'project') return projects.get(action.id).short;
+    if (action.type === 'project') return full ? projects.get(action.id).title : projects.get(action.id).short;
     if (action.type === 'browse') return action.step > 0 ? 'next' : 'prev';
-    if (action.type === 'build') return builds[action.id].name.toLowerCase();
-    return action.id;
+    if (action.type === 'build') return full ? builds[action.id].name : builds[action.id].short;
+    const s = content.sections[action.id];
+    return full ? s?.title ?? action.id : s?.short ?? action.id;
   }
 
   // --- the board ---
@@ -71,7 +73,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         // by screen-reader-only text for what the key does
         const b = keymap.base[code];
         const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${b.step > 0 ? 'next' : 'previous'} project` : '';
-        const parts = [what, fn && `with shift: ${fn}`];
+        const parts = [what, fn && `with shift: ${describe(keymap.fn[code], true)}`];
         const sr = document.createElement('span');
         sr.className = 'sr';
         sr.textContent = `, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`;

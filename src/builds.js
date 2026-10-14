@@ -14,6 +14,7 @@ const clips = (id, downs, ups) => ({
 export const builds = {
   'red-samurai': {
     name: 'Red Samurai',
+    short: 'red', // its sub-legend on shift + 1
     case: 'Gamakay CK68',
     switches: 'Akko CS Silver',
     keycaps: 'Red Samurai PBT',
@@ -31,6 +32,7 @@ export const builds = {
   },
   apollo: {
     name: 'Apollo',
+    short: 'apollo',
     case: 'Gamakay LK67',
     switches: 'Akko Rose Red',
     keycaps: 'Apollo PBT',
@@ -48,6 +50,7 @@ export const builds = {
   },
   'blue-samurai': {
     name: 'Blue Samurai',
+    short: 'blue',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
     keycaps: 'Blue Samurai PBT',
@@ -65,6 +68,7 @@ export const builds = {
   },
   white: {
     name: 'White',
+    short: 'white',
     case: 'Gamakay LK67',
     switches: 'Akko CS Silver, Krytox 205g0',
     keycaps: 'white PBT with blue accents',
@@ -82,6 +86,7 @@ export const builds = {
   },
   olivia: {
     name: 'Olivia',
+    short: 'olivia',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
     keycaps: 'Olivia-style PBT',
@@ -101,6 +106,7 @@ export const builds = {
   },
   matcha: {
     name: 'Matcha',
+    short: 'matcha',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
     keycaps: 'Matcha PBT',

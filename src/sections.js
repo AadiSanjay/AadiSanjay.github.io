@@ -25,7 +25,7 @@ function linkButtons(links) {
 }
 
 function project(p, onKey) {
-  const article = el('article', p.inProgress ? 'project in-progress' : 'project');
+  const article = el('article', ['project', p.inProgress && 'in-progress', p.image && 'featured'].filter(Boolean).join(' '));
   article.id = p.id;
   if (p.image) {
     const img = el('img', 'shot');
@@ -43,15 +43,18 @@ function project(p, onKey) {
   press.title = `opens ${p.title} on the keyboard above`;
   press.addEventListener('click', () => onKey?.(p.key));
   head.append(el('h3', null, p.title), press);
-  article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
-  if (p.how) article.append(el('p', 'how', p.how));
+  // text in one box, so a screenshot can sit beside it instead of pushing the title down
+  const text = el('div', 'project-text');
+  text.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
+  if (p.how) text.append(el('p', 'how', p.how));
   if (p.stack?.length) {
     const tags = el('ul', 'stack');
     tags.setAttribute('aria-label', p.kind ? 'Skills' : 'Built with');
     tags.append(...p.stack.map((t) => el('li', null, t)));
-    article.append(tags);
+    text.append(tags);
   }
-  if (p.links.length) article.append(linkButtons(p.links));
+  if (p.links.length) text.append(linkButtons(p.links));
+  article.append(text);
   return article;
 }
 

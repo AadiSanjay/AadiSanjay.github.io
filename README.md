@@ -40,9 +40,9 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-137 tests in `tests/`:
+138 tests in `tests/`:
 
-- `keymap.test.js`: project panels stay compact (one description, at most one how sentence), layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
+- `keymap.test.js`: every key's sub-legend fits on its cap (7 characters max), project panels stay compact (one description, at most one how sentence), layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
 - `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML, panel focus (button vs. typing, focus returning on close, reduced-motion scrolling), the keys toggle (off ignores typing but not clicks or Esc, persists, survives broken storage), alt and contenteditable never triggering shortcuts, the panel's one how-it-works sentence and its kind (the keyboard shop isn't called a "project").
 - `a11y.test.js`: axe-core on the real page for every build, base and fn layers, and with a panel open (see above).
 - `sections.test.js`: the role lines, project cards (status, blurb, one how-it-works sentence, tags, links; Capsule marked in development with no links or screenshot), About, and Experience render from `content.js` (and the shift + E panel uses the same job list); click-to-copy email, including when the clipboard is blocked.
