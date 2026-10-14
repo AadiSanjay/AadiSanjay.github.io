@@ -1,31 +1,55 @@
-/* colors picked off my board */
+/* light, warm, a little graph-paper: the keyboard is the color */
 :root {
-  --desk: #191613;
-  --paper: #f1e8d4;
-  --ink: #1d1b19;
-  --muted: #a39a89;
+  --bg: #f4efe5;
+  --dot: #1d1b1918;
+  --surface: #fffdf9;
+  --sunken: #ebe4d6;
+  --ink: #1f1c19;
+  --text: #34302b;
+  --muted: #6b6357;
+  --line: #1d1b1922;
+  --accent: #b3222e; /* red samurai red */
+  --accent-strong: #981b26;
+  --brass: #8a7245;
 
-  /* site chrome stays red samurai; the board itself re-skins per build */
+  /* the keycap look used for kbd chips and buttons (red samurai) */
   --alpha: #b3222e;
   --alpha-side: #7a1620;
   --mod: #3a3a3c;
   --mod-side: #232325;
   --legend: #f2c94c;
 
-  --u: min(54px, calc((100vw - 56px) / 16.7));
+  --sidebar-w: 0px; /* the sidebar only sits beside the page on wide screens */
+  --nav-h: 64px;
+  --gutter: 16px;
+  --avail: calc(100vw - var(--sidebar-w) - var(--gutter) * 2 - 16px);
+  --u: min(54px, calc(var(--avail) / 16.5));
   --travel: 4px;
   --press: cubic-bezier(0.3, 0, 0.2, 1) 70ms;
 
-  /* scrollbars: brass on the warm dark desk, a darker brass on the cream panels. the page chrome
-     stays red samurai whatever build you pick, so these read the same on every colorway */
-  --scroll-track: #221e1a;
-  --scroll-thumb: #b3963d;
-  --scroll-thumb-hover: #d4b04f;
-  --panel-track: #e6dbc2;
-  --panel-thumb: #85703f;
+  /* scrollbars: brass on the paper, lighter on the white panels */
+  --scroll-track: #e9e2d4;
+  --scroll-thumb: #8a7245;
+  --scroll-thumb-hover: #6f5b34;
+  --panel-track: #f1ece2;
+  --panel-thumb: #a08a5c;
 
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --sidebar-w: 250px;
+    --gutter: 36px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --sidebar-w: 300px;
+    --gutter: 48px;
+  }
 }
 
 * {
@@ -36,6 +60,8 @@
 html {
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
   scrollbar-width: auto;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 8px); /* jump links land below the sticky nav */
 }
 
 .card-inner {
@@ -74,14 +100,28 @@ html {
 
 body {
   margin: 0;
-  background: var(--desk);
-  color: var(--paper);
+  background-color: var(--bg);
+  /* graph paper */
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+  color: var(--text);
   font-family: var(--sans);
   line-height: 1.5;
 }
 
 a {
-  color: var(--legend);
+  color: var(--accent-strong);
+  text-decoration-color: #981b2655;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 kbd {
@@ -92,12 +132,6 @@ kbd {
   background: var(--mod);
   color: var(--legend);
   box-shadow: 0 2px 0 var(--mod-side);
-}
-
-.desk {
-  max-width: calc(var(--u) * 16.7 + 32px);
-  margin: 0 auto;
-  padding: 3rem 16px 4rem;
 }
 
 /* read by screen readers, not shown */
@@ -113,136 +147,204 @@ kbd {
 .skip {
   position: absolute;
   left: -999px;
+  z-index: 30;
 }
 
 .skip:focus {
   left: 16px;
-  top: 16px;
-  z-index: 10;
-  background: var(--paper);
-  color: var(--ink);
+  top: 12px;
+  background: var(--ink);
+  color: var(--surface);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
 }
 
-.nav {
+/* ---- keycap nav ---- */
+
+.keynav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--nav-h);
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1.25rem;
-  white-space: nowrap; /* keep each link's ↗ on its own line */
-  margin-bottom: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--gutter);
+  background: #f4efe5e6;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.keynav-row {
+  position: relative;
+  display: flex;
+  gap: clamp(0.6rem, 4vw, 3.5rem);
+}
+
+/* the trace that runs between the caps, like on a pcb */
+.keynav-row::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  right: -2rem;
+  top: 50%;
+  border-top: 1px dashed #8a724580;
+}
+
+.navcap {
+  --cap-top: var(--surface);
+  --cap-side: #d6ccb9;
+
+  position: relative;
+  display: block;
+  padding-bottom: 4px; /* room for the skirt */
+  text-decoration: none;
+  color: var(--ink);
   font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.nav a,
-.quick a,
-.footer a {
-  color: var(--paper);
-  text-decoration-color: #ffffff40;
-  text-underline-offset: 3px;
+.navcap-top {
+  position: relative;
+  display: block;
+  padding: 0.35rem 0.85rem 0.4rem;
+  border-radius: 7px;
+  background: linear-gradient(170deg, #ffffff, var(--cap-top) 60%);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 0 var(--cap-side);
+  transition: transform var(--press), box-shadow var(--press);
 }
 
-.nav a:hover,
-.quick a:hover,
-.footer a:hover {
+.navcap:hover .navcap-top {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 var(--cap-side);
+}
+
+.navcap:active .navcap-top,
+.navcap[aria-current] .navcap-top {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--cap-side);
+}
+
+/* the current section's cap is held down and lit, red samurai style */
+.navcap[aria-current] {
+  --cap-top: #981b26; /* the darker red, so the yellow legend passes 4.5:1 */
+  --cap-side: #7a1620;
   color: var(--legend);
-  text-decoration-color: currentColor;
+  font-weight: 600;
 }
 
-/* wide screens: intro on the left, the card display on the right, keyboard right under both */
-@media (min-width: 900px) {
-  .hero {
+.navcap[aria-current] .navcap-top {
+  background: linear-gradient(170deg, #a31f2b, var(--cap-top) 60%);
+  border-color: #7a1620;
+}
+
+.navcap:focus-visible {
+  outline: none;
+}
+
+.navcap:focus-visible .navcap-top {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- layout: sidebar + main ---- */
+
+.site {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .site {
     display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    gap: 2.5rem;
-    align-items: end;
-    margin-bottom: 1.75rem;
-  }
-
-  /* the panel gets the intro's full height: contain: size keeps it from adding any height of its
-     own, so opening even a long panel never moves the keyboard, and it only scrolls inside when its
-     content is taller than the intro */
-  .hero {
-    grid-template-rows: minmax(16.5rem, auto);
-  }
-
-  .hero .display {
-    height: auto;
-    align-self: stretch;
-    contain: size;
-    margin: 0;
-  }
-
-  .desk {
-    padding-top: 1.5rem;
-  }
-
-  .nav {
-    margin-bottom: 1.4rem;
-  }
-
-  .intro h1 {
-    font-size: 2.8rem;
-  }
-
-  .what {
-    font-size: 1.05rem;
-  }
-
-  .roles {
-    line-height: 1.65;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   }
 }
 
-.intro h1 {
+.sidebar {
+  padding: 2rem var(--gutter) 0.5rem;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    position: sticky;
+    top: var(--nav-h);
+    height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    padding: 2.6rem 1.6rem 2rem 2rem;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.site-name {
   margin: 0;
-  font-size: clamp(2rem, 6vw, 3.2rem);
-  letter-spacing: -0.02em;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.quote {
+  margin: 1.1rem 0 0;
+  max-width: 24ch;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text);
 }
 
 .roles {
-  margin: 0.9rem 0 0;
+  margin: 1.4rem 0 0;
   padding: 0;
   list-style: none;
   font-family: var(--mono);
-  font-size: 0.85rem;
-  line-height: 1.8;
+  font-size: 0.8rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.roles li {
+  display: grid;
 }
 
 .roles .at {
-  color: var(--legend);
-  margin-right: 0.6rem;
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
-.what {
-  margin: 0.5rem 0 0;
-  font-size: 1.15rem;
-  max-width: 38ch;
+.roles .at + span {
+  color: var(--muted);
 }
 
 .looking {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.9rem 0 0;
+  margin: 1.5rem 0 0;
   font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 0.78rem;
+  color: var(--text);
 }
 
 .pulse {
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6fcf7f;
-  box-shadow: 0 0 0 0 #6fcf7f80;
+  background: #2f9e44;
+  box-shadow: 0 0 0 0 #2f9e4480;
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
   70% {
-    box-shadow: 0 0 0 7px #6fcf7f00;
+    box-shadow: 0 0 0 7px #2f9e4400;
   }
 }
 
@@ -251,38 +353,121 @@ kbd {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.5rem 0 0;
-  font-size: 0.95rem;
-  color: var(--muted);
+  margin: 0.7rem 0 0;
+  font-size: 0.9rem;
+}
+
+.quick a,
+.side-links a,
+.footer a {
+  color: var(--ink);
+  text-decoration-color: var(--line);
+}
+
+.quick a:hover,
+.side-links a:hover,
+.footer a:hover {
+  color: var(--accent-strong);
+  text-decoration-color: currentColor;
 }
 
 .copy {
   font: inherit;
   font-family: var(--mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--muted);
-  background: none;
-  border: 1px solid #ffffff30;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.05rem 0.55rem;
   cursor: pointer;
 }
 
 .copy:hover {
-  color: var(--legend);
-  border-color: var(--legend);
+  color: var(--accent-strong);
+  border-color: var(--accent);
 }
 
-/* ---- display ---- */
+.side-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: 0.9rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* ---- main column ---- */
+
+.desk {
+  min-width: 0;
+  padding: 0 var(--gutter) 0;
+}
+
+.desk > * {
+  max-width: 68rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* the first screen is the keyboard and nothing else */
+.stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.1rem;
+  padding: 2rem 0 2.5rem;
+  scroll-margin-top: var(--nav-h);
+}
+
+@media (min-width: 1024px) {
+  .stage {
+    min-height: calc(100vh - var(--nav-h));
+    padding: 1.5rem 0 2rem;
+  }
+}
+
+.stage > * {
+  width: 100%;
+  max-width: calc(var(--u) * 16.44);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---- display: the panel above the board ---- */
 
 .display {
-  /* fixed height so opening a card never shoves the keyboard down the page */
-  height: 11.5rem;
-  margin: 2rem 0 1.5rem;
+  /* fixed height so opening a panel never shoves the keyboard down the page */
+  height: 17rem;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+}
+
+/* beside the sidebar on a smaller laptop the board (and so the panel) is narrower: more lines */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .display {
+    height: 19.5rem;
+  }
+}
+
+.idle-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.idle-hint {
+  margin: 0.6rem 0 0;
+  max-width: 60ch;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 
 .for-touch {
@@ -302,10 +487,10 @@ kbd {
 
 .echo {
   min-height: 1.5em;
-  margin: 0.8rem 0 0;
+  margin: 0.7rem 0 0;
   font-family: var(--mono);
-  font-size: 1.1rem;
-  color: var(--paper);
+  font-size: 1.15rem;
+  color: var(--ink);
   white-space: pre;
   overflow: hidden;
 }
@@ -343,7 +528,7 @@ kbd {
 
 .echo:not(:empty)::after {
   content: '▍';
-  color: var(--legend);
+  color: var(--accent);
   animation: blink 1s steps(1) infinite;
 }
 
@@ -353,19 +538,12 @@ kbd {
   }
 }
 
-.idle {
-  margin: 0;
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.85rem;
-}
-
 .dot {
   display: inline-block;
   width: 0.5em;
   height: 0.5em;
   border-radius: 50%;
-  background: var(--legend);
+  background: var(--accent);
 }
 
 .card {
@@ -374,9 +552,11 @@ kbd {
   width: 100%;
   max-height: 100%;
   min-height: 0;
-  background: var(--paper);
+  background: var(--surface);
   color: var(--ink);
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 14px 30px -18px #3b2a1a66;
   overflow: hidden;
   animation: rise 160ms ease-out;
 }
@@ -386,7 +566,7 @@ kbd {
   grid-row: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0.95rem 0.4rem 0.95rem 1.3rem;
+  padding: 1rem 0.4rem 1rem 1.3rem;
 }
 
 .card h2:focus {
@@ -394,7 +574,7 @@ kbd {
 }
 
 .card h2:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -408,27 +588,22 @@ kbd {
   border: 0;
   border-radius: 50%;
   background: none;
-  color: #6b6357;
+  color: var(--muted);
   font-size: 1.3rem;
   line-height: 1;
   cursor: pointer;
-  z-index: 1;
 }
 
 .card .close:hover {
-  background: #1d1b1914;
+  background: #1d1b1912;
   color: var(--ink);
-}
-
-.card .close:focus-visible {
-  outline: 2px solid var(--ink);
 }
 
 .card .kicker {
   margin: 0;
   font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--alpha);
+  font-size: 0.72rem;
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -443,8 +618,8 @@ kbd {
 .card .status {
   margin: 0 0 0.6rem;
   font-family: var(--mono);
-  font-size: 0.8rem;
-  color: #6b6357;
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 
 .card .status:empty {
@@ -453,9 +628,10 @@ kbd {
 
 .card .body p {
   margin: 0 0 0.5rem;
-  max-width: 62ch;
+  max-width: 95ch; /* the panel is as wide as the board; let lines use it */
   font-size: 0.95rem;
   line-height: 1.45;
+  color: var(--text);
 }
 
 .card .stack {
@@ -465,11 +641,12 @@ kbd {
   margin: 0.6rem 0 0;
   list-style: none;
   font-family: var(--mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--muted);
 }
 
 .card .stack li {
-  border: 1px solid currentColor;
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0 0.5rem;
 }
@@ -479,14 +656,6 @@ kbd {
   flex-wrap: wrap;
   gap: 0.6rem;
   margin: 0.8rem 0 4px; /* 4px: room for the buttons' keycap shadow */
-}
-
-.card .more {
-  align-self: center;
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: #6b6357;
 }
 
 .card .links:empty,
@@ -517,12 +686,7 @@ kbd {
   box-shadow: 0 1px 0 #5f1018;
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
-
-.card .btn + .btn {
+.btn + .btn {
   background: var(--mod);
   box-shadow: 0 4px 0 var(--mod-side);
 }
@@ -543,14 +707,16 @@ kbd {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   width: max-content;
+  max-width: 100%;
   margin: 0 auto;
   padding: calc(var(--u) * 0.22);
   background: var(--case);
   border-radius: calc(var(--u) * 0.18);
   transition: background 300ms;
   box-shadow:
-    0 1px 0 #2c2c2e inset,
-    0 30px 50px -25px #000;
+    0 1px 0 #ffffff1f inset,
+    0 2px 0 #00000026,
+    0 28px 40px -22px #3b2a1a80;
 }
 
 .row {
@@ -710,7 +876,6 @@ kbd {
   display: flex;
   padding: 0;
   list-style: none;
-  color: var(--muted);
 }
 
 .hints kbd + kbd {
@@ -722,9 +887,8 @@ kbd {
 .controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.75rem 0.9rem;
-  margin-top: 1.75rem;
   font-family: var(--mono);
   font-size: 0.8rem;
 }
@@ -739,8 +903,10 @@ kbd {
 }
 
 .builds legend {
-  float: left;
-  margin-right: 0.25rem;
+  padding: 0;
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
   color: var(--muted);
 }
 
@@ -749,6 +915,7 @@ kbd {
   align-items: center;
   gap: 0.35rem;
   cursor: pointer;
+  color: var(--ink);
 }
 
 .builds input {
@@ -760,21 +927,22 @@ kbd {
   width: 14px;
   height: 14px;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #ffffff30;
+  box-shadow: 0 0 0 1px #1d1b1940;
 }
 
 .builds input:checked + .swatch {
-  box-shadow: 0 0 0 2px var(--legend);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .builds input:checked ~ .name {
-  color: var(--legend);
+  color: var(--accent-strong);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .builds input:focus-visible ~ .name {
-  outline: 1px solid var(--paper);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .toggles {
@@ -785,12 +953,22 @@ kbd {
 
 .controls button {
   font: inherit;
-  color: var(--paper);
-  background: none;
-  border: 1px solid #ffffff30;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.3rem 0.55rem;
   cursor: pointer;
+}
+
+.controls button:hover {
+  border-color: var(--accent);
+}
+
+.controls button[aria-pressed='false'] {
+  color: var(--muted);
+  background: none;
+  border-style: dashed;
 }
 
 /* each toggle is as wide on as it is off, so flipping it never reflows the row (or the page) */
@@ -802,73 +980,59 @@ kbd {
   min-width: calc(9ch + 1.1rem + 2px); /* "keys: off" */
 }
 
-.controls button[aria-pressed='false'] {
-  color: var(--muted);
-  border-style: dashed;
-}
-
-.controls button:hover {
-  border-color: var(--legend);
-}
-
-/* ---- the plain version ---- */
+/* ---- sections below the keyboard ---- */
 
 .section {
-  margin-top: 4.5rem;
-  scroll-margin-top: 2rem;
+  padding: 4.5rem 0 1rem;
+  border-top: 1px solid var(--line);
 }
 
-/* right after the build picker: close enough that the cards start above the fold at 1440x900 */
-#work {
-  margin-top: 2.5rem;
+.section-title {
+  margin: 0 0 1.8rem;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  color: var(--ink);
 }
 
-.section h2 {
-  margin: 0 0 1rem;
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--legend);
-}
+/* ---- project cards: image + title at rest, the details on hover/focus/tap ---- */
 
 .projects {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
-  align-items: start; /* cards are as tall as their content, no empty space */
-  gap: 1rem;
-}
-
-/* the shipped project with a real screenshot gets the full row: text left, screenshot right */
-.project.featured {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 700px) {
-  .project.featured {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 22.5rem); /* 360px: the 720px shot stays sharp at 2x */
-    gap: 1.6rem;
-    align-items: start;
-  }
-
-  .project.featured .shot {
-    grid-column: 2;
-    grid-row: 1;
-    width: 100%;
-    margin: 0;
-    border-radius: 8px;
-    box-shadow: 0 0 0 1px #ffffff1a;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  align-items: start;
+  gap: 1.2rem;
 }
 
 .project {
-  padding: 1.2rem 1.3rem;
-  border: 1px solid #ffffff1a;
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #ffffff06;
-  scroll-margin-top: 2rem;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
+  transition: box-shadow 160ms, transform 160ms;
+}
+
+.project-media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 11px 11px 0 0;
+  border-bottom: 1px solid var(--line);
+  background: #141210;
+}
+
+.project-media img,
+.project-media svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left; /* FocusTicker's pill lives in that corner */
+}
+
+.project-face {
+  padding: 0.95rem 1.2rem 1rem;
 }
 
 .project-head {
@@ -876,6 +1040,19 @@ kbd {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.project h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.project .status {
+  margin: 0.25rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
 }
 
 .project .press {
@@ -891,7 +1068,7 @@ kbd {
 }
 
 .project .press:hover {
-  color: var(--paper);
+  color: var(--ink);
 }
 
 .project .press kbd {
@@ -908,58 +1085,53 @@ kbd {
   box-shadow: none;
 }
 
-.project .press:focus-visible {
-  outline: 2px solid var(--legend);
-  outline-offset: 3px;
-  border-radius: 4px;
+.project .details {
+  margin-top: 0.7rem;
+  padding: 0.2rem 0.7rem;
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
 }
 
-.project h3 {
-  margin: 0;
-  font-size: 1.2rem;
+/* the drawer: a grid row that animates from 0 to its content's height. the text stays in the
+   page (just clipped) so screen readers always get it, and tabbing into it opens it */
+.project-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease;
 }
 
-.project-text > p:not(.status, .links) {
-  margin: 0;
-  font-size: 0.95rem;
+.project-text {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 1.2rem;
 }
 
-.project .links {
-  margin-top: 1rem;
+.project-text > :first-child {
+  margin-top: 0;
 }
 
-.project .btn {
-  padding: 0.38rem 0.8rem 0.42rem;
-  font-size: 0.85rem;
+.project-text > :last-child {
+  margin-bottom: 1.2rem;
+}
+
+.project-text > p:not(.links) {
+  margin: 0 0 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text);
 }
 
 .project .project-text > p.how {
-  margin-top: 0.6rem;
-  font-size: 0.88rem;
-  color: #d9cfbb;
-}
-
-/* not shipped yet: lighter, so it reads as "coming", not as a card that failed to load */
-.project.in-progress {
-  border-style: dashed;
-  background: none;
-}
-
-.project.in-progress h3 {
-  color: #d9cfbb;
-}
-
-.project .status {
-  margin: 0.15rem 0 0.8rem;
-  font-family: var(--mono);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   color: var(--muted);
 }
 
-
-
-
-.section .stack {
+.project .stack {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -967,40 +1139,88 @@ kbd {
   margin: 0.8rem 0 0;
   list-style: none;
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--muted);
 }
 
-.section .stack li {
-  border: 1px solid #ffffff26;
+.project .stack li {
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.05rem 0.55rem;
 }
 
-.section .links {
+.project .links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin: 1.1rem 0 0;
+  margin: 1.1rem 0 1.4rem;
 }
 
-.section .btn + .btn {
-  background: var(--mod);
-  box-shadow: 0 4px 0 var(--mod-side);
+.project .btn {
+  padding: 0.38rem 0.8rem 0.42rem;
+  font-size: 0.85rem;
 }
 
-.plain .prose p,
-.jobs p {
-  margin: 0 0 0.7rem;
-  max-width: 62ch;
+.project.open .project-more {
+  grid-template-rows: 1fr;
+}
+
+/* with a mouse: the drawer drops down over whatever is below, so hovering never moves the page */
+@media (hover: hover) and (pointer: fine) {
+  .project .details {
+    display: none;
+  }
+
+  .project-more {
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    top: calc(100% - 12px);
+    padding-top: 11px;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-top: 0;
+    border-radius: 0 0 12px 12px;
+    z-index: 2;
+  }
+
+  /* :has(:focus-visible): opened by tabbing in, but not left open just because a button was clicked */
+  .project:is(:hover, :has(:focus-visible), .open) {
+    z-index: 5;
+    transform: translateY(-2px);
+    box-shadow: 0 22px 40px -22px #3b2a1a88;
+  }
+
+  .project:is(:hover, :has(:focus-visible), .open) .project-more {
+    grid-template-rows: 1fr;
+    border-color: var(--line);
+    box-shadow: 0 22px 40px -22px #3b2a1a88;
+  }
+}
+
+/* not shipped yet: dashed, so it reads as "coming", not as a card that failed to load */
+.project.in-progress {
+  border-style: dashed;
+}
+
+/* ---- experience ---- */
+
+/* the last section is tall enough that the experience cap can scroll it right up under the nav */
+#experience {
+  min-height: calc(100vh - var(--nav-h) - 16rem);
 }
 
 .jobs {
   display: grid;
-  gap: 1.4rem;
+  gap: 1.6rem;
+  max-width: 46rem;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.jobs p {
+  margin: 0;
 }
 
 .jobs .job-head {
@@ -1008,24 +1228,73 @@ kbd {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0 0.35rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
+  color: var(--ink);
 }
 
 .jobs .dates {
   margin-left: auto;
   font-family: var(--mono);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
 .jobs li > p:last-child {
-  color: #d9cfbb;
+  max-width: 62ch;
 }
 
+/* ---- about page ---- */
+
+.about {
+  padding: 3.5rem 0 1rem;
+}
+
+.about > * {
+  max-width: 46rem;
+}
+
+.page-title {
+  margin: 0 0 1.4rem;
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.about .intro p {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.hobby {
+  margin-top: 2.6rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.hobby h2 {
+  margin: 0 0 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.hobby p {
+  margin: 0 0 0.6rem;
+  max-width: 62ch;
+}
+
+/* ---- footer ---- */
+
 .footer {
-  margin-top: 5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #ffffff14;
+  margin-top: 4rem;
+  padding: 1.5rem 0 7rem; /* the fixed bottom bar never covers the last line */
+  border-top: 1px solid var(--line);
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -1039,38 +1308,38 @@ kbd {
   flex-wrap: wrap;
   gap: 0.5rem 1.4rem;
   font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
-.project .shot {
-  width: calc(100% + 2.6rem);
-  margin: -1.2rem -1.3rem 1rem;
-  border-radius: 12px 12px 0 0;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  object-position: top left;
-  background: #ffffff0a;
-}
+/* ---- fixed bottom bar: the shortcuts that work + which build you're typing on ---- */
 
-/* fixed bottom bar: the shortcuts that work + which build you're typing on */
 .bottom-bar {
   position: fixed;
-  left: 50%;
+  /* centered under the main column, not the whole window */
+  left: calc(var(--sidebar-w) + (100% - var(--sidebar-w)) / 2);
   bottom: 14px;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 1.1rem;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100% - var(--sidebar-w) - 32px);
   padding: 0.45rem 1rem;
   border-radius: 999px;
-  background: #0d0c0be6;
-  border: 1px solid #ffffff1f;
-  backdrop-filter: blur(6px);
+  background: #1f1c19f0;
+  color: #d9cfbb;
+  box-shadow: 0 12px 30px -12px #0006;
   font-family: var(--mono);
   font-size: 0.72rem;
   white-space: nowrap;
-  z-index: 5;
+  z-index: 15;
+  transition: opacity 180ms, transform 180ms, visibility 180ms;
+}
+
+/* only while the board is on screen */
+.bottom-bar.away {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 10px);
 }
 
 .bottom-bar .hints {
@@ -1079,7 +1348,7 @@ kbd {
   gap: 0.9rem;
   font-size: inherit;
   padding-right: 1.1rem;
-  border-right: 1px solid #ffffff1f;
+  border-right: 1px solid #ffffff26;
 }
 
 .now-typing {
@@ -1091,7 +1360,7 @@ kbd {
 
 .now-label,
 .now-spec {
-  color: var(--muted);
+  color: #b5ab99;
 }
 
 .now-typing strong {
@@ -1100,20 +1369,30 @@ kbd {
 }
 
 /* not enough room for everything: drop the spec, then the shortcuts */
-@media (max-width: 1100px) {
+@media (max-width: 1560px) {
   .now-spec {
     display: none;
   }
 }
 
-@media (max-width: 860px) {
+/* beside the sidebar, the shortcuts need about 1100px; below the sidebar, about 860px */
+@media (max-width: 1240px) {
   .bottom-bar .hints {
     display: none;
   }
 }
 
-.footer {
-  padding-bottom: 6rem; /* the fixed bottom bar never covers the last line */
+@media (max-width: 1023px) and (min-width: 880px) {
+  .bottom-bar .hints {
+    display: flex;
+  }
+}
+
+/* no keyboard on phones, so no keyboard shortcuts legend */
+@media (hover: none) and (pointer: coarse) {
+  .bottom-bar .hints {
+    display: none;
+  }
 }
 
 .noscript {
@@ -1122,11 +1401,85 @@ kbd {
   padding: 0 16px;
 }
 
-@media (max-width: 640px) {
-  .nav {
-    margin-bottom: 1.75rem;
+/* narrow screens: the panel goes under the board, so tapping a key never pushes the board off-screen */
+@media (max-width: 1023px) {
+  .stage .board {
+    order: 1;
   }
 
+  .stage .display {
+    order: 2;
+    height: auto;
+    min-height: 0;
+  }
+
+  .stage .controls {
+    order: 3;
+  }
+
+  .idle-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* phones and tablets: the sidebar becomes a compact header, so the keyboard shows up sooner */
+@media (max-width: 1023px) {
+  .site-name {
+    font-size: 2rem;
+  }
+
+  .site-name br {
+    display: none;
+  }
+
+  .quote {
+    max-width: none;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .roles {
+    margin-top: 0.8rem;
+    gap: 0.25rem;
+  }
+
+  .roles li {
+    display: block;
+  }
+
+  .roles .at {
+    margin-right: 0.5rem;
+  }
+
+  .looking {
+    margin-top: 0.8rem;
+  }
+
+  .quick {
+    margin-top: 0.4rem;
+  }
+
+  .side-links {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .keynav-row {
+    gap: 0.45rem;
+  }
+
+  .navcap {
+    font-size: 0.72rem;
+  }
+
+  .navcap-top {
+    padding: 0.32rem 0.55rem 0.36rem;
+  }
+
+  .section {
+    padding-top: 3.2rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1139,48 +1492,5 @@ kbd {
   *::after {
     transition: none !important;
     animation: none !important;
-  }
-}
-
-/* narrow screens: the card goes under the board, so tapping a key never pushes the board off-screen */
-@media (max-width: 899px) {
-  .desk {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .hero {
-    display: contents;
-  }
-
-  .desk > * {
-    order: 10;
-  }
-
-  .intro {
-    order: 1;
-  }
-
-  .board {
-    order: 2;
-    margin-top: 2rem;
-  }
-
-  .display {
-    order: 3;
-    height: auto;
-    min-height: 0;
-    margin: 1.25rem 0 0;
-  }
-
-  .controls {
-    order: 4;
-  }
-}
-
-/* no keyboard on phones, so no keyboard shortcuts legend */
-@media (hover: none) and (pointer: coarse) {
-  .bottom-bar .hints {
-    display: none;
   }
 }

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderSections, setupCopy } from '../src/sections.js';
+import { renderSections, renderAbout, setupCopy } from '../src/sections.js';
+import { buildIds, builds } from '../src/builds.js';
 import { content } from '../src/content.js';
 
 describe('renderSections (the plain version)', () => {
@@ -39,7 +40,7 @@ describe('renderSections (the plain version)', () => {
       roles: [],
       projects: [{ id: 'x', key: 'KeyX', title: 'X', status: '', body: 'b', links: [], image: { src: 'x.png', alt: 'X in action' } }],
     });
-    const img = document.querySelector('#x img.shot');
+    const img = document.querySelector('#x .project-media img');
     expect(img.alt).toBe('X in action');
     expect(img.loading).toBe('lazy');
     expect(document.querySelectorAll('#x img')).toHaveLength(1);
@@ -57,12 +58,55 @@ describe('renderSections (the plain version)', () => {
     expect(pressed).toEqual(['KeyC']);
   });
 
-  it('a project still in development looks lighter, and claims no links or screenshot', () => {
+  // changed on purpose: Capsule now has a card image, an illustration (not a screenshot)
+  it('a project still in development looks lighter, has no links, and its image is an illustration', () => {
     const capsule = document.querySelector('#capsule');
     expect(capsule.classList.contains('in-progress')).toBe(true);
     expect(capsule.querySelector('.status').textContent).toMatch(/in development/);
-    expect(capsule.querySelector('img, a')).toBeNull();
+    expect(capsule.querySelector('a')).toBeNull();
+    expect(capsule.querySelector('img').getAttribute('src')).toMatch(/capsule\.svg$/);
+    expect(capsule.querySelector('img').alt).toMatch(/^Illustration/);
     expect(document.querySelector('#focusticker').classList.contains('in-progress')).toBe(false);
+  });
+
+  it('PNW Keyboards\' image is every build, drawn by the site in its real colors', () => {
+    const svg = document.querySelector('#pnwkeyboards .project-media svg');
+    expect(svg.getAttribute('role')).toBe('img');
+    for (const id of buildIds) expect(svg.getAttribute('aria-label')).toContain(builds[id].name);
+    // a case per build, all in their own case color
+    const cases = [...svg.querySelectorAll('g > rect:first-child')].map((r) => r.getAttribute('fill'));
+    expect(cases).toEqual(buildIds.map((id) => builds[id].colors.case));
+  });
+
+  it('a card shows its image, title, and status up front, and the rest in its drawer', () => {
+    const card = document.querySelector('#focusticker');
+    const face = card.querySelector('.project-face');
+    expect(face.querySelector('h3').textContent).toBe('FocusTicker');
+    expect(face.querySelector('.status')).not.toBeNull();
+    const drawer = card.querySelector('.project-more');
+    expect(drawer.id).toBe('focusticker-more');
+    expect(drawer.querySelector('.how')).not.toBeNull();
+    expect(drawer.querySelectorAll('a.btn')).toHaveLength(2);
+  });
+
+  it('the details button opens and closes the drawer (touch screens have no hover)', () => {
+    const card = document.querySelector('#capsule');
+    const toggle = card.querySelector('button.details');
+    expect(toggle.getAttribute('aria-controls')).toBe('capsule-more');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    toggle.click();
+    expect(card.classList.contains('open')).toBe(true);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.textContent).toBe('less');
+    toggle.click();
+    expect(card.classList.contains('open')).toBe(false);
+    expect(toggle.textContent).toBe('details');
+  });
+
+  it('links leaving the site say ↗ and open a new tab; links within it say →', () => {
+    const external = document.querySelector('#focusticker a.btn');
+    expect(external.textContent).toMatch(/↗$/);
+    expect(external.target).toBe('_blank');
   });
 
   it('a project with no links gets no empty button row', () => {
@@ -123,5 +167,24 @@ describe('setupCopy', () => {
     setupCopy(button, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } });
     button.click();
     await vi.waitFor(() => expect(button.textContent).toBe('me@example.com'));
+  });
+});
+
+describe('renderAbout', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<main><article data-about></article></main>`;
+    renderAbout(document, content);
+  });
+
+  it('titles the page About and leads with the intro', () => {
+    expect(document.querySelector('h1').textContent).toBe('About');
+    const intro = [...document.querySelectorAll('.intro p')].map((p) => p.textContent);
+    expect(intro).toEqual(content.sections.about.page.intro);
+  });
+
+  it('has a section for each hobby, in order: coding, keyboards, cooking', () => {
+    const sections = [...document.querySelectorAll('section.hobby')];
+    expect(sections.map((s) => s.id)).toEqual(['coding', 'keyboards', 'cooking']);
+    for (const s of sections) expect(s.getAttribute('aria-labelledby')).toBe(s.querySelector('h2').id);
   });
 });

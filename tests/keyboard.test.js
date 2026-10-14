@@ -21,7 +21,7 @@ const content = {
     { id: 'bot', key: 'KeyB', short: 'bot', title: 'Robot', body: '<img src=x>', links: [] },
   ],
   sections: {
-    about: { title: 'About me', body: 'hi', links: [] },
+    about: { title: 'About me', body: 'hi', links: [{ label: 'Read more', href: '/about.html' }] },
     contact: { title: 'Contact', body: '', links: [] },
     experience: { title: 'Experience', body: ['Dev at Acme (2026)'], links: [] },
     education: { title: 'Education', body: ['B.S. CS', 'Somewhere U · 2029'], links: [] },
@@ -848,5 +848,63 @@ describe('shortcuts never fire where they shouldn\'t', () => {
       expect(showing()).toBe('');
       field.remove();
     }
+  });
+});
+
+describe('about panel and the shortcuts bar', () => {
+  it('shift + A opens a short About panel with a link to the about page, not a jump', () => {
+    mount();
+    press('KeyA', { shiftKey: true });
+    expect(showing()).toBe('about');
+    const link = display().querySelector('a.btn');
+    expect(link.getAttribute('href')).toBe('/about.html');
+    expect(link.textContent).toBe('Read more →'); // → stays on the site, ↗ leaves it
+    expect(link.target).toBe('');
+  });
+
+  it('the shortcuts bar steps aside once the board scrolls out of view', () => {
+    root.insertAdjacentHTML('beforeend', '<div class="bottom-bar"></div>');
+    let seen;
+    const win = Object.assign(Object.create(window), {
+      addEventListener: window.addEventListener.bind(window),
+      removeEventListener: window.removeEventListener.bind(window),
+      setTimeout: window.setTimeout.bind(window),
+      IntersectionObserver: class {
+        constructor(cb) {
+          seen = cb;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    });
+    kb = mountKeyboard(root, { content, sound, storage, win });
+    const bar = root.querySelector('.bottom-bar');
+    seen([{ isIntersecting: false }]);
+    expect(bar.classList.contains('away')).toBe(true);
+    seen([{ isIntersecting: true }]);
+    expect(bar.classList.contains('away')).toBe(false);
+  });
+
+  it('reports the build it\'s on (the nav caps click in that build\'s sound)', () => {
+    mount();
+    expect(kb.build).toBe('red-samurai');
+    press('Digit3', { shiftKey: true });
+    expect(kb.build).toBe('blue-samurai');
+  });
+});
+
+describe('build picker, clicking the build you\'re on', () => {
+  it('shows its card instead of doing nothing', () => {
+    mount();
+    root.querySelector('input[value="red-samurai"]').click();
+    expect(showing()).toBe('red-samurai');
+  });
+
+  it('a different build still shows only once per click', () => {
+    mount();
+    const seen = [];
+    new MutationObserver(() => seen.push(showing())).observe(display(), { attributes: true, attributeFilter: ['data-showing'] });
+    root.querySelector('input[value="apollo"]').click();
+    return Promise.resolve().then(() => expect(seen).toEqual(['apollo']));
   });
 });

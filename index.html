@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aadi Sanjay</title>
     <meta name="description" content="Aadi Sanjay, CS + Econ at UIUC. I build Chrome extensions and custom keyboards, and I’m building my first iOS app. Looking for summer 2027 internships." />
-    <meta name="theme-color" content="#191613" />
+    <meta name="theme-color" content="#f4efe5" />
     <meta property="og:title" content="Aadi Sanjay" />
     <meta property="og:description" content="I build Chrome extensions and custom keyboards, and I’m building my first iOS app. My projects, on a keyboard I built." />
     <meta property="og:type" content="website" />
@@ -19,56 +19,65 @@
   </head>
   <body>
     <a class="skip" href="#work">Skip to projects</a>
-
-    <main id="desk" class="desk">
-      <div class="hero">
-      <header class="intro">
-        <nav class="nav" aria-label="Links">
-          <a href="#work">work</a>
-          <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
-          <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">github ↗</a>
-          <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
-        </nav>
-        <h1>Aadi Sanjay</h1>
-        <p class="what">I build Chrome extensions and custom keyboards, and I’m building my first iOS app.</p>
+    <nav class="keynav" aria-label="Site">
+      <div class="keynav-row">
+      <a class="navcap" href="#home" data-nav="home"><span class="navcap-top">home</span></a>
+      <a class="navcap" href="#work" data-nav="work"><span class="navcap-top">work</span></a>
+      <a class="navcap" href="#experience" data-nav="experience"><span class="navcap-top">experience</span></a>
+      <a class="navcap" href="about.html" data-nav="about"><span class="navcap-top">about</span></a>
+      </div>
+    </nav>
+    <div class="site">
+      <header class="sidebar">
+        <h1 class="site-name">Aadi <br />Sanjay.</h1>
+        <p class="quote">“I like building fun projects to solve my problems.”</p>
         <ul class="roles" data-roles></ul>
-        <p class="looking"><span class="pulse" aria-hidden="true"></span> looking for summer 2027 internships</p>
+        <p class="looking"><span class="pulse" aria-hidden="true"></span> open to summer 2027 internships</p>
         <p class="quick">
           <a href="mailto:aadisanjwa@gmail.com">aadisanjwa@gmail.com</a>
           <button type="button" class="copy" data-copy="aadisanjwa@gmail.com">copy</button>
         </p>
+        <p class="side-links">
+          <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
+          <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">github ↗</a>
+          <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
+        </p>
       </header>
 
-      <div class="display" data-display aria-live="polite">
-        <p class="idle">
-          <span class="for-keys">this is my keyboard, and you can type on it. new here? press <kbd>F</kbd> for FocusTicker, it's live on the Chrome Web Store.</span>
-          <span class="for-touch">that's my keyboard. tap a key with a <span class="dot" aria-hidden="true"></span>, like <kbd>F</kbd> for FocusTicker, or scroll down for about and experience.</span>
-        </p>
-        <p class="echo" aria-hidden="true"></p>
-      </div>
-      </div>
+      <main id="desk" class="desk">
+        <section id="home" class="stage" aria-label="My keyboard">
+          <div class="display" data-display aria-live="polite">
+            <div class="idle">
+              <p class="idle-title"><span class="for-keys">type on my keyboard.</span><span class="for-touch">tap my keyboard.</span></p>
+              <p class="idle-hint">
+                <span class="for-keys">it's the one on my desk, with its real sound. new here? press <kbd>F</kbd> for FocusTicker, it's live on the Chrome Web Store.</span>
+                <span class="for-touch">it's the one on my desk, with its real sound. tap a key with a <span class="dot" aria-hidden="true"></span>, like <kbd>F</kbd> for FocusTicker, or scroll down for my work.</span>
+              </p>
+            </div>
+            <p class="echo" aria-hidden="true"></p>
+          </div>
 
-      <div class="board" data-board role="group" aria-label="My keyboard. Keys marked with a dot open projects."></div>
+          <div class="board" data-board role="group" aria-label="My keyboard. Keys marked with a dot open projects."></div>
 
-      <div class="controls">
-        <fieldset class="builds" data-builds>
-          <legend>try my other builds</legend>
-        </fieldset>
-        <div class="toggles">
-          <button type="button" data-sound aria-pressed="true">sound: on</button>
-          <button type="button" data-keys aria-pressed="true" title="Typing letters on this page presses the keyboard. Turn off if that gets in your way; clicking keys still works.">keys: on</button>
-        </div>
-      </div>
+          <div class="controls">
+            <fieldset class="builds" data-builds>
+              <legend>try my other builds</legend>
+            </fieldset>
+            <div class="toggles">
+              <button type="button" data-sound aria-pressed="true">sound: on</button>
+              <button type="button" data-keys aria-pressed="true" title="Typing letters on this page presses the keyboard. Turn off if that gets in your way; clicking keys still works.">keys: on</button>
+            </div>
+          </div>
+        </section>
 
-      <section id="work" class="section" aria-labelledby="work-title">
-        <h2 id="work-title">Selected work</h2>
-        <div class="projects" data-work></div>
-      </section>
+        <section id="work" class="section" aria-labelledby="work-title">
+          <h2 id="work-title" class="section-title">Selected work</h2>
+          <div class="projects" data-work></div>
+        </section>
 
-      <section id="about" class="section plain" data-plain="about" aria-labelledby="about-title"></section>
-      <section id="experience" class="section plain" data-plain="experience" aria-labelledby="experience-title"></section>
+        <section id="experience" class="section" data-plain="experience" aria-labelledby="experience-title"></section>
 
-      <footer class="footer">
+        <footer class="footer">
         <p class="footer-links">
           <a href="mailto:aadisanjwa@gmail.com">email</a>
           <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
@@ -76,22 +85,23 @@
           <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
           <a href="https://www.etsy.com/shop/PNWKeyboards" target="_blank" rel="noopener">keyboard shop ↗</a>
         </p>
-        <p>
-          Designed by me and built with Claude Code. The board is my <span data-build-name>Red Samurai</span> build, and the
-          sounds are recorded from my own keyboards.
-          <a href="https://github.com/AadiSanjay/AadiSanjay.github.io" target="_blank" rel="noopener">source ↗</a>
-        </p>
-      </footer>
+          <p>
+            Designed by me and built with Claude Code. The board is my <span data-build-name>Red Samurai</span> build, and the
+            sounds are recorded from my own keyboards.
+            <a href="https://github.com/AadiSanjay/AadiSanjay.github.io" target="_blank" rel="noopener">source ↗</a>
+          </p>
+        </footer>
 
-      <div class="bottom-bar">
-        <ul class="hints" data-hints aria-label="Keyboard shortcuts"></ul>
-        <p class="now-typing" aria-hidden="true">
-          <span class="now-label">now typing on</span>
-          <strong data-build-name>Red Samurai</strong>
-          <span class="now-spec" data-build-spec>Gamakay CK68 · Akko CS Silver</span>
-        </p>
-      </div>
-    </main>
+        <div class="bottom-bar">
+          <ul class="hints" data-hints aria-label="Keyboard shortcuts"></ul>
+          <p class="now-typing" aria-hidden="true">
+            <span class="now-label">now typing on</span>
+            <strong data-build-name>Red Samurai</strong>
+            <span class="now-spec" data-build-spec>Gamakay CK68 · Akko CS Silver</span>
+          </p>
+        </div>
+      </main>
+    </div>
 
     <noscript>
       <p class="noscript">I’m Aadi Sanjay. I build Chrome extensions and custom keyboards, and I’m building my first iOS app. This site's keyboard needs JavaScript. My resume is at <a href="resume.pdf">resume.pdf</a>, and I'm at aadisanjwa@gmail.com.</p>

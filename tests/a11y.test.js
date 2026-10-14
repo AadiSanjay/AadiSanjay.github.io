@@ -6,9 +6,11 @@ import axe from 'axe-core';
 import { content } from '../src/content.js';
 import { buildIds } from '../src/builds.js';
 import { mountKeyboard } from '../src/keyboard.js';
-import { renderSections } from '../src/sections.js';
+import { renderSections, renderRoles, renderAbout } from '../src/sections.js';
+import { setupNav } from '../src/nav.js';
 
 const html = readFileSync('index.html', 'utf8');
+const aboutHtml = readFileSync('about.html', 'utf8');
 const css = readFileSync('src/style.css', 'utf8');
 
 const options = {
@@ -30,6 +32,13 @@ async function violations() {
 }
 
 let kb;
+function load(source) {
+  const page = new DOMParser().parseFromString(source, 'text/html');
+  document.documentElement.lang = page.documentElement.lang;
+  document.head.innerHTML = `<title>${page.title}</title><style>${css}</style>`;
+  document.body.innerHTML = page.body.innerHTML;
+}
+
 beforeEach(() => {
   // axe draws text on a canvas to tell icon fonts from real text. jsdom has no canvas, and without
   // one axe gives up on the name-mismatch rule, so hand it a canvas where text is always plain text
@@ -43,24 +52,32 @@ beforeEach(() => {
     clearRect() {},
     getImageData: (x, y, w, h) => ({ data: new Uint8ClampedArray(Math.ceil(w) * Math.ceil(h) * 4).fill(1) }),
   });
-  const page = new DOMParser().parseFromString(html, 'text/html');
-  document.documentElement.lang = page.documentElement.lang;
-  document.head.innerHTML = `<title>${page.title}</title><style>${css}</style>`;
-  document.body.innerHTML = page.body.innerHTML;
-  const desk = document.querySelector('#desk');
-  renderSections(desk, content, { onKey: (code) => kb.tap(code) });
-  kb = mountKeyboard(desk, {
+});
+
+afterEach(() => {
+  kb?.destroy();
+  kb = null;
+});
+
+// the same setup main.js does
+function mountHome() {
+  load(html);
+  renderSections(document, content, { onKey: (code) => kb.tap(code) });
+  kb = mountKeyboard(document.querySelector('#desk'), {
     content,
     sound: { play: vi.fn(), setEnabled: vi.fn(), preload: vi.fn() },
     storage: null,
   });
-});
+  setupNav(document.querySelector('.keynav'), { sections: ['home', 'work', 'experience'].map((id) => document.getElementById(id)) });
+}
 
-afterEach(() => kb.destroy());
+// axe is slow in jsdom (about 2-3s per page scan here), so give it room on a slower CI machine
+const AXE_TIMEOUT = 30_000;
 
 describe('axe-core finds no violations (color contrast is checked separately)', () => {
   for (const id of buildIds) {
     it(`${id}: base layer, fn layer, and with a project panel open`, async () => {
+      mountHome();
       kb.setBuild(id);
       expect(await violations()).toEqual([]);
 
@@ -72,6 +89,23 @@ describe('axe-core finds no violations (color contrast is checked separately)', 
       kb.tap('KeyF');
       expect(document.querySelector('[data-display]').dataset.showing).toBe('focusticker');
       expect(await violations()).toEqual([]);
-    });
+    }, AXE_TIMEOUT);
   }
+});
+
+describe('the about page', () => {
+  it('has no axe violations either', async () => {
+    load(aboutHtml);
+    renderRoles(document, content);
+    renderAbout(document, content);
+    setupNav(document.querySelector('.keynav'));
+    expect(document.querySelector('h1').textContent).toBe('About');
+    expect(await violations()).toEqual([]);
+  }, AXE_TIMEOUT);
+
+  it('a project card with its drawer open has none', async () => {
+    mountHome();
+    document.querySelector('#capsule .details').click();
+    expect(await violations()).toEqual([]);
+  }, AXE_TIMEOUT);
 });

@@ -25,11 +25,10 @@ const jobs = [
 ];
 
 export const content = {
-  // the short "@ place / what" lines under my name
+  // the short "@ place / what" lines in the sidebar, under my name
   roles: [
     { at: 'UIUC', what: 'B.S. CS + Econ, May 2029' },
     { at: 'NOBE × Cline Financial', what: 'software developer' },
-    { at: 'PNW Keyboards', what: 'founder, est. 2022' },
   ],
   projects: [
     {
@@ -55,6 +54,8 @@ export const content = {
       title: 'Capsule',
       status: 'iOS app · in development · first version December 2026',
       inProgress: true,
+      // an illustration, not a screenshot: there's nothing to screenshot yet
+      image: { src: `${base}shots/capsule.svg`, alt: 'Illustration of Swift code for Capsule, still being written in an editor' },
       body: 'A private pocket journal I’m building: write a few lines, add a photo, and seal it like a time capsule until a date you choose.',
       stack: ['Swift', 'SwiftUI', 'SwiftData'],
       links: [],
@@ -65,6 +66,7 @@ export const content = {
       short: 'pnw kbs',
       title: 'PNW Keyboards',
       kind: 'keyboard shop', // not a software project
+      art: 'builds', // its card image: the site draws all my builds in their real colors
       // 10 sales, 4.9★ from 7 reviews on the shop page, Oct 14 2026
       status: 'my keyboard shop, est. 2022 · 10 boards sold · 4.9★ (7 reviews) on Etsy',
       body: 'I’ve built and sold custom 65% keyboards, starting in 2022. The keyboard on this page is one of mine, and so are its sounds.',
@@ -76,7 +78,7 @@ export const content = {
     },
   ],
   sections: {
-    // placeholder until I write the real one
+    // placeholder until I write the real one. `body` is the shift + A panel; `page` is about.html
     about: {
       title: 'About',
       short: 'about',
@@ -84,7 +86,19 @@ export const content = {
         'I’m Aadi, a CS + Econ student at UIUC from the Seattle area.',
         'I like building things people actually use: browser extensions, apps, and keyboards.',
       ],
-      links: [],
+      links: [{ label: 'Read more', href: `${base}about.html` }],
+      page: {
+        intro: [
+          'I’m Aadi, a CS + Econ student at UIUC from the Seattle area.',
+          'I like building things people actually use: browser extensions, apps, and keyboards.',
+        ],
+        // the three things I want to talk about. placeholders until I write them
+        hobbies: [
+          { id: 'coding', title: 'Coding', body: 'I build tools I want to use myself, like FocusTicker, and this site.' },
+          { id: 'keyboards', title: 'Keyboards', body: 'I’ve built, tuned, and sold custom mechanical keyboards as PNW Keyboards, starting in 2022. The one on the home page is mine.' },
+          { id: 'cooking', title: 'Cooking', body: 'More on what I cook soon.' },
+        ],
+      },
     },
     experience: {
       title: 'Experience',

@@ -155,8 +155,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       const a = document.createElement('a');
       a.className = 'btn';
       a.href = href;
-      a.textContent = `${label} ↗`;
-      if (/^https?:/.test(href)) {
+      const external = /^https?:/.test(href);
+      a.textContent = `${label} ${external ? '↗' : '→'}`; // ↗ leaves the site, → stays on it
+      if (external) {
         a.target = '_blank';
         a.rel = 'noopener';
       }
@@ -384,9 +385,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     updateLayer();
   }
 
+  // the shortcuts bar only makes sense while you can see the board, so it steps aside after
+  const bar = root.querySelector('.bottom-bar') ?? document.querySelector('.bottom-bar');
   let boardVisible = true;
   const observer = win.IntersectionObserver
-    ? new win.IntersectionObserver(([entry]) => (boardVisible = entry.isIntersecting))
+    ? new win.IntersectionObserver(([entry]) => {
+        boardVisible = entry.isIntersecting;
+        bar?.classList.toggle('away', !boardVisible);
+      })
     : null;
   observer?.observe(board);
 
@@ -430,6 +436,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     label.querySelector('.name').textContent = b.name;
     label.title = `shift + ${i + 1}`;
     label.querySelector('input').addEventListener('change', () => run({ type: 'build', id }));
+    // clicking the build you're already on fires no change event, but should still show its card
+    label.querySelector('input').addEventListener('click', () => {
+      if (buildId === id && display.dataset.showing !== id) run({ type: 'build', id });
+    });
     picker.append(label);
   });
   setBuild(buildId);
@@ -468,6 +478,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   return {
     tap,
     setBuild,
+    get build() {
+      return buildId;
+    },
     get layer() {
       return layer();
     },
