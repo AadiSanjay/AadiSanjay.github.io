@@ -108,11 +108,23 @@ kbd {
   }
 
   .desk {
-    padding-top: 2rem;
+    padding-top: 1.5rem;
   }
 
   .nav {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .intro h1 {
+    font-size: 2.8rem;
+  }
+
+  .what {
+    font-size: 1.05rem;
+  }
+
+  .roles {
+    line-height: 1.65;
   }
 }
 
@@ -860,11 +872,39 @@ kbd {
   }
 }
 
-@media (max-width: 640px) {
+/* narrow screens: the card goes under the board, so tapping a key never pushes the board off-screen */
+@media (max-width: 899px) {
+  .desk {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero {
+    display: contents;
+  }
+
+  .desk > * {
+    order: 10;
+  }
+
+  .intro {
+    order: 1;
+  }
+
+  .board {
+    order: 2;
+    margin-top: 2rem;
+  }
+
   .display {
+    order: 3;
     height: auto;
-    min-height: 6rem;
-    margin: 1.5rem 0 1rem;
+    min-height: 0;
+    margin: 1.25rem 0 0;
+  }
+
+  .controls {
+    order: 4;
   }
 }
 
