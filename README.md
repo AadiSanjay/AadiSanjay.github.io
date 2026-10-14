@@ -1,6 +1,6 @@
 # aadisanjay.github.io
 
-My personal website: my projects, on a keyboard I built.
+My personal website: my projects, on a keyboard I built. Designed by me and built with Claude Code (see [AI use and limitations](#ai-use-and-limitations)).
 
 **Live:** https://aadisanjay.github.io/
 
@@ -8,19 +8,22 @@ Plain HTML/CSS/JavaScript, bundled with [Vite](https://vite.dev), tested with [V
 
 ## The interactive feature
 
-From 2022 until I left for college in August 2026 I built and sold custom mechanical keyboards ([PNW Keyboards](https://www.etsy.com/shop/PNWKeyboards), formerly Floofd Keebs). The homepage is a drawing of my Red Samurai build (Gamakay CK68, 65%), and typing on your real keyboard presses the drawn keys, with the sound of the real board.
+Starting in 2022, I built and sold custom mechanical keyboards ([PNW Keyboards](https://www.etsy.com/shop/PNWKeyboards), formerly Floofd Keebs). The homepage is a drawing of my Red Samurai build (Gamakay CK68, 65%), and typing on your real keyboard presses the drawn keys, with the sound of the real board.
 
 - **Keys with a dot open a project** (F = FocusTicker, C = Capsule, K = PNW Keyboards). Esc closes.
 - **Hold shift (or click fn) for a second layer**, like QMK firmware: A about, E experience, U education, C contact, R resume. Keys the layer doesn't use fall through to the base layer (QMK's `KC_TRNS`).
 - **← / → browse projects**, and a fixed bar at the bottom lists the shortcuts that work (generated from the keymap) next to which build you're typing on.
 - **Try my other builds** (picker, or shift + 1-6) re-skins the board in that build's keycap colorway, switches to its sound, and shows a spec card: case, switches, keycaps, mods. The choice is remembered.
-- **Sounds are recorded from my own boards**, separately for key presses and releases. Clips are cut from my sound-test videos with an FFT-based tool that measures each board's tone and keeps its most typical presses (see [`tools/`](tools/)). P Poppy is built the same way as Blue Samurai, so it shares that board's recording.
+- **Sounds are recorded from my own boards**, separately for key presses and releases. Clips are cut from my sound-test videos with an FFT-based tool that measures each board's tone and keeps its most typical presses (see [`tools/`](tools/)). Olivia is the same core build as Blue Samurai, so it shares that board's recording.
 - **You can always type.** Keys that don't open anything type into a line on the idle screen (and on build cards, so you can try a board's sound); held keys repeat, and typing on any other card steps back to the typing line. On a build card every letter types, including the project keys, so trying a board never jumps to a project. Typing `hire` opens contact.
-- **Cards** close with Esc or their × button (phones have no Esc), and focus goes back to whatever opened them. On each project card below the board, the key badge is a button that presses that key on the board.
-- **A plain version is always there.** The projects are also short cards below the board, generated from the same `src/content.js`, and the resume is one click away, so recruiters can skim and keyboard-averse visitors aren't stuck.
+- **Panels** close with Esc or their × button (phones have no Esc), and focus goes back to whatever opened them. Opening one with a button (clicking or tapping a cap, Enter on a focused cap, or a project card's "press F" button) moves focus to the panel's heading; opening one by typing a letter doesn't steal focus, but Tab goes into the panel next. They're inline, not modal, so there's no focus trap. On wide screens a panel gets the intro's full height, so opening one never moves the keyboard, and it only scrolls inside if its content is taller than that; the × has its own column, so it never scrolls away or covers text. Smooth scrolling and animations turn off with `prefers-reduced-motion`.
+- **A plain version is always there.** Below the board, the projects are short cards and About and Experience are ordinary sections, all generated from the same `src/content.js` as the board, so the two can't drift apart. Nobody has to hit a tiny key on a phone to read them, and the resume is one click away.
+- **Shortcuts can be turned off.** Because single letters do things on this page, a "keys: on/off" toggle next to "sound: on" turns them off ([WCAG 2.1.4](https://www.w3.org/WAI/WCAG21/Understanding/character-key-shortcuts.html)). Off, the page ignores typing (Esc still closes a panel) and the board still works by click and tap. The choice is remembered.
 - **The "now typing on" label** at the bottom of the screen follows whichever build you pick.
 
-Details that matter: browser shortcuts (cmd/ctrl + anything) and form fields are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; only keys that do something are tab stops; touch devices get "tap" copy; axe-core reports zero violations on every colorway.
+Details that matter: browser shortcuts (cmd/ctrl/alt + anything), form fields, and contenteditable areas are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; the page's native scrollbars are recolored to brass on the warm dark background (cream on panels) with `scrollbar-color`, plus `::-webkit-scrollbar` for Safari, with no JavaScript scrolling; only keys that do something are tab stops; touch devices get "tap" copy that points to the plain sections; every key is named by its visible legend first, then what it does, so voice-control users can say what they see.
+
+**Accessibility testing:** `tests/a11y.test.js` mounts the real page (`index.html`, `style.css`, `content.js`) in jsdom and runs axe-core on every build colorway, on the base and fn layers, and with a project panel open, and fails on any violation. jsdom can't render colors, so axe's color-contrast rule is off in that test; contrast was checked with axe in a real browser (Chromium) on every colorway.
 
 ## Setup
 
@@ -37,28 +40,29 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-109 tests in `tests/`:
+138 tests in `tests/`:
 
-- `keymap.test.js`: layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
-- `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
-- `sections.test.js`: the role lines and short project cards render from `content.js`; click-to-copy email, including when the clipboard is blocked.
+- `keymap.test.js`: every key's sub-legend fits on its cap (7 characters max), project panels stay compact (one description, at most one how sentence), layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
+- `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML, panel focus (button vs. typing, focus returning on close, reduced-motion scrolling), the keys toggle (off ignores typing but not clicks or Esc, persists, survives broken storage), alt and contenteditable never triggering shortcuts, the panel's one how-it-works sentence and its kind (the keyboard shop isn't called a "project").
+- `a11y.test.js`: axe-core on the real page for every build, base and fn layers, and with a panel open (see above).
+- `sections.test.js`: the role lines, project cards (status, blurb, one how-it-works sentence, tags, links; Capsule marked in development with no links or screenshot), About, and Experience render from `content.js` (and the shift + E panel uses the same job list); click-to-copy email, including when the clipboard is blocked.
 
 ## CI/CD
 
 - **`.github/workflows/ci.yml`** runs lint → tests → build on every pull request and every push to `main`.
-- **Branch protection on `main`** requires the `check` job to pass before a PR can merge.
+- **Branch protection on `main`** requires the `check` job to pass before a PR can merge. It's enforced for everyone except repo admins, so as the owner I can still override it (GitHub's branch API shows `required_status_checks: ["check"]`, `enforcement_level: "non_admins"`).
 - **`.github/workflows/deploy.yml`** runs only after CI succeeds on `main`, rebuilds that exact commit, and deploys it to GitHub Pages. (For a `<user>.github.io` repo it builds with base `/`, otherwise `/<repo>/`.)
 
 ## Project layout
 
 ```
-index.html          page shell: hero, keyboard, project cards, now-typing label
+index.html          page shell: hero, keyboard, project cards, about, experience, now-typing label
 src/content.js      roles, projects, about, experience, contact (single source of truth)
 src/builds.js       my keyboard builds: specs, colorways, sound clips
 src/layout.js       the 68-key CK68 layout and which caps are mods/accents
 src/keymap.js       base + shift layers, validation, resolve()
 src/keyboard.js     renders the board, handles keys/clicks, cards, build picker
-src/sections.js     renders the role lines + project cards, click-to-copy
+src/sections.js     renders the role lines, project cards, about + experience, click-to-copy
 src/sound.js        plays recordings (Web Audio), synth fallback
 tools/              how the sound clips were cut from my videos
 ```
@@ -70,6 +74,6 @@ I built this with Claude Code, an AI coding assistant. I came up with the concep
 Limitations:
 
 - Colorways are picked by eye from photos and videos, not exact keycap color codes.
-- P Poppy has no recording of its own; it reuses Blue Samurai's because the builds match. Matcha's sound comes from two audio-only recordings matched to it by date, so that match is a best guess.
-- The drawn board is too small to read on phones, so the project cards carry the content there.
+- Olivia has no recording of its own; it reuses Blue Samurai's because the builds match. Matcha's sound comes from two audio-only recordings matched to it by date, so that match is a best guess.
+- On a phone the drawn keys are about 20 px wide, too small to read or tap reliably, so the plain sections below the board carry the content there and the touch hint points to them.
 - Keys are matched by `event.code`, which is a physical position, so on non-QWERTY layouts the letters on the drawn caps won't match yours.

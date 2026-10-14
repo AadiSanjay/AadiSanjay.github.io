@@ -4,14 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aadi Sanjay</title>
-    <meta name="description" content="Aadi Sanjay, CS + Econ at UIUC. Browser extensions, iOS apps, and custom mechanical keyboards. Looking for summer 2027 internships." />
+    <meta name="description" content="Aadi Sanjay, CS + Econ at UIUC. I build Chrome extensions and custom keyboards, and I’m building my first iOS app. Looking for summer 2027 internships." />
     <meta name="theme-color" content="#191613" />
     <meta property="og:title" content="Aadi Sanjay" />
-    <meta property="og:description" content="My projects, on a keyboard I built. Type to explore." />
+    <meta property="og:description" content="I build Chrome extensions and custom keyboards, and I’m building my first iOS app. My projects, on a keyboard I built." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://aadisanjay.github.io/" />
     <meta property="og:image" content="https://aadisanjay.github.io/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aadi Sanjay" />
+    <meta name="twitter:description" content="I build Chrome extensions and custom keyboards, and I’m building my first iOS app. My projects, on a keyboard I built." />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -28,7 +30,7 @@
           <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
         </nav>
         <h1>Aadi Sanjay</h1>
-        <p class="what">I build browser extensions, iOS apps, and custom mechanical keyboards.</p>
+        <p class="what">I build Chrome extensions and custom keyboards, and I’m building my first iOS app.</p>
         <ul class="roles" data-roles></ul>
         <p class="looking"><span class="pulse" aria-hidden="true"></span> looking for summer 2027 internships</p>
         <p class="quick">
@@ -40,7 +42,7 @@
       <div class="display" data-display aria-live="polite">
         <p class="idle">
           <span class="for-keys">this is my keyboard, and you can type on it. new here? press <kbd>F</kbd> for FocusTicker, it's live on the Chrome Web Store.</span>
-          <span class="for-touch">that's my keyboard. tap a key with a <span class="dot" aria-hidden="true"></span>, like <kbd>F</kbd> for FocusTicker, or tap <kbd>fn</kbd> then a lit key for about and contact.</span>
+          <span class="for-touch">that's my keyboard. tap a key with a <span class="dot" aria-hidden="true"></span>, like <kbd>F</kbd> for FocusTicker, or scroll down for about and experience.</span>
         </p>
         <p class="echo" aria-hidden="true"></p>
       </div>
@@ -52,7 +54,10 @@
         <fieldset class="builds" data-builds>
           <legend>try my other builds</legend>
         </fieldset>
-        <button type="button" data-sound aria-pressed="true">sound: on</button>
+        <div class="toggles">
+          <button type="button" data-sound aria-pressed="true">sound: on</button>
+          <button type="button" data-keys aria-pressed="true" title="Typing letters on this page presses the keyboard. Turn off if that gets in your way; clicking keys still works.">keys: on</button>
+        </div>
       </div>
 
       <section id="work" class="section" aria-labelledby="work-title">
@@ -60,16 +65,19 @@
         <div class="projects" data-work></div>
       </section>
 
+      <section id="about" class="section plain" data-plain="about" aria-labelledby="about-title"></section>
+      <section id="experience" class="section plain" data-plain="experience" aria-labelledby="experience-title"></section>
+
       <footer class="footer">
         <p class="footer-links">
           <a href="mailto:aadisanjwa@gmail.com">email</a>
           <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
           <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">github ↗</a>
           <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
-          <a href="https://www.etsy.com/shop/PNWKeyboards" target="_blank" rel="noopener">old keyboard shop ↗</a>
+          <a href="https://www.etsy.com/shop/PNWKeyboards" target="_blank" rel="noopener">keyboard shop ↗</a>
         </p>
         <p>
-          Designed and built by me. The board is my <span data-build-name>Red Samurai</span> build, and the
+          Designed by me and built with Claude Code. The board is my <span data-build-name>Red Samurai</span> build, and the
           sounds are recorded from my own keyboards.
           <a href="https://github.com/AadiSanjay/AadiSanjay.github.io" target="_blank" rel="noopener">source ↗</a>
         </p>
@@ -86,7 +94,7 @@
     </main>
 
     <noscript>
-      <p class="noscript">This site's keyboard needs JavaScript. My resume is at <a href="resume.pdf">resume.pdf</a>, and I'm at aadisanjwa@gmail.com.</p>
+      <p class="noscript">I’m Aadi Sanjay. I build Chrome extensions and custom keyboards, and I’m building my first iOS app. This site's keyboard needs JavaScript. My resume is at <a href="resume.pdf">resume.pdf</a>, and I'm at aadisanjwa@gmail.com.</p>
     </noscript>
     <script type="module" src="/src/main.js"></script>
   </body>

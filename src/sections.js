@@ -25,7 +25,7 @@ function linkButtons(links) {
 }
 
 function project(p, onKey) {
-  const article = el('article', 'project');
+  const article = el('article', ['project', p.inProgress && 'in-progress', p.image && 'featured'].filter(Boolean).join(' '));
   article.id = p.id;
   if (p.image) {
     const img = el('img', 'shot');
@@ -35,17 +35,50 @@ function project(p, onKey) {
     article.append(img);
   }
   const head = el('div', 'project-head');
-  // the key is a button: it presses that key on the board up top
+  // the key is a button: it scrolls up and presses that key on the board, which opens this
+  // project's panel. it says so, and its name starts with what it shows ("press F")
   const press = el('button', 'press');
   press.type = 'button';
-  press.append(el('kbd', null, keyLabel(p.key)));
-  press.setAttribute('aria-label', `Press ${keyLabel(p.key)} on the keyboard`);
-  press.title = `press ${keyLabel(p.key)} on the keyboard`;
+  press.append('press ', el('kbd', null, keyLabel(p.key)), el('span', 'sr', ` on the keyboard to open ${p.title} there`));
+  press.title = `opens ${p.title} on the keyboard above`;
   press.addEventListener('click', () => onKey?.(p.key));
   head.append(el('h3', null, p.title), press);
-  article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
-  if (p.links.length) article.append(linkButtons(p.links));
+  // text in one box, so a screenshot can sit beside it instead of pushing the title down
+  const text = el('div', 'project-text');
+  text.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
+  if (p.how) text.append(el('p', 'how', p.how));
+  if (p.stack?.length) {
+    const tags = el('ul', 'stack');
+    tags.setAttribute('aria-label', p.kind ? 'Skills' : 'Built with');
+    tags.append(...p.stack.map((t) => el('li', null, t)));
+    text.append(tags);
+  }
+  if (p.links.length) text.append(linkButtons(p.links));
+  article.append(text);
   return article;
+}
+
+// about and experience, readable without touching a tiny fn key on a phone
+function plain(section, id, s) {
+  const title = el('h2', null, s.title);
+  title.id = `${id}-title`;
+  section.append(title);
+  if (s.jobs) {
+    const list = el('ol', 'jobs');
+    for (const j of s.jobs) {
+      const li = el('li');
+      const head = el('p', 'job-head');
+      head.append(el('strong', null, j.role), ` · ${j.org}`, el('span', 'dates', j.dates));
+      li.append(head, el('p', null, j.text));
+      list.append(li);
+    }
+    section.append(list);
+  } else {
+    const body = el('div', 'prose');
+    body.append(...[s.body].flat().map((text) => el('p', null, text)));
+    section.append(body);
+  }
+  if (s.links?.length) section.append(linkButtons(s.links));
 }
 
 export function renderSections(root, content, { onKey } = {}) {
@@ -56,6 +89,10 @@ export function renderSections(root, content, { onKey } = {}) {
     roles.append(li);
   }
   root.querySelector('[data-work]').append(...content.projects.map((p) => project(p, onKey)));
+  for (const section of root.querySelectorAll('[data-plain]')) {
+    const s = content.sections?.[section.dataset.plain];
+    if (s) plain(section, section.dataset.plain, s);
+  }
 }
 
 // email: the link still works as mailto, the button copies it

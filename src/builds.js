@@ -14,6 +14,7 @@ const clips = (id, downs, ups) => ({
 export const builds = {
   'red-samurai': {
     name: 'Red Samurai',
+    short: 'red', // its sub-legend on shift + 1
     case: 'Gamakay CK68',
     switches: 'Akko CS Silver',
     keycaps: 'Red Samurai PBT',
@@ -31,11 +32,12 @@ export const builds = {
   },
   apollo: {
     name: 'Apollo',
+    short: 'apollo',
     case: 'Gamakay LK67',
     switches: 'Akko Rose Red',
     keycaps: 'Apollo PBT',
     mods: ['thocky mod', 'lubed stabs'],
-    note: 'The last board I listed before closing the shop.',
+    note: 'Smooth Rose Red linears with a thocky mod underneath, so it sounds soft and low.',
     link: 'https://www.etsy.com/listing/1902725065/custom-mechanical-keyboard-gamakay-lk67',
     sound: { thump: 110, body: 1100 },
     samples: clips('apollo', 6, 4),
@@ -48,6 +50,7 @@ export const builds = {
   },
   'blue-samurai': {
     name: 'Blue Samurai',
+    short: 'blue',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
     keycaps: 'Blue Samurai PBT',
@@ -65,6 +68,7 @@ export const builds = {
   },
   white: {
     name: 'White',
+    short: 'white',
     case: 'Gamakay LK67',
     switches: 'Akko CS Silver, Krytox 205g0',
     keycaps: 'white PBT with blue accents',
@@ -80,13 +84,14 @@ export const builds = {
       accent: '#a9cfe3', accentSide: '#7ea7bd', accentInk: '#22323c',
     },
   },
-  poppy: {
-    name: 'P Poppy',
+  olivia: {
+    name: 'Olivia',
+    short: 'olivia',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
-    keycaps: 'P Poppy PBT',
+    keycaps: 'Olivia-style PBT',
     mods: ['lubed switches', 'lubed stabs'],
-    note: 'Cream and pink, and built the same way as the Blue Samurai.',
+    note: 'Same core build as the Blue Samurai, so it sounds the same: deep and smooth.',
     link: SHOP,
     sound: { thump: 125, body: 1400 },
     // same build as the blue samurai, and I don't have a separate recording of it
@@ -101,6 +106,7 @@ export const builds = {
   },
   matcha: {
     name: 'Matcha',
+    short: 'matcha',
     case: 'Gamakay LK67',
     switches: 'lubed linears',
     keycaps: 'Matcha PBT',

@@ -21,6 +21,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const display = root.querySelector('[data-display]');
   const picker = root.querySelector('[data-builds]');
   const soundBtn = root.querySelector('[data-sound]');
+  const keysBtn = root.querySelector('[data-keys]');
 
   const keymap = buildKeymap(content);
   const projects = new Map(content.projects.map((p) => [p.id, p]));
@@ -33,15 +34,18 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   let fnLatched = false;
   let cardOpener = null;
   let buildId = loadBuild(storage);
+  let keysOn = true; // single-letter shortcuts can be turned off (WCAG 2.1.4)
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
 
-  function describe(action) {
+  // the small second legend on a cap (`short`), or the full name for screen readers
+  function describe(action, full = false) {
     if (!action || action.type === 'close') return '';
-    if (action.type === 'project') return projects.get(action.id).short;
+    if (action.type === 'project') return full ? projects.get(action.id).title : projects.get(action.id).short;
     if (action.type === 'browse') return action.step > 0 ? 'next' : 'prev';
-    if (action.type === 'build') return builds[action.id].name.toLowerCase();
-    return action.id;
+    if (action.type === 'build') return full ? builds[action.id].name : builds[action.id].short;
+    const s = content.sections[action.id];
+    return full ? s?.title ?? action.id : s?.short ?? action.id;
   }
 
   // --- the board ---
@@ -65,10 +69,15 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       cap.querySelector('.sub-fn').textContent = fn;
 
       if (base || fn || code === 'Fn') {
+        // the name is the visible legend (so voice control users can say what they see), followed
+        // by screen-reader-only text for what the key does
         const b = keymap.base[code];
-        const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${base} project` : '';
-        const parts = [what, fn && `with shift: ${fn}`];
-        cap.setAttribute('aria-label', `${label} key, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`);
+        const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${b.step > 0 ? 'next' : 'previous'} project` : '';
+        const parts = [what, fn && `with shift: ${describe(keymap.fn[code], true)}`];
+        const sr = document.createElement('span');
+        sr.className = 'sr';
+        sr.textContent = `, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`;
+        cap.querySelector('.top').append(sr);
       } else {
         // decorative. 60 tab stops of nothing would be miserable.
         cap.tabIndex = -1;
@@ -123,18 +132,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [], image, typing = false, compact = false }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], typing = false, compact = false }) {
     const card = document.createElement('article');
     card.className = compact ? 'card compact' : 'card';
-    card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
-    if (image) {
-      const img = document.createElement('img');
-      img.className = 'thumb';
-      img.src = image.src;
-      img.alt = image.alt;
-      card.classList.add('has-thumb');
-      card.prepend(img);
-    }
+    // the close button gets its own column, and only the content scrolls (when it has to), so the
+    // button never scrolls away or sits on top of text
+    card.innerHTML = `<div class="card-inner"><p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p></div>`;
     card.querySelector('.kicker').textContent = kicker;
     card.querySelector('h2').textContent = title;
     card.querySelector('.status').textContent = status ?? '';
@@ -178,6 +181,21 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (!display.contains(document.activeElement)) cardOpener = document.activeElement;
     card.prepend(close);
     display.replaceChildren(card);
+
+    const heading = card.querySelector('h2');
+    heading.tabIndex = -1;
+    if (openedByButton) {
+      // a button press (click, tap, enter/space) is a request to go there: move focus to the panel
+      heading.focus({ preventScroll: true });
+      card.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+    } else if (!document.activeElement || document.activeElement === document.body) {
+      // opened by typing a letter: don't take focus mid-typing, but if nothing else has it, make
+      // the panel the next stop for tab (browsers continue tabbing from where focus last was)
+      card.tabIndex = -1;
+      card.focus({ preventScroll: true });
+      card.blur();
+      card.removeAttribute('tabindex');
+    }
   }
 
   // name the layer key the way you reached it: fn if you tapped fn (phones have no shift), else shift
@@ -203,7 +221,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
+      // what it does, plus at most one sentence on how. the screenshot, tags, and the rest live on the
+      // cards below, which keeps panels short enough to never need a scrollbar
+      showCard({ kicker: `[${key}] ${p.kind ?? 'project'}`, ...p, body: [p.body, p.how].flat().filter(Boolean), stack: [] });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[${layerKey()} + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
@@ -216,7 +236,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
         body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : 'No recording of this one, so the sound is approximated.')}`,
         stack: b.mods,
-        links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My old Etsy shop', href: b.link }],
+        links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My Etsy shop', href: b.link }],
         typing: true, // build cards are for trying the board, so give typing somewhere to go
         compact: true,
       });
@@ -274,6 +294,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- input ---
+  let openedByButton = false;
+  const reducedMotion = () => !!win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  // a cap clicked, tapped, or pressed with enter/space, or a project card's key button
   function tap(code) {
     sound.play(buildId);
     pulse(code);
@@ -282,7 +306,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
       return;
     }
-    act(code, typedBy(code));
+    openedByButton = true;
+    try {
+      act(code, typedBy(code));
+    } finally {
+      openedByButton = false;
+    }
     // clicking fn is one-shot: it only applies to the next key
     if (fnLatched) {
       fnLatched = false;
@@ -298,6 +327,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (target?.closest?.('textarea, select, [contenteditable], input:not([type=radio], [type=checkbox])')) return;
     if (target?.matches?.('input[type=radio]') && code.startsWith('Arrow')) return;
     if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
+    // keys: off means the page ignores typing. esc still closes a panel; clicking caps still works
+    if (!keysOn && code !== 'Escape') return;
     // on a focused button or link, enter/space should activate it natively. the drawn caps are the
     // exception for space: it types a space (enter still activates a focused cap)
     const onCap = !!target?.closest?.('.cap');
@@ -417,6 +448,20 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
   soundBtn.addEventListener('click', () => setSound(soundBtn.getAttribute('aria-pressed') !== 'true'));
   setSound(getPref(storage, 'sound', 'on') === 'on');
+
+  // --- keys toggle: same pattern as sound ---
+  function setKeys(on) {
+    keysOn = on;
+    setPref(storage, 'keys', on ? 'on' : 'off');
+    if (!keysBtn) return;
+    keysBtn.setAttribute('aria-pressed', String(on));
+    keysBtn.textContent = on ? 'keys: on' : 'keys: off';
+  }
+  keysBtn?.addEventListener('click', () => {
+    setKeys(!keysOn);
+    releaseAll(); // don't leave a held shift layer behind
+  });
+  setKeys(getPref(storage, 'keys', 'on') !== 'off');
 
   updateLayer();
 

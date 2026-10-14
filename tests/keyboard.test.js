@@ -60,6 +60,7 @@ beforeEach(() => {
       <p><strong data-build-name></strong> <span data-build-spec></span></p>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
+      <button data-keys></button>
     </main>`;
   root = document.querySelector('#desk');
   sound = { play: vi.fn(), setEnabled: vi.fn(), preload: vi.fn() };
@@ -203,13 +204,12 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
   });
 
-  it('shows a thumbnail on the card when the project has an image', () => {
+  // changed on purpose: the screenshot moved to the project card below, so the panel stays short
+  it('panels leave the screenshot to the project card below', () => {
     content.projects[1].image = { src: 'bot.jpg', alt: 'the robot' };
     mount();
     press('KeyB');
-    expect(display().querySelector('img.thumb').alt).toBe('the robot');
-    press('KeyS');
-    expect(display().querySelector('img.thumb')).toBeNull();
+    expect(display().querySelector('img')).toBeNull();
     delete content.projects[1].image;
   });
 
@@ -217,6 +217,27 @@ describe('typing on the keyboard', () => {
     mount();
     press('KeyS');
     expect(display().querySelectorAll('.body p')).toHaveLength(2);
+  });
+
+  // the robot again, but with a how-it-works sentence and a kind
+  const withRobotShop = () => {
+    const robot = { ...content.projects[1], how: 'Gears.', kind: 'robot shop' };
+    kb = mountKeyboard(root, { content: { ...content, projects: [content.projects[0], robot] }, sound, storage });
+  };
+
+  it('a project panel adds its one how-it-works sentence after the description', () => {
+    withRobotShop();
+    press('KeyB');
+    const paras = [...display().querySelectorAll('.body p')].map((p) => p.textContent);
+    expect(paras).toEqual(['<img src=x>', 'Gears.']);
+  });
+
+  it('a project that isn\'t software says what it is in the kicker', () => {
+    withRobotShop();
+    press('KeyB');
+    expect(display().querySelector('.kicker').textContent).toBe('[B] robot shop');
+    press('KeyS');
+    expect(display().querySelector('.kicker').textContent).toBe('[S] project');
   });
 
   it('project cards lead with what it does: no tech-stack chips, links as buttons', () => {
@@ -227,6 +248,67 @@ describe('typing on the keyboard', () => {
     expect(gh.target).toBe('_blank');
     expect(gh.rel).toBe('noopener');
     expect(mail.target).toBe(''); // mailto shouldn't open a blank tab
+  });
+});
+
+describe('panel focus', () => {
+  const heading = () => display().querySelector('h2');
+
+  it('opening a panel with a button (a cap clicked or pressed with enter) moves focus to its heading', () => {
+    mount();
+    cap('KeyS').focus();
+    cap('KeyS').click();
+    expect(heading().tabIndex).toBe(-1);
+    expect(document.activeElement).toBe(heading());
+  });
+
+  it('the same goes for an outside button that taps a key, and closing hands focus back to it', () => {
+    mount();
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    outside.focus();
+    kb.tap('KeyS');
+    expect(document.activeElement).toBe(heading());
+    press('Escape');
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it('opening a panel by typing a letter leaves focus alone', () => {
+    mount();
+    root.querySelector('[data-sound]').focus();
+    press('KeyS');
+    expect(showing()).toBe('sched');
+    expect(document.activeElement).toBe(root.querySelector('[data-sound]'));
+    document.activeElement.blur();
+    press('KeyB');
+    expect(showing()).toBe('bot');
+    expect(document.activeElement).toBe(document.body); // nothing is focused mid-typing
+  });
+
+  it('typing on caps (keys that open nothing) never moves focus', () => {
+    mount();
+    cap('KeyX').focus();
+    cap('KeyX').click();
+    expect(document.activeElement).toBe(cap('KeyX'));
+  });
+
+  it('scrolls the panel into view smoothly, or instantly with reduced motion', () => {
+    const scrolls = [];
+    Element.prototype.scrollIntoView = function (opts) {
+      scrolls.push(opts.behavior);
+    };
+    try {
+      kb = mountKeyboard(root, { content, sound, storage, win: Object.assign(Object.create(window), {
+        addEventListener: window.addEventListener.bind(window),
+        removeEventListener: window.removeEventListener.bind(window),
+        setTimeout: window.setTimeout.bind(window),
+        matchMedia: (q) => ({ matches: q.includes('reduce') }),
+      }) });
+      cap('KeyS').click();
+      expect(scrolls).toEqual(['auto']);
+    } finally {
+      delete Element.prototype.scrollIntoView;
+    }
   });
 });
 
@@ -522,7 +604,7 @@ describe('typing works on every build', () => {
   it('what you typed carries over when you switch builds', () => {
     mount();
     typeWord('xy');
-    root.querySelector('input[value="poppy"]').click();
+    root.querySelector('input[value="olivia"]').click();
     typeWord('z');
     root.querySelector('input[value="matcha"]').click();
     expect(line()).toBe('xyz');
@@ -557,7 +639,9 @@ describe('browsing with the arrow keys', () => {
 
   it('arrow caps are labeled for screen readers', () => {
     mount();
-    expect(cap('ArrowRight').getAttribute('aria-label')).toContain('next project');
+    // named by its visible legend first, then what it does (no aria-label that hides the legend)
+    expect(cap('ArrowRight').hasAttribute('aria-label')).toBe(false);
+    expect(cap('ArrowRight').textContent).toBe('→next, next project');
     expect(cap('ArrowRight').tabIndex).toBe(0);
   });
 });
@@ -591,13 +675,13 @@ describe('build picker', () => {
 
   it('picking a build re-skins the board, changes the sound, and is remembered', () => {
     mount();
-    root.querySelector('input[value="poppy"]').click();
+    root.querySelector('input[value="olivia"]').click();
     expect(board().style.getPropertyValue('--alpha')).toBe('#f2ede7');
     expect(board().style.getPropertyValue('--alpha-ink')).toBe('#2b2b2b');
-    expect(showing()).toBe('poppy');
+    expect(showing()).toBe('olivia');
     press('KeyF');
-    expect(sound.play).toHaveBeenLastCalledWith('poppy');
-    expect(storage.data.get('build')).toBe('poppy');
+    expect(sound.play).toHaveBeenLastCalledWith('olivia');
+    expect(storage.data.get('build')).toBe('olivia');
     expect(display().textContent).toContain('that board’s recording'); // shares the blue samurai's sound
   });
 
@@ -668,5 +752,101 @@ describe('sound toggle', () => {
     root.querySelector('[data-sound]').click();
     expect(sound.setEnabled).toHaveBeenLastCalledWith(false);
     expect(storage.data.get('sound')).toBe('off');
+  });
+});
+
+describe('keys toggle (single-letter shortcuts can be turned off)', () => {
+  const keysBtn = () => root.querySelector('[data-keys]');
+
+  it('starts on, shown with aria-pressed like the sound toggle', () => {
+    mount();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('true');
+    expect(keysBtn().textContent).toBe('keys: on');
+  });
+
+  it('when off, letters, digits, and space do nothing to the page', () => {
+    mount();
+    keysBtn().click();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('false');
+    expect(keysBtn().textContent).toBe('keys: off');
+    sound.play.mockClear();
+    const f = press('KeyS', { key: 's' });
+    const shiftDigit = press('Digit2', { key: '@', shiftKey: true });
+    const space = press('Space', { key: ' ' });
+    expect(showing()).toBe('');
+    expect(root.querySelector('.echo').textContent).toBe('');
+    expect(cap('KeyS').classList.contains('down')).toBe(false);
+    expect(sound.play).not.toHaveBeenCalled();
+    expect([f, shiftDigit, space].some((e) => e.defaultPrevented)).toBe(false); // space scrolls again
+    expect(kb.layer).toBe('base');
+  });
+
+  it('when off, clicking and tapping caps still works', () => {
+    mount();
+    keysBtn().click();
+    cap('KeyS').click();
+    expect(showing()).toBe('sched');
+  });
+
+  it('when off, esc still closes a panel', () => {
+    mount();
+    keysBtn().click();
+    cap('KeyS').click();
+    press('Escape');
+    expect(showing()).toBe('');
+  });
+
+  it('is remembered, and turns back on', () => {
+    mount();
+    keysBtn().click();
+    expect(storage.data.get('keys')).toBe('off');
+    kb.destroy();
+    root.querySelector('[data-board]').replaceChildren();
+    root.querySelector('[data-builds]').replaceChildren();
+    root.querySelector('[data-hints]').replaceChildren();
+    mount();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('false');
+    press('KeyS');
+    expect(showing()).toBe('');
+    keysBtn().click();
+    expect(storage.data.get('keys')).toBe('on');
+    press('KeyS');
+    expect(showing()).toBe('sched');
+  });
+
+  it('turning keys off mid-hold drops the shift layer', () => {
+    mount();
+    press('ShiftLeft');
+    expect(kb.layer).toBe('fn');
+    keysBtn().click();
+    expect(kb.layer).toBe('base');
+  });
+
+  it('still works when storage is broken', () => {
+    storage = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+    mount();
+    keysBtn().click();
+    expect(keysBtn().textContent).toBe('keys: off');
+  });
+});
+
+describe('shortcuts never fire where they shouldn\'t', () => {
+  it('not with alt held (alt+letter types special characters on a Mac)', () => {
+    mount();
+    const e = press('KeyS', { key: 'ß', altKey: true });
+    expect(showing()).toBe('');
+    expect(e.defaultPrevented).toBe(false);
+  });
+
+  it('not inside a contenteditable or textarea', () => {
+    mount();
+    for (const html of ['<div contenteditable="true"></div>', '<textarea></textarea>']) {
+      const field = document.createElement('div');
+      field.innerHTML = html;
+      document.body.append(field);
+      field.firstChild.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', bubbles: true, cancelable: true }));
+      expect(showing()).toBe('');
+      field.remove();
+    }
   });
 });

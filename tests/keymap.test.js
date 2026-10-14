@@ -35,6 +35,26 @@ describe('resolve', () => {
   });
 });
 
+describe('content.js', () => {
+  it('panels stay compact: one description and at most one how-it-works sentence', () => {
+    for (const p of content.projects) {
+      expect(typeof p.body, p.id).toBe('string');
+      if (p.how) expect(p.how.match(/[.!?](\s|$)/g), p.id).toHaveLength(1);
+    }
+  });
+});
+
+describe('sub-legends', () => {
+  it('fit on a cap: 7 characters at most, so none get cut off mid-word', () => {
+    const shorts = [
+      ...content.projects.map((p) => p.short),
+      ...Object.values(content.sections).map((s) => s.short),
+      ...Object.values(builds).map((b) => b.short),
+    ];
+    for (const s of shorts) expect(s?.length, s).toBeLessThanOrEqual(7);
+  });
+});
+
 describe('buildKeymap', () => {
   it('my real content.js builds a valid keymap', () => {
     expect(() => buildKeymap(content)).not.toThrow();
@@ -88,8 +108,8 @@ describe('builds', () => {
 });
 
 describe('builds', () => {
-  it('P Poppy plays the Blue Samurai recordings', () => {
-    expect(builds.poppy.samples).toEqual(builds['blue-samurai'].samples);
+  it('Olivia plays the Blue Samurai recordings', () => {
+    expect(builds.olivia.samples).toEqual(builds['blue-samurai'].samples);
   });
 });
 
@@ -97,7 +117,7 @@ describe('loadBuild', () => {
   const store = (value) => ({ getItem: () => value });
 
   it('loads a saved build', () => {
-    expect(loadBuild(store('poppy'))).toBe('poppy');
+    expect(loadBuild(store('olivia'))).toBe('olivia');
   });
 
   it('falls back on garbage, prototype keys, or nothing saved', () => {
