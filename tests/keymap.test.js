@@ -3,6 +3,7 @@ import { buildKeymap, resolve } from '../src/keymap.js';
 import { existsSync } from 'node:fs';
 import { builds, loadBuild, DEFAULT_BUILD, buildIds } from '../src/builds.js';
 import { rows } from '../src/layout.js';
+import { content } from '../src/content.js';
 
 const project = (id, key) => ({ id, key, short: id, title: id, blurb: '', tags: [], links: [] });
 const keymap = buildKeymap({ projects: [project('alpha', 'KeyA'), project('sched', 'KeyS')] });
@@ -35,6 +36,12 @@ describe('resolve', () => {
 });
 
 describe('buildKeymap', () => {
+  it('my real content.js builds a valid keymap', () => {
+    expect(() => buildKeymap(content)).not.toThrow();
+    const codes = new Set(rows.flat().map((key) => key.code));
+    for (const p of content.projects) expect(codes.has(p.key), `${p.id} uses ${p.key}`).toBe(true);
+  });
+
   it('rejects two projects on the same key', () => {
     expect(() => buildKeymap({ projects: [project('a', 'KeyS'), project('b', 'KeyS')] })).toThrow(/both use KeyS/);
   });
