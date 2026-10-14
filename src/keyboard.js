@@ -161,6 +161,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     display.replaceChildren(card);
   }
 
+  // the key that triggers an action on the shift layer, e.g. 'A' for about
+  function fnKey(action) {
+    const code = Object.keys(keymap.fn).find((c) => keymap.fn[c].type === action.type && keymap.fn[c].id === action.id);
+    return code ? caps.get(code).querySelector('.legend').textContent.split('\n').pop() : '?';
+  }
+
   // ← / → walk through the projects in order, wrapping around
   function browse(step) {
     const ids = content.projects.map((p) => p.id);
@@ -178,12 +184,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
-      showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
+      showCard({ kicker: `[shift + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
     } else if (action.type === 'build') {
       setBuild(action.id);
       const b = builds[action.id];
       showCard({
-        kicker: `[shift] build ${buildIds.indexOf(action.id) + 1}/${buildIds.length}`,
+        kicker: `[shift + ${buildIds.indexOf(action.id) + 1}] build`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
         body: [b.note, b.soundNote ?? (b.samples.down.length ? 'The sound is recorded from this exact board. Type something.' : 'No recording of this one, so the sound is approximated. Type something.')],
@@ -221,6 +227,16 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     return true;
   }
 
+  // what clicking a cap types: its character for letters/digits/punctuation, a space for the
+  // spacebar, and nothing for keys like Tab or Ctrl
+  function typedBy(code) {
+    if (code === 'Space') return ' ';
+    if (code === 'Backspace') return code;
+    const legend = caps.get(code).querySelector('.legend').textContent;
+    const char = legend.split('\n').pop();
+    return char.length === 1 ? char.toLowerCase() : '';
+  }
+
   // --- input ---
   function tap(code) {
     sound.play(buildId);
@@ -230,7 +246,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
       return;
     }
-    act(code, code === 'Backspace' ? code : caps.get(code).querySelector('.legend').textContent.slice(-1).toLowerCase());
+    act(code, typedBy(code));
     // clicking fn is one-shot: it only applies to the next key
     if (fnLatched) {
       fnLatched = false;

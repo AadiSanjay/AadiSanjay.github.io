@@ -258,6 +258,12 @@ describe('typing on dead keys', () => {
     expect(down.defaultPrevented).toBe(true);
   });
 
+  it('clicking caps types their character, a space for the spacebar, and nothing for Tab/Ctrl', () => {
+    mount();
+    for (const code of ['KeyQ', 'Space', 'Digit1', 'Tab', 'ControlLeft', 'Enter', 'Comma']) cap(code).click();
+    expect(echo()).toBe('q 1,');
+  });
+
   it('only keeps the last 32 characters', () => {
     mount();
     for (let i = 0; i < 40; i++) press('KeyQ', { key: 'q' });
@@ -318,11 +324,12 @@ describe('the fn layer', () => {
     expect(root.querySelectorAll('.cap.down')).toHaveLength(0);
   });
 
-  it('shift+u shows education', () => {
+  it('shift+u shows education, and the card names the exact combo', () => {
     mount();
     press('ShiftLeft', { shiftKey: true });
     press('KeyU', { shiftKey: true });
     expect(display().querySelector('h2').textContent).toBe('Education');
+    expect(display().querySelector('.kicker').textContent).toBe('[shift + U] education');
     expect(display().textContent).toContain('2029');
   });
 
