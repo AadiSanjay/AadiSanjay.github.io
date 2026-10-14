@@ -106,7 +106,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function pulse(code) {
     const cap = caps.get(code);
     cap.classList.add('down');
-    win.setTimeout(() => cap.classList.remove('down'), 90);
+    win.setTimeout(() => {
+      cap.classList.remove('down');
+      sound.play(buildId, 'up');
+    }, 90);
   }
 
   function nope(code) {
@@ -181,7 +184,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         kicker: `[shift] build ${buildIds.indexOf(action.id) + 1}/${buildIds.length}`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
-        body: [b.note, b.samples.length ? 'The sound is recorded from this exact board. Type something.' : 'No clean recording of this one yet, so the sound is approximated. Type something.'],
+        body: [b.note, b.soundNote ?? (b.samples.down.length ? 'The sound is recorded from this exact board. Type something.' : 'No recording of this one, so the sound is approximated. Type something.')],
         stack: b.mods,
         links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My old Etsy shop', href: b.link }],
       });
@@ -263,7 +266,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   function onKeyUp(e) {
     const code = codeOf(e);
-    caps.get(code)?.classList.remove('down');
+    const cap = caps.get(code);
+    if (cap?.classList.contains('down')) sound.play(buildId, 'up');
+    cap?.classList.remove('down');
     if (SHIFTS.has(code)) {
       shiftHeld = false;
       updateLayer();

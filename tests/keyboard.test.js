@@ -77,12 +77,20 @@ describe('typing on the keyboard', () => {
     expect(sound.play).toHaveBeenCalledWith('red-samurai');
   });
 
-  it('shows the cap going down and coming back up', () => {
+  it('shows the cap going down and coming back up, with a press and a release sound', () => {
     mount();
     press('KeyS');
     expect(cap('KeyS').classList.contains('down')).toBe(true);
+    expect(sound.play).toHaveBeenLastCalledWith('red-samurai');
     release('KeyS');
     expect(cap('KeyS').classList.contains('down')).toBe(false);
+    expect(sound.play).toHaveBeenLastCalledWith('red-samurai', 'up');
+  });
+
+  it('a keyup for a key we never saw go down makes no release sound', () => {
+    mount();
+    release('KeyS');
+    expect(sound.play).not.toHaveBeenCalled();
   });
 
   it('an unmapped key wiggles, plays, and leaves the page alone', () => {
@@ -369,8 +377,8 @@ describe('build picker', () => {
   it('starts fetching recordings as soon as a build is picked', () => {
     mount();
     expect(sound.preload).toHaveBeenCalledWith('red-samurai');
-    kb.setBuild('rose-red');
-    expect(sound.preload).toHaveBeenLastCalledWith('rose-red');
+    kb.setBuild('apollo');
+    expect(sound.preload).toHaveBeenLastCalledWith('apollo');
   });
 
   it('shift+number picks a build from the keyboard and shows its specs', () => {
@@ -386,8 +394,8 @@ describe('build picker', () => {
   it('the "now typing on" label follows the picked build', () => {
     mount();
     expect(root.querySelector('[data-build-name]').textContent).toBe('Red Samurai');
-    root.querySelector('input[value="rose-red"]').click();
-    expect(root.querySelector('[data-build-name]').textContent).toBe('Rose Red');
+    root.querySelector('input[value="apollo"]').click();
+    expect(root.querySelector('[data-build-name]').textContent).toBe('Apollo');
     expect(root.querySelector('[data-build-spec]').textContent).toBe('Gamakay LK67 · Akko Rose Red');
   });
 

@@ -70,9 +70,15 @@ describe('layout', () => {
 describe('builds', () => {
   it('every recording a build points to exists in public/sounds', () => {
     for (const id of buildIds) {
-      for (const url of builds[id].samples) {
+      for (const url of [...builds[id].samples.down, ...builds[id].samples.up]) {
         expect(existsSync(new URL(`../public${url}`, import.meta.url)), url).toBe(true);
       }
+    }
+  });
+
+  it('every build with releases also has presses', () => {
+    for (const id of buildIds) {
+      if (builds[id].samples.up.length) expect(builds[id].samples.down.length, id).toBeGreaterThan(0);
     }
   });
 

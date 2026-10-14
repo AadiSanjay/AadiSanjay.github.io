@@ -5,27 +5,38 @@ export function createSound() {
   let ctx = null;
   let noise = null;
   let enabled = true;
-  const files = {}; // build id -> Promise<ArrayBuffer[] | null>, fetched ahead of time
-  const decoded = {}; // build id -> AudioBuffer[] | null, once decoded
+  const files = {}; // 'build:down' -> Promise<ArrayBuffer[] | null>, fetched ahead of time
+  const decoded = {}; // 'build:down' -> AudioBuffer[] | null, once decoded
+  const last = {}; // 'build:down' -> index of the clip played last
 
   // fetching doesn't need an AudioContext, so this can run before the first key press
   function preload(id) {
-    if (files[id] || !builds[id].samples.length) return;
-    files[id] = Promise.all(
-      builds[id].samples.map(async (url) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`${url}: ${res.status}`);
-        return res.arrayBuffer();
-      }),
-    ).catch(() => null);
+    for (const kind of ['down', 'up']) {
+      const key = `${id}:${kind}`;
+      const urls = builds[id].samples[kind];
+      if (files[key] || !urls.length) continue;
+      files[key] = Promise.all(
+        urls.map(async (url) => {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`${url}: ${res.status}`);
+          return res.arrayBuffer();
+        }),
+      ).catch(() => null);
+      decode(key); // decode right away so even the first key press uses the real recording
+    }
   }
 
-  async function decode(id) {
-    decoded[id] = null; // also marks "in progress" so we only decode once
-    const raw = await files[id];
+  // an offline context can decode before any user gesture (autoplay rules only apply to playback),
+  // and the AudioBuffers it makes play fine in the real context later
+  let decoder = null;
+  async function decode(key) {
+    decoded[key] = null; // also marks "in progress" so we only decode once
+    const raw = await files[key];
     if (!raw) return;
     try {
-      decoded[id] = await Promise.all(raw.map((buf) => ctx.decodeAudioData(buf.slice(0))));
+      const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      decoder ??= new OAC(1, 1, 44100);
+      decoded[key] = await Promise.all(raw.map((buf) => decoder.decodeAudioData(buf)));
     } catch {
       // can't decode (old browser, bad file): stick with the synth
     }
@@ -68,24 +79,45 @@ export function createSound() {
     osc.stop(at + 0.08);
   }
 
-  function play(buildId) {
+  // kind: 'down' when a key is pressed, 'up' when it's released
+  function play(buildId, kind = 'down') {
     if (!enabled) return;
     if (!ctx && !setup()) return;
     if (ctx.state === 'suspended') ctx.resume();
 
-    const wobble = 0.95 + Math.random() * 0.1; // no two presses sound identical
+    const key = `${buildId}:${kind}`;
     preload(buildId);
-    if (files[buildId] && !(buildId in decoded)) decode(buildId);
 
-    const recorded = decoded[buildId];
+    const recorded = decoded[key];
     if (recorded?.length) {
+      // pick a different clip than last time, and vary it only slightly so the board keeps its character
+      let i = Math.floor(Math.random() * recorded.length);
+      if (recorded.length > 1 && i === last[key]) i = (i + 1) % recorded.length;
+      last[key] = i;
       const src = ctx.createBufferSource();
-      src.buffer = recorded[Math.floor(Math.random() * recorded.length)];
-      src.playbackRate.value = wobble;
-      src.connect(ctx.destination);
+      src.buffer = recorded[i];
+      src.playbackRate.value = 0.985 + Math.random() * 0.03;
+      const amp = ctx.createGain();
+      amp.gain.value = 0.9 + Math.random() * 0.2;
+      src.connect(amp).connect(ctx.destination);
       src.start();
       return;
     }
+    if (kind === 'up') {
+      // no clean release recordings: a softer, slightly higher copy of the board's own press
+      const presses = decoded[`${buildId}:down`];
+      if (!presses?.length) return; // the synth only does presses
+      const src = ctx.createBufferSource();
+      src.buffer = presses[Math.floor(Math.random() * presses.length)];
+      src.playbackRate.value = 1.2 + Math.random() * 0.05;
+      const amp = ctx.createGain();
+      amp.gain.value = 0.3;
+      src.connect(amp).connect(ctx.destination);
+      src.start();
+      return;
+    }
+
+    const wobble = 0.95 + Math.random() * 0.1;
 
     const s = builds[buildId].sound;
     const t = ctx.currentTime;

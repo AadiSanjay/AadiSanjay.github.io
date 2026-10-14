@@ -13,7 +13,7 @@ From 2022 until I left for college in August 2026 I built and sold custom mechan
 - **Keys with a dot open a project** (F = FocusTicker, C = Capsule, K = PNW Keyboards). Esc closes.
 - **Hold shift (or click fn) for a second layer**, like QMK firmware: A about, E experience, C contact, R resume. Keys the layer doesn't use fall through to the base layer (QMK's `KC_TRNS`).
 - **Try my other builds** (picker, or shift + 1-6) re-skins the board in that build's keycap colorway, switches to its sound, and shows a spec card: case, switches, keycaps, mods. The choice is remembered.
-- **Sounds are recorded from my own boards.** Clips are cut from my sound-test videos (see [`tools/`](tools/)). Two builds don't have a clean recording yet; they use a Web Audio synth and their cards say so.
+- **Sounds are recorded from my own boards**, separately for key presses and releases. Clips are cut from my sound-test videos with an FFT-based tool that measures each board's tone and keeps its most typical presses (see [`tools/`](tools/)). Olivia has no recording, so it uses a Web Audio synth and its card says so.
 - **Dead keys echo** what you type on the idle screen. Typing `hire` opens contact.
 - **A plain version is always there.** The projects are also short cards below the board, generated from the same `src/content.js`, and the resume is one click away, so recruiters can skim and keyboard-averse visitors aren't stuck.
 - **The "now typing on" label** at the bottom of the screen follows whichever build you pick.
@@ -68,6 +68,6 @@ I built this with Claude Code, an AI coding assistant. I came up with the concep
 Limitations:
 
 - Colorways are picked by eye from photos and videos, not exact keycap color codes.
-- Olivia and Matcha use a synthesized sound because I don't have a clean recording of them. Two of my videos are audio-only, so I couldn't match them to a board.
+- Olivia uses a synthesized sound because I don't have a recording of it. Matcha's sound comes from two audio-only recordings matched to it by date, so that match is a best guess.
 - The drawn board is too small to read on phones, so the project cards carry the content there.
 - Keys are matched by `event.code`, which is a physical position, so on non-QWERTY layouts the letters on the drawn caps won't match yours.
