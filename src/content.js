@@ -39,7 +39,7 @@ export const content = {
       short: 'pnw kbs',
       title: 'PNW Keyboards',
       status: 'my keyboard shop, 2022 – 2026 · 4.9★ on Etsy',
-      body: 'I built and sold custom 65% keyboards until I left for college. The board up there is one of mine, and so are the sounds.',
+      body: 'I built and sold custom 65% keyboards until I left for college. The keyboard on this page is one of mine, and so are its sounds.',
       stack: ['lubing', 'mods', 'sound tuning'],
       links: [
         { label: 'Old Etsy shop', href: 'https://www.etsy.com/shop/PNWKeyboards' },
