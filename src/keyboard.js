@@ -243,7 +243,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     const target = e.target;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
     if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
-    if ((code === 'Enter' || code === 'Space') && target?.closest?.('button, a')) return; // native click handles it
+    // on a focused button or link, enter/space should activate it natively. the drawn caps are the
+    // exception for space: it types a space (enter still activates a focused cap)
+    const onCap = !!target?.closest?.('.cap');
+    if ((code === 'Enter' || (code === 'Space' && !onCap)) && target?.closest?.('button, a')) return;
 
     const cap = caps.get(code);
     if (!cap) return;
@@ -294,6 +297,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     ? new win.IntersectionObserver(([entry]) => (boardVisible = entry.isIntersecting))
     : null;
   observer?.observe(board);
+
+  // clicking a cap with the mouse shouldn't leave it focused, or the next space/enter would re-press it
+  board.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.cap')) e.preventDefault();
+  });
 
   board.addEventListener('click', (e) => {
     const cap = e.target.closest('.cap');

@@ -234,6 +234,30 @@ describe('typing on dead keys', () => {
     expect(echo()).toBe('q ');
   });
 
+  it('space types even when a cap has focus, instead of re-pressing that cap', () => {
+    mount();
+    cap('KeyQ').focus();
+    const e = new KeyboardEvent('keydown', { code: 'Space', key: ' ', bubbles: true, cancelable: true });
+    cap('KeyQ').dispatchEvent(e);
+    expect(e.defaultPrevented).toBe(true); // no native click on the focused cap
+    expect(echo()).toBe(' ');
+  });
+
+  it('enter on a focused cap is left to the browser, so it activates that cap', () => {
+    mount();
+    const e = new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true, cancelable: true });
+    cap('KeyS').dispatchEvent(e);
+    expect(e.defaultPrevented).toBe(false);
+    expect(sound.play).not.toHaveBeenCalled();
+  });
+
+  it('clicking a cap with the mouse does not focus it', () => {
+    mount();
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    cap('KeyS').dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(true);
+  });
+
   it('only keeps the last 32 characters', () => {
     mount();
     for (let i = 0; i < 40; i++) press('KeyQ', { key: 'q' });
