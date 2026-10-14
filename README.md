@@ -20,7 +20,9 @@ Starting in 2022, I built and sold custom mechanical keyboards ([PNW Keyboards](
 - **A plain version is always there.** The projects are also short cards below the board, generated from the same `src/content.js`, and the resume is one click away, so recruiters can skim and keyboard-averse visitors aren't stuck.
 - **The "now typing on" label** at the bottom of the screen follows whichever build you pick.
 
-Details that matter: browser shortcuts (cmd/ctrl + anything) and form fields are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; only keys that do something are tab stops; touch devices get "tap" copy; axe-core reports zero violations on every colorway.
+Details that matter: browser shortcuts (cmd/ctrl + anything) and form fields are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; only keys that do something are tab stops; touch devices get "tap" copy; every key is named by its visible legend first, then what it does, so voice-control users can say what they see.
+
+**Accessibility testing:** `tests/a11y.test.js` mounts the real page (`index.html`, `style.css`, `content.js`) in jsdom and runs axe-core on every build colorway, on the base and fn layers, and with a project panel open, and fails on any violation. jsdom can't render colors, so axe's color-contrast rule is off in that test; contrast was checked with axe in a real browser (Chromium) on every colorway.
 
 ## Setup
 
@@ -37,10 +39,11 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-109 tests in `tests/`:
+115 tests in `tests/`:
 
 - `keymap.test.js`: layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
 - `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
+- `a11y.test.js`: axe-core on the real page for every build, base and fn layers, and with a panel open (see above).
 - `sections.test.js`: the role lines and short project cards render from `content.js`; click-to-copy email, including when the clipboard is blocked.
 
 ## CI/CD

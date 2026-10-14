@@ -65,10 +65,15 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       cap.querySelector('.sub-fn').textContent = fn;
 
       if (base || fn || code === 'Fn') {
+        // the name is the visible legend (so voice control users can say what they see), followed
+        // by screen-reader-only text for what the key does
         const b = keymap.base[code];
-        const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${base} project` : '';
+        const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${b.step > 0 ? 'next' : 'previous'} project` : '';
         const parts = [what, fn && `with shift: ${fn}`];
-        cap.setAttribute('aria-label', `${label} key, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`);
+        const sr = document.createElement('span');
+        sr.className = 'sr';
+        sr.textContent = `, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`;
+        cap.querySelector('.top').append(sr);
       } else {
         // decorative. 60 tab stops of nothing would be miserable.
         cap.tabIndex = -1;

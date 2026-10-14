@@ -557,7 +557,9 @@ describe('browsing with the arrow keys', () => {
 
   it('arrow caps are labeled for screen readers', () => {
     mount();
-    expect(cap('ArrowRight').getAttribute('aria-label')).toContain('next project');
+    // named by its visible legend first, then what it does (no aria-label that hides the legend)
+    expect(cap('ArrowRight').hasAttribute('aria-label')).toBe(false);
+    expect(cap('ArrowRight').textContent).toBe('→next, next project');
     expect(cap('ArrowRight').tabIndex).toBe(0);
   });
 });

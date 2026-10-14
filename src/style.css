@@ -52,6 +52,16 @@ kbd {
   padding: 3rem 16px 4rem;
 }
 
+/* read by screen readers, not shown */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .skip {
   position: absolute;
   left: -999px;
