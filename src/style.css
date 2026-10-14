@@ -159,10 +159,34 @@ kbd {
 /* ---- display ---- */
 
 .display {
-  min-height: 7rem;
-  margin: 2.5rem 0 1.5rem;
+  /* fixed height so opening a card never shoves the keyboard down the page */
+  height: 15.5rem;
+  margin: 2rem 0 1.5rem;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.echo {
+  min-height: 1.5em;
+  margin: 0.8rem 0 0;
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  color: var(--paper);
+  white-space: pre;
+  overflow: hidden;
+}
+
+.echo:not(:empty)::after {
+  content: '▍';
+  color: var(--legend);
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 .idle {
@@ -182,6 +206,8 @@ kbd {
 
 .card {
   width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
   background: var(--paper);
   color: var(--ink);
   border-radius: 10px;
@@ -240,6 +266,14 @@ kbd {
   flex-wrap: wrap;
   gap: 0.6rem;
   margin: 1rem 0 0;
+}
+
+.card .more {
+  align-self: center;
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: #6b6357;
 }
 
 .card .links:empty,
@@ -696,7 +730,8 @@ kbd {
 
 @media (max-width: 640px) {
   .display {
-    min-height: 0;
+    height: auto;
+    min-height: 6rem;
     margin: 1.5rem 0 1rem;
   }
 }

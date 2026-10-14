@@ -6,6 +6,16 @@ import { getPref, setPref } from './prefs.js';
 const SHIFTS = new Set(['ShiftLeft', 'ShiftRight']);
 const MODIFIERS = new Set([...SHIFTS, 'ControlLeft', 'ControlRight', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight']);
 
+const NAMED = { ' ': 'Space', Escape: 'Escape', Enter: 'Enter', Backspace: 'Backspace', Tab: 'Tab', Shift: 'ShiftLeft' };
+
+// some virtual keyboards and IMEs leave event.code empty, so work it out from event.key
+export function codeOf(e) {
+  if (e.code) return e.code;
+  if (/^[a-z]$/i.test(e.key)) return `Key${e.key.toUpperCase()}`;
+  if (/^[0-9]$/.test(e.key)) return `Digit${e.key}`;
+  return NAMED[e.key] ?? '';
+}
+
 export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const board = root.querySelector('[data-board]');
   const display = root.querySelector('[data-display]');
@@ -84,7 +94,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [] }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], more }) {
     const card = document.createElement('article');
     card.className = 'card';
     card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
@@ -112,6 +122,13 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       }
       card.querySelector('.links').append(a);
     }
+    if (more) {
+      const a = document.createElement('a');
+      a.className = 'more';
+      a.href = more;
+      a.textContent = 'full write-up ↓';
+      card.querySelector('.links').append(a);
+    }
     display.replaceChildren(card);
   }
 
@@ -120,7 +137,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, ...p });
+      showCard({ kicker: `[${key}] project`, ...p, body: [p.body].flat()[0], more: `#${p.id}` });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       const body = s.items ? s.items.map((i) => `${i.role}, ${i.org} (${i.dates}). ${i.blurb}`) : s.body;
@@ -138,13 +155,29 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       });
     } else {
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
+      typed = '';
     }
   }
 
-  function act(code) {
+  let typed = '';
+  function echo(char) {
+    if (display.dataset.showing) return; // only while the idle screen is up
+    if (char === 'Backspace') typed = typed.slice(0, -1);
+    else if (char.length === 1) typed = (typed + char).slice(-32);
+    else return;
+    const line = display.querySelector('.echo');
+    if (line) line.textContent = typed;
+    if (/hire$/i.test(typed)) {
+      typed = '';
+      run({ type: 'section', id: 'contact' });
+    }
+  }
+
+  function act(code, char) {
     const action = resolve(keymap, layer(), code);
     if (!action) {
       nope(code);
+      echo(char);
       return false;
     }
     run(action);
@@ -160,7 +193,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
       return;
     }
-    act(code);
+    act(code, code === 'Backspace' ? code : caps.get(code).querySelector('.legend').textContent.slice(-1).toLowerCase());
     // clicking fn is one-shot: it only applies to the next key
     if (fnLatched) {
       fnLatched = false;
@@ -169,31 +202,35 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   function onKeyDown(e) {
+    const code = codeOf(e);
     const target = e.target;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
-    if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(e.code)) return; // leave browser shortcuts alone
-    if ((e.code === 'Enter' || e.code === 'Space') && target?.closest?.('button, a')) return; // native click handles it
+    if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
+    if ((code === 'Enter' || code === 'Space') && target?.closest?.('button, a')) return; // native click handles it
 
-    const cap = caps.get(e.code);
+    const cap = caps.get(code);
     if (!cap) return;
-    if (SHIFTS.has(e.code)) {
+    if (SHIFTS.has(code)) {
       shiftHeld = true;
       updateLayer();
     }
     if (e.repeat) {
-      if (resolve(keymap, layer(), e.code)) e.preventDefault();
+      if (resolve(keymap, layer(), code)) e.preventDefault();
       return;
     }
 
     cap.classList.add('down');
     sound.play(buildId);
-    if (MODIFIERS.has(e.code)) return;
-    if (act(e.code)) e.preventDefault();
+    if (MODIFIERS.has(code)) return;
+    if (act(code, e.key)) e.preventDefault();
+    // space is for typing while you're at the keyboard, and for scrolling once you've left it
+    else if (code === 'Space' && boardVisible) e.preventDefault();
   }
 
   function onKeyUp(e) {
-    caps.get(e.code)?.classList.remove('down');
-    if (SHIFTS.has(e.code)) {
+    const code = codeOf(e);
+    caps.get(code)?.classList.remove('down');
+    if (SHIFTS.has(code)) {
       shiftHeld = false;
       updateLayer();
     }
@@ -205,6 +242,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     shiftHeld = false;
     updateLayer();
   }
+
+  let boardVisible = true;
+  const observer = win.IntersectionObserver
+    ? new win.IntersectionObserver(([entry]) => (boardVisible = entry.isIntersecting))
+    : null;
+  observer?.observe(board);
 
   board.addEventListener('click', (e) => {
     const cap = e.target.closest('.cap');
@@ -263,6 +306,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       win.removeEventListener('keydown', onKeyDown);
       win.removeEventListener('keyup', onKeyUp);
       win.removeEventListener('blur', releaseAll);
+      observer?.disconnect();
     },
   };
 }

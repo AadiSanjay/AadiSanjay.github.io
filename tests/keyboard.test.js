@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mountKeyboard } from '../src/keyboard.js';
+import { mountKeyboard, codeOf } from '../src/keyboard.js';
 
 const content = {
   projects: [
@@ -56,7 +56,7 @@ const showing = () => display().dataset.showing ?? '';
 beforeEach(() => {
   document.body.innerHTML = `
     <main id="desk">
-      <div data-display><p class="idle">type a key</p></div>
+      <div data-display><p class="idle">type a key</p><p class="echo"></p></div>
       <div data-board></div>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
@@ -142,15 +142,86 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
   });
 
-  it('renders every paragraph, the stack, and links as buttons', () => {
+  it('the card shows a summary and links to the full write-up below', () => {
     mount();
     press('KeyS');
-    expect(display().querySelectorAll('.body p')).toHaveLength(2);
+    expect(display().querySelectorAll('.body p')).toHaveLength(1);
+    expect(display().querySelector('a.more').getAttribute('href')).toBe('#sched');
+  });
+
+  it('renders the stack and links as buttons', () => {
+    mount();
+    press('KeyS');
     expect([...display().querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(['JS', 'CSS']);
     const [gh, mail] = display().querySelectorAll('a.btn');
     expect(gh.target).toBe('_blank');
     expect(gh.rel).toBe('noopener');
     expect(mail.target).toBe(''); // mailto shouldn't open a blank tab
+  });
+});
+
+describe('codeOf', () => {
+  it('uses event.code when there is one', () => {
+    expect(codeOf({ code: 'KeyS', key: 'Σ' })).toBe('KeyS');
+  });
+
+  it('falls back to event.key when code is empty', () => {
+    expect(codeOf({ code: '', key: 'f' })).toBe('KeyF');
+    expect(codeOf({ code: '', key: 'F' })).toBe('KeyF');
+    expect(codeOf({ code: '', key: '3' })).toBe('Digit3');
+    expect(codeOf({ code: '', key: 'Escape' })).toBe('Escape');
+    expect(codeOf({ code: '', key: ' ' })).toBe('Space');
+    expect(codeOf({ code: '', key: 'Dead' })).toBe('');
+  });
+
+  it('a key event with no code still works', () => {
+    mount();
+    press('', { key: 'f' });
+    expect(showing()).toBe('');
+    press('', { key: 's' });
+    expect(showing()).toBe('sched');
+    press('', { key: 'Escape' });
+    expect(showing()).toBe('');
+  });
+});
+
+describe('typing on dead keys', () => {
+  const echo = () => display().querySelector('.echo').textContent;
+
+  it('echoes what you type on the idle screen, and backspace works', () => {
+    mount();
+    for (const key of 'hello') press(`Key${key.toUpperCase()}`, { key });
+    press('Backspace', { key: 'Backspace' });
+    expect(echo()).toBe('hell');
+  });
+
+  it('typing "hire" opens contact', () => {
+    mount();
+    for (const key of 'hire') press(`Key${key.toUpperCase()}`, { key });
+    expect(showing()).toBe('contact');
+  });
+
+  it('does not echo while a card is open, and esc clears the line', () => {
+    mount();
+    press('KeyQ', { key: 'q' });
+    press('KeyS', { key: 's' });
+    press('KeyQ', { key: 'q' });
+    press('Escape', { key: 'Escape' });
+    expect(echo()).toBe('');
+  });
+
+  it('space types a space instead of scrolling while the board is on screen', () => {
+    mount();
+    press('KeyQ', { key: 'q' });
+    const e = press('Space', { key: ' ' });
+    expect(e.defaultPrevented).toBe(true);
+    expect(echo()).toBe('q ');
+  });
+
+  it('only keeps the last 32 characters', () => {
+    mount();
+    for (let i = 0; i < 40; i++) press('KeyQ', { key: 'q' });
+    expect(echo()).toHaveLength(32);
   });
 });
 
