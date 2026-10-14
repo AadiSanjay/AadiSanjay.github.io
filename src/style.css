@@ -98,10 +98,18 @@ kbd {
   letter-spacing: -0.02em;
 }
 
-.tagline {
-  margin: 0.4rem 0 0;
-  font-size: 1.1rem;
-  max-width: 40ch;
+.roles {
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.roles .at {
+  color: var(--legend);
+  margin-right: 0.6rem;
 }
 
 .looking {
@@ -160,7 +168,7 @@ kbd {
 
 .display {
   /* fixed height so opening a card never shoves the keyboard down the page */
-  height: 15.5rem;
+  height: 13rem;
   margin: 2rem 0 1.5rem;
   display: flex;
   flex-direction: column;
@@ -591,17 +599,16 @@ kbd {
   color: var(--legend);
 }
 
-.section h2.sub-title {
-  margin-top: 3rem;
-}
-
 .projects {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
 }
 
 .project {
-  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 1.3rem;
   border: 1px solid #ffffff1a;
   border-radius: 12px;
   background: #ffffff06;
@@ -617,26 +624,28 @@ kbd {
 
 .project h3 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
-.project .status,
-.timeline .dates {
+.project > p:not(.status) {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.project .links {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.project .status {
   margin: 0.15rem 0 0.8rem;
   font-family: var(--mono);
   font-size: 0.78rem;
   color: var(--muted);
 }
 
-.project p,
-.timeline p,
-.about p {
-  max-width: 64ch;
-}
 
-.project > p:not(.status, .links) {
-  margin: 0 0 0.7rem;
-}
+
 
 .section .stack {
   display: flex;
@@ -668,43 +677,6 @@ kbd {
   box-shadow: 0 4px 0 var(--mod-side);
 }
 
-.timeline {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.timeline > li {
-  display: grid;
-  grid-template-columns: 9.5rem 1fr;
-  gap: 1rem;
-  padding: 1.1rem 0;
-  border-top: 1px solid #ffffff14;
-}
-
-.timeline .dates {
-  margin: 0.2rem 0 0;
-}
-
-.timeline h3 {
-  margin: 0;
-  font-size: 1.05rem;
-}
-
-.timeline .org {
-  font-weight: 400;
-  color: var(--muted);
-}
-
-.timeline p {
-  margin: 0.35rem 0 0;
-}
-
-.about p {
-  margin: 0 0 1rem;
-  font-size: 1.05rem;
-}
-
 .footer {
   margin-top: 5rem;
   padding-top: 1.5rem;
@@ -717,6 +689,41 @@ kbd {
   max-width: 64ch;
 }
 
+/* shows which build you're typing on; follows the picker */
+.now-typing {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: #0d0c0bdd;
+  border: 1px solid #ffffff1f;
+  backdrop-filter: blur(6px);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 5;
+}
+
+.now-label,
+.now-spec {
+  color: var(--muted);
+}
+
+.now-typing strong {
+  color: var(--legend);
+  font-weight: 600;
+}
+
+.footer {
+  padding-bottom: 3.5rem; /* room for the now-typing label */
+}
+
 .noscript {
   max-width: 40rem;
   margin: 2rem auto;
@@ -724,13 +731,12 @@ kbd {
 }
 
 @media (max-width: 640px) {
-  .timeline > li {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
-  }
-
   .nav {
     margin-bottom: 1.75rem;
+  }
+
+  .now-spec {
+    display: none;
   }
 }
 

@@ -22,11 +22,7 @@ const content = {
   sections: {
     about: { title: 'About me', body: 'hi', links: [] },
     contact: { title: 'Contact', body: '', links: [] },
-    experience: {
-      title: 'Experience',
-      items: [{ role: 'Dev', org: 'Acme', dates: '2026', blurb: 'built things', stack: [] }],
-      links: [],
-    },
+    experience: { title: 'Experience', body: ['Dev at Acme (2026)'], links: [] },
     resume: { title: 'Resume', body: '', links: [] },
   },
 };
@@ -58,6 +54,7 @@ beforeEach(() => {
     <main id="desk">
       <div data-display><p class="idle">type a key</p><p class="echo"></p></div>
       <div data-board></div>
+      <p><strong data-build-name></strong> <span data-build-spec></span></p>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
     </main>`;
@@ -142,11 +139,10 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
   });
 
-  it('the card shows a summary and links to the full write-up below', () => {
+  it('the card shows every paragraph of the project', () => {
     mount();
     press('KeyS');
-    expect(display().querySelectorAll('.body p')).toHaveLength(1);
-    expect(display().querySelector('a.more').getAttribute('href')).toBe('#sched');
+    expect(display().querySelectorAll('.body p')).toHaveLength(2);
   });
 
   it('renders the stack and links as buttons', () => {
@@ -252,11 +248,11 @@ describe('the fn layer', () => {
     expect(root.querySelectorAll('.cap.down')).toHaveLength(0);
   });
 
-  it('shift+e lists experience items as paragraphs', () => {
+  it('shift+e shows experience', () => {
     mount();
     press('ShiftLeft', { shiftKey: true });
     press('KeyE', { shiftKey: true });
-    expect(display().querySelector('.body').textContent).toBe('Dev, Acme (2026). built things');
+    expect(display().querySelector('.body').textContent).toBe('Dev at Acme (2026)');
   });
 
   it('clicking fn applies to the next key only', () => {
@@ -316,6 +312,14 @@ describe('build picker', () => {
     expect(root.querySelector('input[value="blue-samurai"]').checked).toBe(true);
     expect(display().querySelector('h2').textContent).toBe('Blue Samurai');
     expect(display().querySelector('.status').textContent).toContain('Gamakay LK67');
+  });
+
+  it('the "now typing on" label follows the picked build', () => {
+    mount();
+    expect(root.querySelector('[data-build-name]').textContent).toBe('Red Samurai');
+    root.querySelector('input[value="rose-red"]').click();
+    expect(root.querySelector('[data-build-name]').textContent).toBe('Rose Red');
+    expect(root.querySelector('[data-build-spec]').textContent).toBe('Gamakay LK67 · Akko Rose Red');
   });
 
   it('starts with the saved build', () => {

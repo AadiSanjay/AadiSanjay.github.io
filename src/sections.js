@@ -24,12 +24,6 @@ function linkButtons(links) {
   return row;
 }
 
-function chips(items) {
-  const ul = el('ul', 'stack');
-  for (const t of items) ul.append(el('li', null, t));
-  return ul;
-}
-
 function project(p) {
   const article = el('article', 'project');
   article.id = p.id;
@@ -37,36 +31,19 @@ function project(p) {
   const kbd = el('kbd', null, keyLabel(p.key));
   kbd.title = `press ${keyLabel(p.key)} on the keyboard above`;
   head.append(el('h3', null, p.title), kbd);
-  article.append(head, el('p', 'status', p.status));
-  for (const text of [p.body].flat()) article.append(el('p', null, text));
-  article.append(chips(p.stack ?? []));
+  article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
   if (p.links.length) article.append(linkButtons(p.links));
   return article;
 }
 
-function timeline(items) {
-  const ol = el('ol', 'timeline');
-  for (const i of items) {
-    const li = el('li');
-    li.append(el('p', 'dates', i.dates));
-    const body = el('div');
-    const h = el('h3', null, i.role);
-    h.append(el('span', 'org', ` · ${i.org}`));
-    body.append(h, el('p', null, i.blurb));
-    if (i.stack.length) body.append(chips(i.stack));
-    li.append(body);
-    ol.append(li);
-  }
-  return ol;
-}
-
 export function renderSections(root, content) {
-  const { sections } = content;
+  const roles = root.querySelector('[data-roles]');
+  for (const { at, what } of content.roles) {
+    const li = el('li');
+    li.append(el('span', 'at', `@${at}`), el('span', null, what));
+    roles.append(li);
+  }
   root.querySelector('[data-work]').append(...content.projects.map(project));
-  root.querySelector('[data-experience]').append(timeline(sections.experience.items));
-  root.querySelector('[data-education]').append(timeline(sections.education.items));
-  const about = root.querySelector('[data-about]');
-  for (const text of sections.about.body) about.append(el('p', null, text));
 }
 
 // email: the link still works as mailto, the button copies it

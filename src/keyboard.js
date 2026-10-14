@@ -94,7 +94,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [], more }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [] }) {
     const card = document.createElement('article');
     card.className = 'card';
     card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
@@ -122,13 +122,6 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       }
       card.querySelector('.links').append(a);
     }
-    if (more) {
-      const a = document.createElement('a');
-      a.className = 'more';
-      a.href = more;
-      a.textContent = 'full write-up ↓';
-      card.querySelector('.links').append(a);
-    }
     display.replaceChildren(card);
   }
 
@@ -137,11 +130,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, ...p, body: [p.body].flat()[0], more: `#${p.id}` });
+      showCard({ kicker: `[${key}] project`, ...p });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
-      const body = s.items ? s.items.map((i) => `${i.role}, ${i.org} (${i.dates}). ${i.blurb}`) : s.body;
-      showCard({ kicker: `[shift] ${action.id}`, title: s.title, body, links: s.links });
+      showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
     } else if (action.type === 'build') {
       setBuild(action.id);
       const b = builds[action.id];
@@ -151,7 +143,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
         body: [b.note, b.samples.length ? 'The sound is recorded from this exact board. Type something.' : 'No clean recording of this one yet, so the sound is approximated. Type something.'],
         stack: b.mods,
-        links: [{ label: b.link.includes('/listing/') ? 'See the listing' : 'PNW Keyboards on Etsy', href: b.link }],
+        links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My old Etsy shop', href: b.link }],
       });
     } else {
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
@@ -269,6 +261,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       board.style.setProperty(`--${cssName(key)}`, value);
     }
     for (const input of picker.querySelectorAll('input')) input.checked = input.value === id;
+    for (const node of document.querySelectorAll('[data-build-name]')) node.textContent = builds[id].name;
+    for (const node of document.querySelectorAll('[data-build-spec]')) {
+      node.textContent = `${builds[id].case} · ${builds[id].switches}`;
+    }
   }
 
   buildIds.forEach((id, i) => {

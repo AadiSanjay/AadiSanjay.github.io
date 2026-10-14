@@ -19,22 +19,18 @@
 
     <main id="desk" class="desk">
       <header class="intro">
-        <nav class="nav" aria-label="Sections">
+        <nav class="nav" aria-label="Links">
           <a href="#work">work</a>
-          <a href="#experience">experience</a>
-          <a href="#about">about</a>
           <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
+          <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">github ↗</a>
+          <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">linkedin ↗</a>
         </nav>
         <h1>Aadi Sanjay</h1>
-        <p class="tagline">CS + Econ at UIUC. I build browser extensions, iOS apps, and custom mechanical keyboards.</p>
-        <p class="looking"><span class="pulse" aria-hidden="true"></span> looking for summer 2027 SWE internships</p>
+        <ul class="roles" data-roles></ul>
+        <p class="looking"><span class="pulse" aria-hidden="true"></span> looking for summer 2027 internships</p>
         <p class="quick">
           <a href="mailto:aadisanjwa@gmail.com">aadisanjwa@gmail.com</a>
           <button type="button" class="copy" data-copy="aadisanjwa@gmail.com">copy</button>
-          <span aria-hidden="true">·</span>
-          <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">LinkedIn</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">GitHub</a>
         </p>
       </header>
 
@@ -57,36 +53,24 @@
         <button type="button" data-sound aria-pressed="true">sound: on</button>
       </div>
 
-      <p class="scroll-hint"><a href="#work">or just scroll for the normal version ↓</a></p>
-
       <section id="work" class="section" aria-labelledby="work-title">
-        <h2 id="work-title">Work</h2>
+        <h2 id="work-title">Selected work</h2>
         <div class="projects" data-work></div>
-      </section>
-
-      <section id="experience" class="section" aria-labelledby="experience-title">
-        <h2 id="experience-title">Experience</h2>
-        <div data-experience></div>
-        <h2 class="sub-title">Education</h2>
-        <div data-education></div>
-        <p class="links">
-          <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Full resume (PDF) ↗</a>
-        </p>
-      </section>
-
-      <section id="about" class="section" aria-labelledby="about-title">
-        <h2 id="about-title">About</h2>
-        <div class="about" data-about></div>
       </section>
 
       <footer class="footer">
         <p>
-          Built from scratch with plain JavaScript and Vite, tested with Vitest, deployed by GitHub Actions.
-          The board is my Red Samurai build, and the sounds are recorded from my own keyboards.
-          <a href="https://github.com/AadiSanjay/PersonalWebsite" target="_blank" rel="noopener">Source ↗</a>
+          Designed and built by me. The board is my <span data-build-name>Red Samurai</span> build, and the
+          sounds are recorded from my own keyboards.
+          <a href="https://github.com/AadiSanjay/AadiSanjay.github.io" target="_blank" rel="noopener">source ↗</a>
         </p>
-        <p>© 2026 Aadi Sanjay</p>
       </footer>
+
+      <p class="now-typing" aria-hidden="true">
+        <span class="now-label">now typing on</span>
+        <strong data-build-name>Red Samurai</strong>
+        <span class="now-spec" data-build-spec>Gamakay CK68 · Akko CS Silver</span>
+      </p>
     </main>
 
     <noscript>
