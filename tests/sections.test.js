@@ -5,7 +5,8 @@ import { content } from '../src/content.js';
 
 describe('renderSections (the plain version)', () => {
   beforeEach(() => {
-    document.body.innerHTML = `<main><ul data-roles></ul><div data-work></div></main>`;
+    document.body.innerHTML = `<main><ul data-roles></ul><div data-work></div>
+      <section data-plain="about"></section><section data-plain="experience"></section></main>`;
     renderSections(document.querySelector('main'), content);
   });
 
@@ -53,6 +54,37 @@ describe('renderSections (the plain version)', () => {
 
   it('a project with no links gets no empty button row', () => {
     expect(document.querySelector('#capsule .links')).toBeNull();
+  });
+
+  it('renders About as plain text from content.js, word for word', () => {
+    const about = document.querySelector('[data-plain="about"]');
+    expect(about.querySelector('h2').textContent).toBe(content.sections.about.title);
+    expect(about.querySelector('h2').id).toBe('about-title'); // the section's aria-labelledby
+    const paras = [...about.querySelectorAll('.prose p')].map((p) => p.textContent);
+    expect(paras).toEqual([content.sections.about.body].flat());
+  });
+
+  it('renders every job in Experience, in order, with its role, org, dates, and sentence', () => {
+    const items = [...document.querySelectorAll('[data-plain="experience"] .jobs li')];
+    const { jobs } = content.sections.experience;
+    expect(items).toHaveLength(jobs.length);
+    items.forEach((li, i) => {
+      expect(li.querySelector('strong').textContent).toBe(jobs[i].role);
+      expect(li.querySelector('.job-head').textContent).toContain(jobs[i].org);
+      expect(li.querySelector('.dates').textContent).toBe(jobs[i].dates);
+      expect(li.querySelector('p:last-child').textContent).toBe(jobs[i].text);
+    });
+  });
+
+  it('the shift + E panel and the Experience section come from the same jobs', () => {
+    const { jobs, body } = content.sections.experience;
+    expect(body).toEqual(jobs.map((j) => `${j.role}, ${j.org} (${j.dates})`));
+  });
+
+  it('skips a plain section content.js doesn\'t have', () => {
+    document.body.innerHTML = `<main><ul data-roles></ul><div data-work></div><section data-plain="nope"></section></main>`;
+    renderSections(document.querySelector('main'), content);
+    expect(document.querySelector('[data-plain="nope"]').childElementCount).toBe(0);
   });
 });
 

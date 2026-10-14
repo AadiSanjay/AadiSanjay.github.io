@@ -1,6 +1,28 @@
 // `key` is the event.code that opens the project
 const base = import.meta.env?.BASE_URL ?? '/';
 
+// one list for both the shift + E panel (one line each) and the Experience section (with a sentence)
+const jobs = [
+  {
+    role: 'Software Developer',
+    org: 'NOBE Technology Committee × Cline Financial',
+    dates: 'Sep 2026 – now',
+    text: 'On a team building a React/TypeScript and C#/.NET investment app, I wrote the C# (ClosedXML) parsing for brokerage workbooks: it extracts transaction and cost-basis data, then validates and normalizes it.',
+  },
+  {
+    role: 'Founder',
+    org: 'PNW Keyboards',
+    dates: 'est. 2022',
+    text: 'I’ve built, tuned, and sold custom keyboards, including the one at the top of this page.',
+  },
+  {
+    role: 'Co-founder & Web Developer',
+    org: 'Educatodos',
+    dates: '2024 – 2026',
+    text: 'I coded our multilingual website for Spanish-speaking English learners. As an organization, Educatodos served 50+ learners.',
+  },
+];
+
 export const content = {
   // the short "@ place / what" lines under my name
   roles: [
@@ -59,11 +81,8 @@ export const content = {
     },
     experience: {
       title: 'Experience',
-      body: [
-        'Software Developer at NOBE × Cline Financial (2026 – now)',
-        'Founder of PNW Keyboards (est. 2022)',
-        'Co-founder & web developer at Educatodos (2024 – 2026)',
-      ],
+      body: jobs.map((j) => `${j.role}, ${j.org} (${j.dates})`),
+      jobs,
       links: [],
     },
     education: {

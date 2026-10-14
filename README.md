@@ -17,10 +17,10 @@ Starting in 2022, I built and sold custom mechanical keyboards ([PNW Keyboards](
 - **Sounds are recorded from my own boards**, separately for key presses and releases. Clips are cut from my sound-test videos with an FFT-based tool that measures each board's tone and keeps its most typical presses (see [`tools/`](tools/)). Olivia is the same core build as Blue Samurai, so it shares that board's recording.
 - **You can always type.** Keys that don't open anything type into a line on the idle screen (and on build cards, so you can try a board's sound); held keys repeat, and typing on any other card steps back to the typing line. On a build card every letter types, including the project keys, so trying a board never jumps to a project. Typing `hire` opens contact.
 - **Cards** close with Esc or their × button (phones have no Esc), and focus goes back to whatever opened them. On each project card below the board, the key badge is a button that presses that key on the board.
-- **A plain version is always there.** The projects are also short cards below the board, generated from the same `src/content.js`, and the resume is one click away, so recruiters can skim and keyboard-averse visitors aren't stuck.
+- **A plain version is always there.** Below the board, the projects are short cards and About and Experience are ordinary sections, all generated from the same `src/content.js` as the board, so the two can't drift apart. Nobody has to hit a tiny key on a phone to read them, and the resume is one click away.
 - **The "now typing on" label** at the bottom of the screen follows whichever build you pick.
 
-Details that matter: browser shortcuts (cmd/ctrl + anything) and form fields are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; only keys that do something are tab stops; touch devices get "tap" copy; every key is named by its visible legend first, then what it does, so voice-control users can say what they see.
+Details that matter: browser shortcuts (cmd/ctrl + anything) and form fields are never hijacked; holding a key doesn't machine-gun the sound; alt-tabbing mid-press doesn't leave shift stuck; space types while the board is on screen but scrolls once you've left it; only keys that do something are tab stops; touch devices get "tap" copy that points to the plain sections; every key is named by its visible legend first, then what it does, so voice-control users can say what they see.
 
 **Accessibility testing:** `tests/a11y.test.js` mounts the real page (`index.html`, `style.css`, `content.js`) in jsdom and runs axe-core on every build colorway, on the base and fn layers, and with a project panel open, and fails on any violation. jsdom can't render colors, so axe's color-contrast rule is off in that test; contrast was checked with axe in a real browser (Chromium) on every colorway.
 
@@ -39,12 +39,12 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-115 tests in `tests/`:
+119 tests in `tests/`:
 
 - `keymap.test.js`: layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
 - `keyboard.test.js`: the real DOM in jsdom. Typing is checked on every build, reached through the picker, shift + number, and a saved build on load. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
 - `a11y.test.js`: axe-core on the real page for every build, base and fn layers, and with a panel open (see above).
-- `sections.test.js`: the role lines and short project cards render from `content.js`; click-to-copy email, including when the clipboard is blocked.
+- `sections.test.js`: the role lines, short project cards, About, and Experience render from `content.js` (and the shift + E panel uses the same job list); click-to-copy email, including when the clipboard is blocked.
 
 ## CI/CD
 
@@ -55,13 +55,13 @@ npm run build      # production build into dist/
 ## Project layout
 
 ```
-index.html          page shell: hero, keyboard, project cards, now-typing label
+index.html          page shell: hero, keyboard, project cards, about, experience, now-typing label
 src/content.js      roles, projects, about, experience, contact (single source of truth)
 src/builds.js       my keyboard builds: specs, colorways, sound clips
 src/layout.js       the 68-key CK68 layout and which caps are mods/accents
 src/keymap.js       base + shift layers, validation, resolve()
 src/keyboard.js     renders the board, handles keys/clicks, cards, build picker
-src/sections.js     renders the role lines + project cards, click-to-copy
+src/sections.js     renders the role lines, project cards, about + experience, click-to-copy
 src/sound.js        plays recordings (Web Audio), synth fallback
 tools/              how the sound clips were cut from my videos
 ```
@@ -74,5 +74,5 @@ Limitations:
 
 - Colorways are picked by eye from photos and videos, not exact keycap color codes.
 - Olivia has no recording of its own; it reuses Blue Samurai's because the builds match. Matcha's sound comes from two audio-only recordings matched to it by date, so that match is a best guess.
-- The drawn board is too small to read on phones, so the project cards carry the content there.
+- On a phone the drawn keys are about 20 px wide, too small to read or tap reliably, so the plain sections below the board carry the content there and the touch hint points to them.
 - Keys are matched by `event.code`, which is a physical position, so on non-QWERTY layouts the letters on the drawn caps won't match yours.

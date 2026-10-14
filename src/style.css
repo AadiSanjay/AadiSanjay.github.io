@@ -874,6 +874,39 @@ kbd {
   box-shadow: 0 4px 0 var(--mod-side);
 }
 
+.plain .prose p,
+.jobs p {
+  margin: 0 0 0.7rem;
+  max-width: 62ch;
+}
+
+.jobs {
+  display: grid;
+  gap: 1.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jobs .job-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.jobs .dates {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.jobs li > p:last-child {
+  color: #d9cfbb;
+}
+
 .footer {
   margin-top: 5rem;
   padding-top: 1.5rem;

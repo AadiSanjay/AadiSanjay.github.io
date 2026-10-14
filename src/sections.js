@@ -48,6 +48,29 @@ function project(p, onKey) {
   return article;
 }
 
+// about and experience, readable without touching a tiny fn key on a phone
+function plain(section, id, s) {
+  const title = el('h2', null, s.title);
+  title.id = `${id}-title`;
+  section.append(title);
+  if (s.jobs) {
+    const list = el('ol', 'jobs');
+    for (const j of s.jobs) {
+      const li = el('li');
+      const head = el('p', 'job-head');
+      head.append(el('strong', null, j.role), ` · ${j.org}`, el('span', 'dates', j.dates));
+      li.append(head, el('p', null, j.text));
+      list.append(li);
+    }
+    section.append(list);
+  } else {
+    const body = el('div', 'prose');
+    body.append(...[s.body].flat().map((text) => el('p', null, text)));
+    section.append(body);
+  }
+  if (s.links?.length) section.append(linkButtons(s.links));
+}
+
 export function renderSections(root, content, { onKey } = {}) {
   const roles = root.querySelector('[data-roles]');
   for (const { at, what } of content.roles) {
@@ -56,6 +79,10 @@ export function renderSections(root, content, { onKey } = {}) {
     roles.append(li);
   }
   root.querySelector('[data-work]').append(...content.projects.map((p) => project(p, onKey)));
+  for (const section of root.querySelectorAll('[data-plain]')) {
+    const s = content.sections?.[section.dataset.plain];
+    if (s) plain(section, section.dataset.plain, s);
+  }
 }
 
 // email: the link still works as mailto, the button copies it
