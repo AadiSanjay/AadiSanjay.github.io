@@ -8,7 +8,6 @@ const clips = (id, downs, ups) => ({
   down: Array.from({ length: downs }, (_, i) => `${base}sounds/${id}/down-${i + 1}.m4a`),
   up: Array.from({ length: ups }, (_, i) => `${base}sounds/${id}/up-${i + 1}.m4a`),
 });
-const NONE = { down: [], up: [] };
 
 // boards I've built and sold. colors are picked from photos and videos of each one.
 // `sound` is the synth fallback for builds I don't have a clean recording of.
@@ -81,16 +80,18 @@ export const builds = {
       accent: '#a9cfe3', accentSide: '#7ea7bd', accentInk: '#22323c',
     },
   },
-  olivia: {
-    name: 'Olivia',
+  poppy: {
+    name: 'P Poppy',
     case: 'Gamakay LK67',
-    switches: 'Gateron Milky Yellow',
-    keycaps: 'Olivia-style PBT',
-    mods: ['SuperLube on switches', 'dielectric grease on stabs'],
-    note: 'The deepest, creamiest one I’ve made.',
+    switches: 'lubed linears',
+    keycaps: 'P Poppy PBT',
+    mods: ['lubed switches', 'lubed stabs'],
+    note: 'Cream and pink, and built the same way as the Blue Samurai.',
     link: SHOP,
-    sound: { thump: 95, body: 800 },
-    samples: NONE,
+    sound: { thump: 125, body: 1400 },
+    // same build as the blue samurai, and I don't have a separate recording of it
+    samples: clips('blue-samurai', 6, 0),
+    soundNote: 'The sound is that board’s recording.',
     colors: {
       case: '#e8e4de',
       alpha: '#f2ede7', alphaSide: '#cdc5bb', alphaInk: '#2b2b2b',
