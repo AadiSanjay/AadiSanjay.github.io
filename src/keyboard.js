@@ -245,8 +245,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     }
   }
 
+  // on a build card you're trying out the board, so letters that normally open a project
+  // (F, C, K) just type instead. esc or × first, then they open projects again.
+  const typesInstead = (action, char) =>
+    action?.type === 'project' && char?.length === 1 && buildIds.includes(display.dataset.showing);
+
   function act(code, char) {
-    const action = resolve(keymap, layer(), code);
+    let action = resolve(keymap, layer(), code);
+    if (typesInstead(action, char)) action = null;
     if (!action) {
       // typing a character is a fine thing to do; only wiggle keys that really do nothing
       if (char === 'Backspace' || char?.length === 1) echo(char);
@@ -310,7 +316,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     }
     if (e.repeat) {
       // held keys: no extra sounds or re-opened cards, but typing repeats like a real keyboard
-      if (resolve(keymap, layer(), code)) e.preventDefault();
+      const held = resolve(keymap, layer(), code);
+      if (held && !typesInstead(held, e.key)) e.preventDefault();
       else if (e.key === 'Backspace' || e.key?.length === 1) {
         echo(e.key);
         if (code === 'Space') e.preventDefault();
