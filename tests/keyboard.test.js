@@ -476,6 +476,49 @@ describe('typing works on every build', () => {
     expect(showing()).not.toBe('sched'); // didn't browse projects
   });
 
+  it('on a build card, project letters type instead of opening the project', () => {
+    mount();
+    root.querySelector('input[value="apollo"]').click();
+    typeWord('xsbx'); // S and B open projects in the test content
+    expect(showing()).toBe('apollo');
+    expect(line()).toBe('xsbx');
+  });
+
+  it('held project letters repeat on a build card too', () => {
+    mount();
+    root.querySelector('input[value="apollo"]').click();
+    press('KeyS', { key: 's' });
+    press('KeyS', { key: 's', repeat: true });
+    expect(line()).toBe('ss');
+  });
+
+  it('after closing the build card, project letters open projects again', () => {
+    mount();
+    root.querySelector('input[value="apollo"]').click();
+    press('Escape', { key: 'Escape' });
+    press('KeyS', { key: 's' });
+    expect(showing()).toBe('sched');
+  });
+
+  it('on a build card, shift + number still switches builds and esc still closes', () => {
+    mount();
+    root.querySelector('input[value="apollo"]').click();
+    press('ShiftLeft', { shiftKey: true });
+    press('Digit6', { shiftKey: true, key: '^' });
+    release('ShiftLeft');
+    expect(showing()).toBe('matcha');
+    press('Escape', { key: 'Escape' });
+    expect(showing()).toBe('');
+  });
+
+  it('clicking a project cap on a build card types too', () => {
+    mount();
+    root.querySelector('input[value="apollo"]').click();
+    cap('KeyS').click();
+    expect(showing()).toBe('apollo');
+    expect(line()).toBe('s');
+  });
+
   it('what you typed carries over when you switch builds', () => {
     mount();
     typeWord('xy');
