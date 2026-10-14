@@ -77,7 +77,6 @@ kbd {
 
 .nav a,
 .quick a,
-.scroll-hint a,
 .footer a {
   color: var(--paper);
   text-decoration-color: #ffffff40;
@@ -86,7 +85,6 @@ kbd {
 
 .nav a:hover,
 .quick a:hover,
-.scroll-hint a:hover,
 .footer a:hover {
   color: var(--legend);
   text-decoration-color: currentColor;
@@ -656,13 +654,6 @@ kbd {
 }
 
 /* ---- the plain version ---- */
-
-.scroll-hint {
-  margin: 2.5rem 0 0;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-}
 
 .section {
   margin-top: 5rem;

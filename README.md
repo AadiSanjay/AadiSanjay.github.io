@@ -36,7 +36,7 @@ npm run lint       # eslint
 npm run build      # production build into dist/
 ```
 
-68 tests in `tests/`:
+72 tests in `tests/`:
 
 - `keymap.test.js`: layer resolution and fall-through, shift+number → builds, duplicate/reserved key validation, the layout is 16 units wide with 68 unique keys, every recording a build points to exists, saved prefs (garbage values, prototype keys like `toString`, storage that throws).
 - `keyboard.test.js`: the real DOM in jsdom. Pressing and clicking keys, unmapped keys, esc, key repeat, browser shortcuts, typing in inputs, keys with an empty `event.code` (virtual keyboards), the shift layer and releasing it on window blur, one-shot fn, the build picker re-skinning and persisting, the typing echo and `hire` easter egg, project text never parsed as HTML.
