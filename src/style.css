@@ -1,0 +1,20 @@
+/* intentionally bare -- the real look comes once the concept is picked */
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 44rem;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  line-height: 1.5;
+}
+
+[data-filters] button[aria-pressed='true'] {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+[data-grid] {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
