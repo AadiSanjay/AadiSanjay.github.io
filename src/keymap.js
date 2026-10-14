@@ -16,6 +16,7 @@ export function buildKeymap(content) {
     KeyC: { type: 'section', id: 'contact' },
     KeyE: { type: 'section', id: 'experience' },
     KeyR: { type: 'section', id: 'resume' },
+    KeyU: { type: 'section', id: 'education' }, // u for uiuc
   };
   buildIds.forEach((id, i) => {
     fn[`Digit${i + 1}`] = { type: 'build', id };

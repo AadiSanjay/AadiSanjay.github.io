@@ -38,6 +38,9 @@ describe('resolve', () => {
 describe('buildKeymap', () => {
   it('my real content.js builds a valid keymap', () => {
     expect(() => buildKeymap(content)).not.toThrow();
+    for (const action of Object.values(buildKeymap(content).fn)) {
+      if (action.type === 'section') expect(content.sections[action.id], action.id).toBeDefined();
+    }
     const codes = new Set(rows.flat().map((key) => key.code));
     for (const p of content.projects) expect(codes.has(p.key), `${p.id} uses ${p.key}`).toBe(true);
   });

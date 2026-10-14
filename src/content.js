@@ -4,7 +4,7 @@ const base = import.meta.env?.BASE_URL ?? '/';
 export const content = {
   // the short "@ place / what" lines under my name
   roles: [
-    { at: 'UIUC', what: 'CS + Econ' },
+    { at: 'UIUC', what: 'B.S. CS + Econ, May 2029' },
     { at: 'NOBE × Cline Financial', what: 'software developer' },
     { at: 'PNW Keyboards', what: 'founder, 2022 – 26' },
   ],
@@ -47,6 +47,7 @@ export const content = {
     },
   ],
   sections: {
+    // placeholder until I write the real one
     about: {
       title: 'About',
       body: [
@@ -62,6 +63,11 @@ export const content = {
         'Founder of PNW Keyboards (2022 – 2026)',
         'Co-founder & web developer at Educatodos (2024 – 2026)',
       ],
+      links: [],
+    },
+    education: {
+      title: 'Education',
+      body: ['B.S. Computer Science + Economics', 'University of Illinois Urbana-Champaign · expected May 2029'],
       links: [],
     },
     contact: {

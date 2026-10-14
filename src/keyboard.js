@@ -202,8 +202,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
     const cap = caps.get(code);
     if (!cap) return;
-    if (SHIFTS.has(code)) {
-      shiftHeld = true;
+    // trust the event's own shift flag too, in case we missed the shift keydown (focus changes, synthetic input)
+    const shift = SHIFTS.has(code) || !!e.shiftKey;
+    if (shift !== shiftHeld) {
+      shiftHeld = shift;
       updateLayer();
     }
     if (e.repeat) {

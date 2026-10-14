@@ -1,4 +1,3 @@
-import './style.css';
 import { content } from './content.js';
 import { createSound } from './sound.js';
 import { mountKeyboard } from './keyboard.js';

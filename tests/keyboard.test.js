@@ -23,6 +23,7 @@ const content = {
     about: { title: 'About me', body: 'hi', links: [] },
     contact: { title: 'Contact', body: '', links: [] },
     experience: { title: 'Experience', body: ['Dev at Acme (2026)'], links: [] },
+    education: { title: 'Education', body: ['B.S. CS', 'Somewhere U · 2029'], links: [] },
     resume: { title: 'Resume', body: '', links: [] },
   },
 };
@@ -232,6 +233,14 @@ describe('the fn layer', () => {
     expect(kb.layer).toBe('base');
   });
 
+  it('uses the shift flag on the event even if the shift keydown was missed', () => {
+    mount();
+    press('KeyU', { shiftKey: true });
+    expect(showing()).toBe('education');
+    press('KeyQ');
+    expect(kb.layer).toBe('base');
+  });
+
   it('project keys still work while shift is held', () => {
     mount();
     press('ShiftRight', { shiftKey: true });
@@ -246,6 +255,14 @@ describe('the fn layer', () => {
     window.dispatchEvent(new Event('blur'));
     expect(kb.layer).toBe('base');
     expect(root.querySelectorAll('.cap.down')).toHaveLength(0);
+  });
+
+  it('shift+u shows education', () => {
+    mount();
+    press('ShiftLeft', { shiftKey: true });
+    press('KeyU', { shiftKey: true });
+    expect(display().querySelector('h2').textContent).toBe('Education');
+    expect(display().textContent).toContain('2029');
   });
 
   it('shift+e shows experience', () => {
