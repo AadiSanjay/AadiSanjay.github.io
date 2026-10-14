@@ -21,10 +21,13 @@ describe('renderSections (the plain version)', () => {
     expect(document.querySelector('#focusticker kbd').textContent).toBe('F');
   });
 
-  it('keeps project cards short: status, one blurb, links', () => {
+  // changed on purpose: cards now carry a little more evidence than the panels (a how-it-works
+  // sentence and tags), but still no lists or case studies
+  it('keeps project cards scannable: status, one blurb, at most one how sentence, tags, links', () => {
     const ft = content.projects.find((p) => p.id === 'focusticker');
     const article = document.querySelector('#focusticker');
-    expect(article.querySelectorAll('p:not(.status, .links)')).toHaveLength(1);
+    expect([...article.querySelectorAll('p:not(.status, .links)')].map((p) => p.textContent)).toEqual([ft.body, ft.how]);
+    expect([...article.querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(ft.stack);
     const links = [...article.querySelectorAll('a.btn')];
     expect(links.map((a) => a.href)).toEqual(ft.links.map((l) => l.href));
     expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
@@ -50,6 +53,14 @@ describe('renderSections (the plain version)', () => {
     expect(btn.getAttribute('aria-label')).toBe('Press C on the keyboard');
     btn.click();
     expect(pressed).toEqual(['KeyC']);
+  });
+
+  it('a project still in development looks lighter, and claims no links or screenshot', () => {
+    const capsule = document.querySelector('#capsule');
+    expect(capsule.classList.contains('in-progress')).toBe(true);
+    expect(capsule.querySelector('.status').textContent).toMatch(/in development/);
+    expect(capsule.querySelector('img, a')).toBeNull();
+    expect(document.querySelector('#focusticker').classList.contains('in-progress')).toBe(false);
   });
 
   it('a project with no links gets no empty button row', () => {

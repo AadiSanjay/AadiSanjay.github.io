@@ -834,6 +834,22 @@ kbd {
   padding-top: 1rem;
 }
 
+.project .how {
+  margin-top: 0.6rem;
+  font-size: 0.88rem;
+  color: #d9cfbb;
+}
+
+/* not shipped yet: lighter, so it reads as "coming", not as a card that failed to load */
+.project.in-progress {
+  border-style: dashed;
+  background: none;
+}
+
+.project.in-progress h3 {
+  color: #d9cfbb;
+}
+
 .project .status {
   margin: 0.15rem 0 0.8rem;
   font-family: var(--mono);

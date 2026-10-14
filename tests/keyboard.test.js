@@ -219,6 +219,27 @@ describe('typing on the keyboard', () => {
     expect(display().querySelectorAll('.body p')).toHaveLength(2);
   });
 
+  // the robot again, but with a how-it-works sentence and a kind
+  const withRobotShop = () => {
+    const robot = { ...content.projects[1], how: 'Gears.', kind: 'robot shop' };
+    kb = mountKeyboard(root, { content: { ...content, projects: [content.projects[0], robot] }, sound, storage });
+  };
+
+  it('a project panel adds its one how-it-works sentence after the description', () => {
+    withRobotShop();
+    press('KeyB');
+    const paras = [...display().querySelectorAll('.body p')].map((p) => p.textContent);
+    expect(paras).toEqual(['<img src=x>', 'Gears.']);
+  });
+
+  it('a project that isn\'t software says what it is in the kicker', () => {
+    withRobotShop();
+    press('KeyB');
+    expect(display().querySelector('.kicker').textContent).toBe('[B] robot shop');
+    press('KeyS');
+    expect(display().querySelector('.kicker').textContent).toBe('[S] project');
+  });
+
   it('project cards lead with what it does: no tech-stack chips, links as buttons', () => {
     mount();
     press('KeyS');

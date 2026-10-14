@@ -35,6 +35,15 @@ describe('resolve', () => {
   });
 });
 
+describe('content.js', () => {
+  it('panels stay compact: one description and at most one how-it-works sentence', () => {
+    for (const p of content.projects) {
+      expect(typeof p.body, p.id).toBe('string');
+      if (p.how) expect(p.how.match(/[.!?](\s|$)/g), p.id).toHaveLength(1);
+    }
+  });
+});
+
 describe('buildKeymap', () => {
   it('my real content.js builds a valid keymap', () => {
     expect(() => buildKeymap(content)).not.toThrow();

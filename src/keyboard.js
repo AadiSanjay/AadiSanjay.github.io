@@ -208,7 +208,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
+      // what it does, plus at most one sentence on how. tags and the rest live on the cards below
+      showCard({ kicker: `[${key}] ${p.kind ?? 'project'}`, ...p, body: [p.body, p.how].flat().filter(Boolean), stack: [] });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[${layerKey()} + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });

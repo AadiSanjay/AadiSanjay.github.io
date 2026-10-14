@@ -25,7 +25,7 @@ function linkButtons(links) {
 }
 
 function project(p, onKey) {
-  const article = el('article', 'project');
+  const article = el('article', p.inProgress ? 'project in-progress' : 'project');
   article.id = p.id;
   if (p.image) {
     const img = el('img', 'shot');
@@ -44,6 +44,13 @@ function project(p, onKey) {
   press.addEventListener('click', () => onKey?.(p.key));
   head.append(el('h3', null, p.title), press);
   article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
+  if (p.how) article.append(el('p', 'how', p.how));
+  if (p.stack?.length) {
+    const tags = el('ul', 'stack');
+    tags.setAttribute('aria-label', p.kind ? 'Skills' : 'Built with');
+    tags.append(...p.stack.map((t) => el('li', null, t)));
+    article.append(tags);
+  }
   if (p.links.length) article.append(linkButtons(p.links));
   return article;
 }
