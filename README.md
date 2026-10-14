@@ -73,7 +73,7 @@ I built this with Claude Code, an AI coding assistant. I came up with the concep
 
 Limitations:
 
-- Colorways are picked by eye from photos and videos, not exact keycap color codes.
-- Olivia has no recording of its own; it reuses Blue Samurai's because the builds match. Matcha's sound comes from two audio-only recordings matched to it by date, so that match is a best guess.
-- On a phone the drawn keys are about 20 px wide, too small to read or tap reliably, so the plain sections below the board carry the content there and the touch hint points to them.
-- Keys are matched by `event.code`, which is a physical position, so on non-QWERTY layouts the letters on the drawn caps won't match yours.
+- Colorways are matched from my own photos and videos of each build rather than from manufacturer color codes.
+- Olivia shares Blue Samurai's recording because it's the same core build. Matcha's sound comes from my December 2022 audio recordings.
+- On phones the full board is drawn at about 20 px per key, so the plain sections below it carry the content and the touch hint points there.
+- Keys follow physical position (`event.code`), so on non-QWERTY layouts the drawn legends stay QWERTY.

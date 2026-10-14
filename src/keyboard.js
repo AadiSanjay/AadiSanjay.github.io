@@ -234,7 +234,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         kicker: `[${layerKey()} + ${buildIds.indexOf(action.id) + 1}] build`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
-        body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : 'No recording of this one, so the sound is approximated.')}`,
+        body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : '')}`,
         stack: b.mods,
         links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My Etsy shop', href: b.link }],
         typing: true, // build cards are for trying the board, so give typing somewhere to go

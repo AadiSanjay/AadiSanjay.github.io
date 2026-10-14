@@ -53,7 +53,7 @@ export const content = {
       key: 'KeyC',
       short: 'capsule',
       title: 'Capsule',
-      status: 'iOS app · in development · first version targeted for December 2026',
+      status: 'iOS app · in development · first version December 2026',
       inProgress: true,
       body: 'A private pocket journal I’m building: write a few lines, add a photo, and seal it like a time capsule until a date you choose.',
       stack: ['Swift', 'SwiftUI', 'SwiftData'],
