@@ -167,6 +167,21 @@ kbd {
   justify-content: flex-end;
 }
 
+.for-touch {
+  display: none;
+}
+
+/* phones and tablets: you tap, you don't type */
+@media (hover: none) and (pointer: coarse) {
+  .for-keys {
+    display: none;
+  }
+
+  .for-touch {
+    display: inline;
+  }
+}
+
 .echo {
   min-height: 1.5em;
   margin: 0.8rem 0 0;
@@ -286,12 +301,12 @@ kbd {
   display: inline-block;
   padding: 0.45rem 0.9rem 0.5rem;
   border-radius: 7px;
-  background: var(--alpha);
+  background: #981b26; /* a shade darker than the caps so the yellow text passes 4.5:1 */
   color: var(--legend);
   font-weight: 700;
   font-size: 0.9rem;
   text-decoration: none;
-  box-shadow: 0 4px 0 var(--alpha-side);
+  box-shadow: 0 4px 0 #5f1018;
   transition: transform 60ms, box-shadow 60ms;
 }
 
@@ -301,7 +316,7 @@ kbd {
 
 .btn:active {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--alpha-side);
+  box-shadow: 0 1px 0 #5f1018;
 }
 
 .btn:focus-visible {
