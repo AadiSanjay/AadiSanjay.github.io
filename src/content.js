@@ -55,15 +55,54 @@ export const content = {
       body: [
         'I’m Aadi, a Computer Science + Economics student at the University of Illinois Urbana-Champaign (class of 2029) and a National Merit Finalist, originally from the Seattle area.',
         'I like building things people actually use: browser extensions, apps, and keyboards. Right now I’m a software developer on the NOBE Technology Committee, building an investment app for Cline Financial.',
+        'Outside of code I coached 160+ middle-school debaters, mentored DECA competitors (I was an ICDC finalist), and spend too long listening to switches.',
       ],
       links: [],
     },
     experience: {
       title: 'Experience',
-      body: [
-        'Software Developer, NOBE Technology Committee × Cline Financial (Sep 2026 – now). React/TypeScript and C#/.NET investment app; I wrote the parser that turns brokerage workbooks into clean transaction and cost-basis data.',
-        'Co-Founder & Web Developer, Educatodos (2024 – 2026). A multilingual site for Spanish-speaking English learners, serving 50+ students.',
-        'Web Developer, GLOW Action (2025 – 2026). Prototyped a disaster-preparedness app for rural communities in Andhra Pradesh.',
+      items: [
+        {
+          role: 'Software Developer',
+          org: 'NOBE Technology Committee × Cline Financial',
+          dates: 'Sep 2026 – now',
+          blurb: 'Building a React/TypeScript and C#/.NET investment app in a shared codebase. I wrote the ClosedXML parser that turns brokerage subaccount workbooks into validated, normalized transaction and cost-basis data.',
+          stack: ['React', 'TypeScript', 'C#', '.NET', 'ClosedXML'],
+        },
+        {
+          role: 'Founder',
+          org: 'PNW Keyboards (prev. Floofd Keebs)',
+          dates: '2022 – now',
+          blurb: 'Design, mod, and sell custom 65% keyboards on Etsy: 10 sales and a 4.9★ average across 7 reviews.',
+          stack: ['soldering', 'acoustics', 'small business'],
+        },
+        {
+          role: 'Co-Founder & Web Developer',
+          org: 'Educatodos',
+          dates: 'Jan 2024 – Aug 2026',
+          blurb: 'Built a multilingual site for Spanish-speaking English learners and co-ran tutoring for 50+ students.',
+          stack: ['HTML', 'CSS', 'JavaScript'],
+        },
+        {
+          role: 'Web Developer',
+          org: 'GLOW Action',
+          dates: 'Mar 2025 – Jun 2026',
+          blurb: 'Designed and prototyped C3-AP, a disaster-preparedness app for rural communities in Andhra Pradesh, shaped by feedback from 50+ youth.',
+          stack: ['prototyping', 'UX research'],
+        },
+      ],
+      links: [],
+    },
+    education: {
+      title: 'Education',
+      items: [
+        {
+          role: 'B.S. Computer Science + Economics',
+          org: 'University of Illinois Urbana-Champaign',
+          dates: 'expected May 2029',
+          blurb: 'National Merit Finalist. Coursework: CS 124, MATH 257 (Linear Algebra), STAT 200.',
+          stack: [],
+        },
       ],
       links: [],
     },

@@ -4,18 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aadi Sanjay</title>
-    <meta name="description" content="Aadi Sanjay's projects, on a keyboard." />
+    <meta name="description" content="Aadi Sanjay, CS + Econ at UIUC. Browser extensions, iOS apps, and custom mechanical keyboards. Looking for summer 2027 internships." />
+    <meta name="theme-color" content="#191613" />
+    <meta property="og:title" content="Aadi Sanjay" />
+    <meta property="og:description" content="My projects, on a keyboard I built. Type to explore." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   </head>
   <body>
+    <a class="skip" href="#work">Skip to projects</a>
+
     <main id="desk" class="desk">
       <header class="intro">
+        <nav class="nav" aria-label="Sections">
+          <a href="#work">work</a>
+          <a href="#experience">experience</a>
+          <a href="#about">about</a>
+          <a href="resume.pdf" target="_blank" rel="noopener">resume ↗</a>
+        </nav>
         <h1>Aadi Sanjay</h1>
-        <p>CS + Econ at UIUC. I build browser extensions, apps, and keyboards.</p>
+        <p class="tagline">CS + Econ at UIUC. I build browser extensions, iOS apps, and custom mechanical keyboards.</p>
+        <p class="looking"><span class="pulse" aria-hidden="true"></span> looking for summer 2027 SWE internships</p>
+        <p class="quick">
+          <a href="mailto:aadisanjwa@gmail.com">aadisanjwa@gmail.com</a>
+          <button type="button" class="copy" data-copy="aadisanjwa@gmail.com">copy</button>
+          <span aria-hidden="true">·</span>
+          <a href="https://www.linkedin.com/in/aadi-sanjay/" target="_blank" rel="noopener">LinkedIn</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://github.com/AadiSanjay" target="_blank" rel="noopener">GitHub</a>
+        </p>
       </header>
 
       <div class="display" data-display aria-live="polite">
         <p class="idle">
-          type a key with a <span class="dot" aria-hidden="true"></span> to open a project.<br />
+          this is my keyboard. type a key with a <span class="dot" aria-hidden="true"></span> to open a project.<br />
           hold <kbd>shift</kbd> (or click <kbd>fn</kbd>) for about, experience, contact, resume, and my other builds.
         </p>
       </div>
@@ -27,14 +49,43 @@
           <legend>try my other builds</legend>
         </fieldset>
         <button type="button" data-sound aria-pressed="true">sound: on</button>
-        <button type="button" data-list-toggle aria-expanded="false" aria-controls="work-list">just show me a list</button>
       </div>
 
-      <section id="work-list" class="work-list" data-list hidden>
-        <h2>Work</h2>
-        <ul></ul>
+      <p class="scroll-hint"><a href="#work">or just scroll for the normal version ↓</a></p>
+
+      <section id="work" class="section" aria-labelledby="work-title">
+        <h2 id="work-title">Work</h2>
+        <div class="projects" data-work></div>
       </section>
+
+      <section id="experience" class="section" aria-labelledby="experience-title">
+        <h2 id="experience-title">Experience</h2>
+        <div data-experience></div>
+        <h2 class="sub-title">Education</h2>
+        <div data-education></div>
+        <p class="links">
+          <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Full resume (PDF) ↗</a>
+        </p>
+      </section>
+
+      <section id="about" class="section" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <div class="about" data-about></div>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Built from scratch with plain JavaScript and Vite, tested with Vitest, deployed by GitHub Actions.
+          The board is my Red Samurai build, and the sounds are recorded from my own keyboards.
+          <a href="https://github.com/AadiSanjay/PersonalWebsite" target="_blank" rel="noopener">Source ↗</a>
+        </p>
+        <p>© 2026 Aadi Sanjay</p>
+      </footer>
     </main>
+
+    <noscript>
+      <p class="noscript">This site's keyboard needs JavaScript. My resume is at <a href="resume.pdf">resume.pdf</a>, and I'm at aadisanjwa@gmail.com.</p>
+    </noscript>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

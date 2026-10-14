@@ -22,7 +22,11 @@ const content = {
   sections: {
     about: { title: 'About me', body: 'hi', links: [] },
     contact: { title: 'Contact', body: '', links: [] },
-    experience: { title: 'Experience', body: '', links: [] },
+    experience: {
+      title: 'Experience',
+      items: [{ role: 'Dev', org: 'Acme', dates: '2026', blurb: 'built things', stack: [] }],
+      links: [],
+    },
     resume: { title: 'Resume', body: '', links: [] },
   },
 };
@@ -56,8 +60,6 @@ beforeEach(() => {
       <div data-board></div>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
-      <button data-list-toggle></button>
-      <section data-list hidden><ul></ul></section>
     </main>`;
   root = document.querySelector('#desk');
   sound = { play: vi.fn(), setEnabled: vi.fn(), preload: vi.fn() };
@@ -179,6 +181,13 @@ describe('the fn layer', () => {
     expect(root.querySelectorAll('.cap.down')).toHaveLength(0);
   });
 
+  it('shift+e lists experience items as paragraphs', () => {
+    mount();
+    press('ShiftLeft', { shiftKey: true });
+    press('KeyE', { shiftKey: true });
+    expect(display().querySelector('.body').textContent).toBe('Dev, Acme (2026). built things');
+  });
+
   it('clicking fn applies to the next key only', () => {
     mount();
     cap('Fn').click();
@@ -266,18 +275,11 @@ describe('build picker', () => {
   });
 });
 
-describe('sound + list toggles', () => {
+describe('sound toggle', () => {
   it('sound can be turned off and stays off', () => {
     mount();
     root.querySelector('[data-sound]').click();
     expect(sound.setEnabled).toHaveBeenLastCalledWith(false);
     expect(storage.data.get('sound')).toBe('off');
-  });
-
-  it('list view shows every project', () => {
-    mount();
-    root.querySelector('[data-list-toggle]').click();
-    expect(root.querySelector('[data-list]').hidden).toBe(false);
-    expect(root.querySelectorAll('[data-list] li')).toHaveLength(2);
   });
 });

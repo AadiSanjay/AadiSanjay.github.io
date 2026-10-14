@@ -11,8 +11,6 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const display = root.querySelector('[data-display]');
   const picker = root.querySelector('[data-builds]');
   const soundBtn = root.querySelector('[data-sound]');
-  const list = root.querySelector('[data-list]');
-  const listBtn = root.querySelector('[data-list-toggle]');
 
   const keymap = buildKeymap(content);
   const projects = new Map(content.projects.map((p) => [p.id, p]));
@@ -125,7 +123,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       showCard({ kicker: `[${key}] project`, ...p });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
-      showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
+      const body = s.items ? s.items.map((i) => `${i.role}, ${i.org} (${i.dates}). ${i.blurb}`) : s.body;
+      showCard({ kicker: `[shift] ${action.id}`, title: s.title, body, links: s.links });
     } else if (action.type === 'build') {
       setBuild(action.id);
       const b = builds[action.id];
@@ -242,7 +241,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   });
   setBuild(buildId);
 
-  // --- sound + list toggles ---
+  // --- sound toggle ---
   function setSound(on) {
     sound.setEnabled(on);
     setPref(storage, 'sound', on ? 'on' : 'off');
@@ -251,30 +250,6 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
   soundBtn.addEventListener('click', () => setSound(soundBtn.getAttribute('aria-pressed') !== 'true'));
   setSound(getPref(storage, 'sound', 'on') === 'on');
-
-  for (const p of content.projects) {
-    const li = document.createElement('li');
-    li.innerHTML = `<kbd></kbd> <strong></strong> <span></span><p></p>`;
-    li.querySelector('kbd').textContent = caps.get(p.key).querySelector('.legend').textContent;
-    li.querySelector('strong').textContent = p.title;
-    li.querySelector('span').textContent = p.status ? `· ${p.status}` : '';
-    li.querySelector('p').textContent = [p.body].flat()[0];
-    for (const { label, href } of p.links) {
-      const a = document.createElement('a');
-      a.className = 'btn';
-      a.href = href;
-      a.textContent = `${label} ↗`;
-      li.append(a);
-    }
-    list.querySelector('ul').append(li);
-  }
-  function setList(open) {
-    list.hidden = !open;
-    listBtn.setAttribute('aria-expanded', String(open));
-  }
-  listBtn.addEventListener('click', () => setList(list.hidden));
-  // the board gets too small to read on phones, so start with the list there
-  setList(!!win.matchMedia?.('(max-width: 640px)').matches);
 
   updateLayer();
 
