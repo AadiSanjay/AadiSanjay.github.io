@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mountKeyboard, codeOf } from '../src/keyboard.js';
+import { buildIds } from '../src/builds.js';
 
 const content = {
   projects: [
@@ -95,12 +96,18 @@ describe('typing on the keyboard', () => {
 
   it('an unmapped key wiggles, plays, and leaves the page alone', () => {
     mount();
-    press('KeyS');
-    const e = press('KeyQ');
+    const e = press('KeyQ', { key: 'q' });
     expect(cap('KeyQ').classList.contains('nope')).toBe(true);
-    expect(showing()).toBe('sched');
-    expect(e.defaultPrevented).toBe(false); // e.g. space still scrolls, tab still tabs
-    expect(sound.play).toHaveBeenCalledTimes(2);
+    expect(e.defaultPrevented).toBe(false); // e.g. tab still tabs
+    expect(sound.play).toHaveBeenCalledTimes(1);
+  });
+
+  it('typing a letter while a project card is open goes back to typing', () => {
+    mount();
+    press('KeyS');
+    press('KeyQ', { key: 'q' });
+    expect(showing()).toBe('');
+    expect(display().querySelector('.echo').textContent).toBe('q');
   });
 
   it('esc goes back to the idle screen', () => {
@@ -217,13 +224,18 @@ describe('typing on dead keys', () => {
     expect(showing()).toBe('contact');
   });
 
-  it('does not echo while a card is open, and esc clears the line', () => {
+  it('esc clears the line', () => {
     mount();
-    press('KeyQ', { key: 'q' });
-    press('KeyS', { key: 's' });
     press('KeyQ', { key: 'q' });
     press('Escape', { key: 'Escape' });
     expect(echo()).toBe('');
+  });
+
+  it('keys that type nothing (tab, ctrl) don\'t close an open card', () => {
+    mount();
+    press('KeyS');
+    press('Tab', { key: 'Tab' });
+    expect(showing()).toBe('sched');
   });
 
   it('space types a space instead of scrolling while the board is on screen', () => {
@@ -348,6 +360,75 @@ describe('the fn layer', () => {
     cap('KeyC').click();
     expect(showing()).toBe('contact');
     expect(kb.layer).toBe('base');
+  });
+});
+
+describe('typing works on every build', () => {
+  const typeWord = (w) => {
+    for (const ch of w) {
+      press(ch === ' ' ? 'Space' : `Key${ch.toUpperCase()}`, { key: ch });
+      release(ch === ' ' ? 'Space' : `Key${ch.toUpperCase()}`);
+    }
+  };
+  const line = () => display().querySelector('.echo')?.textContent;
+
+  for (const id of buildIds) {
+    it(`${id}: picked from the picker, typing shows on its card and plays its sound`, () => {
+      mount();
+      root.querySelector(`input[value="${id}"]`).click();
+      typeWord('thock it');
+      expect(line()).toBe('thock it');
+      expect(sound.play).toHaveBeenCalledWith(id);
+      expect(sound.play).toHaveBeenCalledWith(id, 'up');
+    });
+
+    it(`${id}: picked with shift + number, typing still works`, () => {
+      mount();
+      const n = buildIds.indexOf(id) + 1;
+      press('ShiftLeft', { shiftKey: true });
+      press(`Digit${n}`, { shiftKey: true, key: String(n) });
+      release(`Digit${n}`);
+      release('ShiftLeft');
+      expect(root.dataset.build).toBe(id);
+      typeWord('yo');
+      expect(line()).toBe('yo');
+    });
+
+    it(`${id}: saved from last visit, typing works on the idle screen`, () => {
+      storage = memoryStorage({ build: id });
+      mount();
+      typeWord('hey');
+      expect(line()).toBe('hey');
+      expect(sound.play).toHaveBeenLastCalledWith(id, 'up');
+    });
+  }
+
+  it('typing keeps working right after clicking a build in the picker (radio has focus)', () => {
+    mount();
+    const radio = root.querySelector('input[value="apollo"]');
+    radio.click();
+    radio.focus();
+    for (const ch of 'yo') radio.dispatchEvent(new KeyboardEvent('keydown', { code: `Key${ch.toUpperCase()}`, key: ch, bubbles: true }));
+    expect(line()).toBe('yo');
+  });
+
+  it('arrow keys on a focused build radio are left to the browser (moving between builds)', () => {
+    mount();
+    const radio = root.querySelector('input[value="apollo"]');
+    radio.focus();
+    const e = new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight', bubbles: true, cancelable: true });
+    radio.dispatchEvent(e);
+    expect(e.defaultPrevented).toBe(false);
+    expect(showing()).not.toBe('sched'); // didn't browse projects
+  });
+
+  it('what you typed carries over when you switch builds', () => {
+    mount();
+    typeWord('xy');
+    root.querySelector('input[value="olivia"]').click();
+    typeWord('z');
+    root.querySelector('input[value="matcha"]').click();
+    expect(line()).toBe('xyz');
   });
 });
 

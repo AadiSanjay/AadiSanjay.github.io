@@ -122,9 +122,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [], image }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], image, typing = false, compact = false }) {
     const card = document.createElement('article');
-    card.className = 'card';
+    card.className = compact ? 'card compact' : 'card';
     card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
     if (image) {
       const img = document.createElement('img');
@@ -157,6 +157,14 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         a.rel = 'noopener';
       }
       card.querySelector('.links').append(a);
+    }
+    if (typing) {
+      // right under the description, so long spec lines or tags can never push it out of view
+      const line = document.createElement('p');
+      line.className = 'echo';
+      line.setAttribute('aria-hidden', 'true');
+      line.textContent = typed;
+      card.querySelector('.body').after(line);
     }
     display.replaceChildren(card);
   }
@@ -192,9 +200,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         kicker: `[shift + ${buildIds.indexOf(action.id) + 1}] build`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
-        body: [b.note, b.soundNote ?? (b.samples.down.length ? 'The sound is recorded from this exact board. Type something.' : 'No recording of this one, so the sound is approximated. Type something.')],
+        body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : 'No recording of this one, so the sound is approximated.')}`,
         stack: b.mods,
         links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My old Etsy shop', href: b.link }],
+        typing: true, // build cards are for trying the board, so give typing somewhere to go
+        compact: true,
       });
     } else {
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
@@ -204,7 +214,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   let typed = '';
   function echo(char) {
-    if (display.dataset.showing) return; // only while the idle screen is up
+    if (char !== 'Backspace' && char.length !== 1) return;
+    // typing always works: build cards have their own line, and any other card steps aside for it
+    if (!display.querySelector('.echo')) run({ type: 'close' });
     if (char === 'Backspace') typed = typed.slice(0, -1);
     else if (char.length === 1) typed = (typed + char).slice(-32);
     else return;
@@ -257,7 +269,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function onKeyDown(e) {
     const code = codeOf(e);
     const target = e.target;
-    if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
+    // leave real text fields alone. radio buttons (the build picker) aren't text fields: clicking one
+    // focuses it, and typing must keep working. arrows still move between radios natively.
+    if (target?.closest?.('textarea, select, [contenteditable], input:not([type=radio], [type=checkbox])')) return;
+    if (target?.matches?.('input[type=radio]') && code.startsWith('Arrow')) return;
     if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
     // on a focused button or link, enter/space should activate it natively. the drawn caps are the
     // exception for space: it types a space (enter still activates a focused cap)

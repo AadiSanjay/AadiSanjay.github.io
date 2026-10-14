@@ -241,6 +241,37 @@ kbd {
   overflow: hidden;
 }
 
+.card .echo:empty::before {
+  content: 'type something…';
+  color: #1d1b1966;
+}
+
+/* build cards: tags and the button share a row to leave room for the typing line */
+.card.compact .stack,
+.card.compact .links {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-top: 0.5rem;
+}
+
+.card.compact .links {
+  margin-left: 0.6rem;
+}
+
+.card.compact .btn {
+  padding: 0.3rem 0.75rem 0.35rem;
+  font-size: 0.8rem;
+}
+
+.card .echo {
+  margin: 0 0 0.2rem;
+  min-height: 1.4em;
+  font-size: 1rem;
+  color: var(--ink);
+  border-bottom: 1px dashed #1d1b1933;
+  padding-bottom: 0.3rem;
+}
+
 .echo:not(:empty)::after {
   content: '▍';
   color: var(--legend);
