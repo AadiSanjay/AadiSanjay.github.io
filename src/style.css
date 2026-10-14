@@ -16,12 +16,60 @@
   --travel: 4px;
   --press: cubic-bezier(0.3, 0, 0.2, 1) 70ms;
 
+  /* scrollbars: brass on the warm dark desk, a darker brass on the cream panels. the page chrome
+     stays red samurai whatever build you pick, so these read the same on every colorway */
+  --scroll-track: #221e1a;
+  --scroll-thumb: #b3963d;
+  --scroll-thumb-hover: #d4b04f;
+  --panel-track: #e6dbc2;
+  --panel-thumb: #85703f;
+
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* real, native scrollbars, just recolored: no js, no hijacking */
+html {
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+  scrollbar-width: auto;
+}
+
+.card-inner {
+  scrollbar-color: var(--panel-thumb) var(--panel-track);
+  scrollbar-width: auto;
+}
+
+/* safari (and older chrome) don't support scrollbar-color yet */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border: 3px solid var(--scroll-track);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
+}
+
+.card-inner::-webkit-scrollbar-track {
+  background: var(--panel-track);
+}
+
+.card-inner::-webkit-scrollbar-thumb {
+  background: var(--panel-thumb);
+  border-color: var(--panel-track);
 }
 
 body {
