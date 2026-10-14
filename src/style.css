@@ -732,7 +732,7 @@ kbd {
 .builds {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  gap: 0.5rem 0.6rem;
   margin: 0;
   padding: 0;
   border: 0;
@@ -789,8 +789,17 @@ kbd {
   background: none;
   border: 1px solid #ffffff30;
   border-radius: 999px;
-  padding: 0.3rem 0.65rem;
+  padding: 0.3rem 0.55rem;
   cursor: pointer;
+}
+
+/* each toggle is as wide on as it is off, so flipping it never reflows the row (or the page) */
+.controls [data-sound] {
+  min-width: calc(10ch + 1.1rem + 2px); /* "sound: off" */
+}
+
+.controls [data-keys] {
+  min-width: calc(9ch + 1.1rem + 2px); /* "keys: off" */
 }
 
 .controls button[aria-pressed='false'] {
