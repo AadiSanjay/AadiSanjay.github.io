@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildKeymap, resolve } from '../src/keymap.js';
-import { loadBuild, DEFAULT_BUILD, buildIds } from '../src/builds.js';
+import { existsSync } from 'node:fs';
+import { builds, loadBuild, DEFAULT_BUILD, buildIds } from '../src/builds.js';
 import { rows } from '../src/layout.js';
 
 const project = (id, key) => ({ id, key, short: id, title: id, blurb: '', tags: [], links: [] });
@@ -52,6 +53,20 @@ describe('layout', () => {
     const codes = rows.flat().map((key) => key.code);
     expect(codes).toHaveLength(68);
     expect(new Set(codes).size).toBe(68);
+  });
+});
+
+describe('builds', () => {
+  it('every recording a build points to exists in public/sounds', () => {
+    for (const id of buildIds) {
+      for (const url of builds[id].samples) {
+        expect(existsSync(new URL(`../public${url}`, import.meta.url)), url).toBe(true);
+      }
+    }
+  });
+
+  it('every build defines a case color plus all nine keycap colors', () => {
+    for (const id of buildIds) expect(Object.keys(builds[id].colors)).toHaveLength(10);
   });
 });
 

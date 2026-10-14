@@ -133,9 +133,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
         kicker: `[shift] build ${buildIds.indexOf(action.id) + 1}/${buildIds.length}`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
-        body: `${b.note} type something.`,
+        body: [b.note, b.samples.length ? 'The sound is recorded from this exact board. Type something.' : 'No clean recording of this one yet, so the sound is approximated. Type something.'],
         stack: b.mods,
-        links: [{ label: 'PNW Keyboards on Etsy', href: 'https://www.etsy.com/shop/PNWKeyboards' }],
+        links: [{ label: b.link.includes('/listing/') ? 'See the listing' : 'PNW Keyboards on Etsy', href: b.link }],
       });
     } else {
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
@@ -221,6 +221,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function setBuild(id) {
     buildId = id;
     saveBuild(storage, id);
+    sound.preload?.(id);
     root.dataset.build = id;
     for (const [key, value] of Object.entries(builds[id].colors)) {
       board.style.setProperty(`--${cssName(key)}`, value);

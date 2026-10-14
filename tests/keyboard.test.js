@@ -60,7 +60,7 @@ beforeEach(() => {
       <section data-list hidden><ul></ul></section>
     </main>`;
   root = document.querySelector('#desk');
-  sound = { play: vi.fn(), setEnabled: vi.fn() };
+  sound = { play: vi.fn(), setEnabled: vi.fn(), preload: vi.fn() };
   storage = memoryStorage();
 });
 
@@ -218,12 +218,20 @@ describe('build picker', () => {
     press('KeyF');
     expect(sound.play).toHaveBeenLastCalledWith('olivia');
     expect(storage.data.get('build')).toBe('olivia');
+    expect(display().textContent).toContain('approximated'); // no recording of olivia yet
+  });
+
+  it('starts fetching recordings as soon as a build is picked', () => {
+    mount();
+    expect(sound.preload).toHaveBeenCalledWith('red-samurai');
+    kb.setBuild('rose-red');
+    expect(sound.preload).toHaveBeenLastCalledWith('rose-red');
   });
 
   it('shift+number picks a build from the keyboard and shows its specs', () => {
     mount();
     press('ShiftLeft', { shiftKey: true });
-    press('Digit2', { shiftKey: true });
+    press('Digit3', { shiftKey: true });
     expect(root.dataset.build).toBe('blue-samurai');
     expect(root.querySelector('input[value="blue-samurai"]').checked).toBe(true);
     expect(display().querySelector('h2').textContent).toBe('Blue Samurai');
@@ -253,8 +261,8 @@ describe('build picker', () => {
       },
     };
     mount();
-    expect(() => kb.setBuild('wob-white')).not.toThrow();
-    expect(root.dataset.build).toBe('wob-white');
+    expect(() => kb.setBuild('white')).not.toThrow();
+    expect(root.dataset.build).toBe('white');
   });
 });
 
