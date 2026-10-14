@@ -117,10 +117,18 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [] }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], image }) {
     const card = document.createElement('article');
     card.className = 'card';
     card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
+    if (image) {
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = image.src;
+      img.alt = image.alt;
+      card.classList.add('has-thumb');
+      card.prepend(img);
+    }
     card.querySelector('.kicker').textContent = kicker;
     card.querySelector('h2').textContent = title;
     card.querySelector('.status').textContent = status ?? '';

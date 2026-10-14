@@ -14,6 +14,7 @@ export const content = {
       key: 'KeyF',
       short: 'focusticker',
       title: 'FocusTicker',
+      image: { src: `${base}shots/focusticker.jpg`, alt: 'FocusTicker’s timer pill in the corner of LinkedIn, showing 02:34 today' },
       status: 'live on the Chrome Web Store',
       body: 'A Chrome extension that puts a small live timer on LinkedIn, Reddit, and other time sinks, so you see how long you’ve been scrolling instead of getting blocked.',
       stack: ['JavaScript', 'Manifest V3', 'Chrome APIs'],

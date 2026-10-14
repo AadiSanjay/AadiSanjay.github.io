@@ -244,6 +244,22 @@ kbd {
   animation: rise 160ms ease-out;
 }
 
+.card .thumb {
+  float: right;
+  width: min(42%, 17rem);
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  margin: 0 0 0.5rem 1rem;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px #0000001a;
+}
+
+@media (max-width: 640px) {
+  .card .thumb {
+    display: none;
+  }
+}
+
 .card .kicker {
   margin: 0;
   font-family: var(--mono);

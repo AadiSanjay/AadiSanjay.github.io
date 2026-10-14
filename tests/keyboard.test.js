@@ -141,6 +141,16 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
   });
 
+  it('shows a thumbnail on the card when the project has an image', () => {
+    content.projects[1].image = { src: 'bot.jpg', alt: 'the robot' };
+    mount();
+    press('KeyB');
+    expect(display().querySelector('img.thumb').alt).toBe('the robot');
+    press('KeyS');
+    expect(display().querySelector('img.thumb')).toBeNull();
+    delete content.projects[1].image;
+  });
+
   it('the card shows every paragraph of the project', () => {
     mount();
     press('KeyS');
