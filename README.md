@@ -1,6 +1,6 @@
 # aadisanjay.github.io
 
-My personal website: my projects, on a keyboard I built.
+My personal website: my projects, on a keyboard I built. Designed by me and built with Claude Code (see [AI use and limitations](#ai-use-and-limitations)).
 
 **Live:** https://aadisanjay.github.io/
 
