@@ -60,6 +60,7 @@ beforeEach(() => {
       <p><strong data-build-name></strong> <span data-build-spec></span></p>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
+      <button data-keys></button>
     </main>`;
   root = document.querySelector('#desk');
   sound = { play: vi.fn(), setEnabled: vi.fn(), preload: vi.fn() };
@@ -751,5 +752,101 @@ describe('sound toggle', () => {
     root.querySelector('[data-sound]').click();
     expect(sound.setEnabled).toHaveBeenLastCalledWith(false);
     expect(storage.data.get('sound')).toBe('off');
+  });
+});
+
+describe('keys toggle (single-letter shortcuts can be turned off)', () => {
+  const keysBtn = () => root.querySelector('[data-keys]');
+
+  it('starts on, shown with aria-pressed like the sound toggle', () => {
+    mount();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('true');
+    expect(keysBtn().textContent).toBe('keys: on');
+  });
+
+  it('when off, letters, digits, and space do nothing to the page', () => {
+    mount();
+    keysBtn().click();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('false');
+    expect(keysBtn().textContent).toBe('keys: off');
+    sound.play.mockClear();
+    const f = press('KeyS', { key: 's' });
+    const shiftDigit = press('Digit2', { key: '@', shiftKey: true });
+    const space = press('Space', { key: ' ' });
+    expect(showing()).toBe('');
+    expect(root.querySelector('.echo').textContent).toBe('');
+    expect(cap('KeyS').classList.contains('down')).toBe(false);
+    expect(sound.play).not.toHaveBeenCalled();
+    expect([f, shiftDigit, space].some((e) => e.defaultPrevented)).toBe(false); // space scrolls again
+    expect(kb.layer).toBe('base');
+  });
+
+  it('when off, clicking and tapping caps still works', () => {
+    mount();
+    keysBtn().click();
+    cap('KeyS').click();
+    expect(showing()).toBe('sched');
+  });
+
+  it('when off, esc still closes a panel', () => {
+    mount();
+    keysBtn().click();
+    cap('KeyS').click();
+    press('Escape');
+    expect(showing()).toBe('');
+  });
+
+  it('is remembered, and turns back on', () => {
+    mount();
+    keysBtn().click();
+    expect(storage.data.get('keys')).toBe('off');
+    kb.destroy();
+    root.querySelector('[data-board]').replaceChildren();
+    root.querySelector('[data-builds]').replaceChildren();
+    root.querySelector('[data-hints]').replaceChildren();
+    mount();
+    expect(keysBtn().getAttribute('aria-pressed')).toBe('false');
+    press('KeyS');
+    expect(showing()).toBe('');
+    keysBtn().click();
+    expect(storage.data.get('keys')).toBe('on');
+    press('KeyS');
+    expect(showing()).toBe('sched');
+  });
+
+  it('turning keys off mid-hold drops the shift layer', () => {
+    mount();
+    press('ShiftLeft');
+    expect(kb.layer).toBe('fn');
+    keysBtn().click();
+    expect(kb.layer).toBe('base');
+  });
+
+  it('still works when storage is broken', () => {
+    storage = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+    mount();
+    keysBtn().click();
+    expect(keysBtn().textContent).toBe('keys: off');
+  });
+});
+
+describe('shortcuts never fire where they shouldn\'t', () => {
+  it('not with alt held (alt+letter types special characters on a Mac)', () => {
+    mount();
+    const e = press('KeyS', { key: 'ß', altKey: true });
+    expect(showing()).toBe('');
+    expect(e.defaultPrevented).toBe(false);
+  });
+
+  it('not inside a contenteditable or textarea', () => {
+    mount();
+    for (const html of ['<div contenteditable="true"></div>', '<textarea></textarea>']) {
+      const field = document.createElement('div');
+      field.innerHTML = html;
+      document.body.append(field);
+      field.firstChild.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', bubbles: true, cancelable: true }));
+      expect(showing()).toBe('');
+      field.remove();
+    }
   });
 });

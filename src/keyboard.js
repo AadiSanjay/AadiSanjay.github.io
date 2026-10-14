@@ -21,6 +21,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const display = root.querySelector('[data-display]');
   const picker = root.querySelector('[data-builds]');
   const soundBtn = root.querySelector('[data-sound]');
+  const keysBtn = root.querySelector('[data-keys]');
 
   const keymap = buildKeymap(content);
   const projects = new Map(content.projects.map((p) => [p.id, p]));
@@ -33,6 +34,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   let fnLatched = false;
   let cardOpener = null;
   let buildId = loadBuild(storage);
+  let keysOn = true; // single-letter shortcuts can be turned off (WCAG 2.1.4)
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
 
@@ -323,6 +325,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (target?.closest?.('textarea, select, [contenteditable], input:not([type=radio], [type=checkbox])')) return;
     if (target?.matches?.('input[type=radio]') && code.startsWith('Arrow')) return;
     if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
+    // keys: off means the page ignores typing. esc still closes a panel; clicking caps still works
+    if (!keysOn && code !== 'Escape') return;
     // on a focused button or link, enter/space should activate it natively. the drawn caps are the
     // exception for space: it types a space (enter still activates a focused cap)
     const onCap = !!target?.closest?.('.cap');
@@ -442,6 +446,20 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
   soundBtn.addEventListener('click', () => setSound(soundBtn.getAttribute('aria-pressed') !== 'true'));
   setSound(getPref(storage, 'sound', 'on') === 'on');
+
+  // --- keys toggle: same pattern as sound ---
+  function setKeys(on) {
+    keysOn = on;
+    setPref(storage, 'keys', on ? 'on' : 'off');
+    if (!keysBtn) return;
+    keysBtn.setAttribute('aria-pressed', String(on));
+    keysBtn.textContent = on ? 'keys: on' : 'keys: off';
+  }
+  keysBtn?.addEventListener('click', () => {
+    setKeys(!keysOn);
+    releaseAll(); // don't leave a held shift layer behind
+  });
+  setKeys(getPref(storage, 'keys', 'on') !== 'off');
 
   updateLayer();
 
