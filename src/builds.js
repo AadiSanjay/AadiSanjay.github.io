@@ -35,7 +35,7 @@ export const builds = {
     switches: 'Akko Rose Red',
     keycaps: 'Apollo PBT',
     mods: ['thocky mod', 'lubed stabs'],
-    note: 'The last board I listed before closing the shop.',
+    note: 'Smooth Rose Red linears with a thocky mod underneath, so it sounds soft and low.',
     link: 'https://www.etsy.com/listing/1902725065/custom-mechanical-keyboard-gamakay-lk67',
     sound: { thump: 110, body: 1100 },
     samples: clips('apollo', 6, 4),

@@ -6,7 +6,7 @@ export const content = {
   roles: [
     { at: 'UIUC', what: 'B.S. CS + Econ, May 2029' },
     { at: 'NOBE × Cline Financial', what: 'software developer' },
-    { at: 'PNW Keyboards', what: 'founder, 2022 – 26' },
+    { at: 'PNW Keyboards', what: 'founder, est. 2022' },
   ],
   projects: [
     {
@@ -38,11 +38,11 @@ export const content = {
       key: 'KeyK',
       short: 'pnw kbs',
       title: 'PNW Keyboards',
-      status: 'my keyboard shop, 2022 – 2026 · 4.9★ on Etsy',
-      body: 'I built and sold custom 65% keyboards until I left for college. The keyboard on this page is one of mine, and so are its sounds.',
+      status: 'my keyboard shop, est. 2022 · 4.9★ on Etsy',
+      body: 'I’ve built and sold custom 65% keyboards, starting in 2022. The keyboard on this page is one of mine, and so are its sounds.',
       stack: ['lubing', 'mods', 'sound tuning'],
       links: [
-        { label: 'Old Etsy shop', href: 'https://www.etsy.com/shop/PNWKeyboards' },
+        { label: 'Etsy shop', href: 'https://www.etsy.com/shop/PNWKeyboards' },
         { label: 'Sound test', href: 'https://www.youtube.com/shorts/_28FialngiE' },
       ],
     },
@@ -61,7 +61,7 @@ export const content = {
       title: 'Experience',
       body: [
         'Software Developer at NOBE × Cline Financial (2026 – now)',
-        'Founder of PNW Keyboards (2022 – 2026)',
+        'Founder of PNW Keyboards (est. 2022)',
         'Co-founder & web developer at Educatodos (2024 – 2026)',
       ],
       links: [],

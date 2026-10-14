@@ -8,7 +8,7 @@ Plain HTML/CSS/JavaScript, bundled with [Vite](https://vite.dev), tested with [V
 
 ## The interactive feature
 
-From 2022 until I left for college in August 2026 I built and sold custom mechanical keyboards ([PNW Keyboards](https://www.etsy.com/shop/PNWKeyboards), formerly Floofd Keebs). The homepage is a drawing of my Red Samurai build (Gamakay CK68, 65%), and typing on your real keyboard presses the drawn keys, with the sound of the real board.
+Starting in 2022, I built and sold custom mechanical keyboards ([PNW Keyboards](https://www.etsy.com/shop/PNWKeyboards), formerly Floofd Keebs). The homepage is a drawing of my Red Samurai build (Gamakay CK68, 65%), and typing on your real keyboard presses the drawn keys, with the sound of the real board.
 
 - **Keys with a dot open a project** (F = FocusTicker, C = Capsule, K = PNW Keyboards). Esc closes.
 - **Hold shift (or click fn) for a second layer**, like QMK firmware: A about, E experience, U education, C contact, R resume. Keys the layer doesn't use fall through to the base layer (QMK's `KC_TRNS`).
