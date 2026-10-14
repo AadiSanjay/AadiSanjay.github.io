@@ -27,6 +27,13 @@ function linkButtons(links) {
 function project(p) {
   const article = el('article', 'project');
   article.id = p.id;
+  if (p.image) {
+    const img = el('img', 'shot');
+    img.src = p.image.src;
+    img.alt = p.image.alt;
+    img.loading = 'lazy';
+    article.append(img);
+  }
   const head = el('div', 'project-head');
   const kbd = el('kbd', null, keyLabel(p.key));
   kbd.title = `press ${keyLabel(p.key)} on the keyboard above`;

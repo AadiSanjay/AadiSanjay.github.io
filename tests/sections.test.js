@@ -29,6 +29,18 @@ describe('renderSections (the plain version)', () => {
     expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
   });
 
+  it('shows a lazy-loaded screenshot only when a project has one', () => {
+    document.querySelector('[data-work]').replaceChildren();
+    renderSections(document.querySelector('main'), {
+      roles: [],
+      projects: [{ id: 'x', key: 'KeyX', title: 'X', status: '', body: 'b', links: [], image: { src: 'x.png', alt: 'X in action' } }],
+    });
+    const img = document.querySelector('#x img.shot');
+    expect(img.alt).toBe('X in action');
+    expect(img.loading).toBe('lazy');
+    expect(document.querySelectorAll('#x img')).toHaveLength(1);
+  });
+
   it('a project with no links gets no empty button row', () => {
     expect(document.querySelector('#capsule .links')).toBeNull();
   });

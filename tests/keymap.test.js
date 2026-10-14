@@ -51,6 +51,7 @@ describe('buildKeymap', () => {
 
   it('rejects reserved keys', () => {
     expect(() => buildKeymap({ projects: [project('a', 'Escape')] })).toThrow(/reserved/);
+    expect(() => buildKeymap({ projects: [project('a', 'ArrowRight')] })).toThrow(/reserved/);
   });
 });
 

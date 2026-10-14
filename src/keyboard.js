@@ -36,6 +36,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function describe(action) {
     if (!action || action.type === 'close') return '';
     if (action.type === 'project') return projects.get(action.id).short;
+    if (action.type === 'browse') return action.step > 0 ? 'next' : 'prev';
     if (action.type === 'build') return builds[action.id].name.toLowerCase();
     return action.id;
   }
@@ -61,7 +62,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       cap.querySelector('.sub-fn').textContent = fn;
 
       if (base || fn || code === 'Fn') {
-        const parts = [base && `opens ${projects.get(keymap.base[code].id).title}`, fn && `with shift: ${fn}`];
+        const b = keymap.base[code];
+        const what = b?.type === 'project' ? `opens ${projects.get(b.id).title}` : b?.type === 'browse' ? `${base} project` : '';
+        const parts = [what, fn && `with shift: ${fn}`];
         cap.setAttribute('aria-label', `${label} key, ${parts.filter(Boolean).join(', ') || 'toggles the fn layer'}`);
       } else {
         // decorative. 60 tab stops of nothing would be miserable.
@@ -73,6 +76,26 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       rowEl.append(cap);
     }
     board.append(rowEl);
+  }
+
+  const hints = root.querySelector('[data-hints]');
+  if (hints) {
+    const items = [
+      ...content.projects.map((p) => [[caps.get(p.key).querySelector('.legend').textContent], p.title]),
+      [['←', '→'], 'browse'],
+      [['shift'], 'about, contact & more'],
+      [['esc'], 'back'],
+    ];
+    for (const [keys, what] of items) {
+      const li = document.createElement('li');
+      for (const k of keys) {
+        const kbd = document.createElement('kbd');
+        kbd.textContent = k;
+        li.append(kbd);
+      }
+      li.append(` ${what}`);
+      hints.append(li);
+    }
   }
 
   function updateLayer() {
@@ -125,7 +148,16 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     display.replaceChildren(card);
   }
 
+  // ← / → walk through the projects in order, wrapping around
+  function browse(step) {
+    const ids = content.projects.map((p) => p.id);
+    const at = ids.indexOf(display.dataset.showing);
+    const next = at === -1 ? (step > 0 ? 0 : ids.length - 1) : (at + step + ids.length) % ids.length;
+    run({ type: 'project', id: ids[next] });
+  }
+
   function run(action) {
+    if (action.type === 'browse') return browse(action.step);
     display.dataset.showing = action.type === 'close' ? '' : action.id;
     if (action.type === 'project') {
       const p = projects.get(action.id);

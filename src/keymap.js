@@ -1,10 +1,14 @@
 import { buildIds } from './builds.js';
 
-const RESERVED = new Set(['Escape', 'ShiftLeft', 'ShiftRight', 'Fn']);
+const RESERVED = new Set(['Escape', 'ShiftLeft', 'ShiftRight', 'Fn', 'ArrowLeft', 'ArrowRight']);
 
 // two layers, like qmk. base = projects, fn = everything else.
 export function buildKeymap(content) {
-  const base = { Escape: { type: 'close' } };
+  const base = {
+    Escape: { type: 'close' },
+    ArrowLeft: { type: 'browse', step: -1 },
+    ArrowRight: { type: 'browse', step: 1 },
+  };
   for (const p of content.projects) {
     if (RESERVED.has(p.key)) throw new Error(`${p.id} can't use reserved key ${p.key}`);
     if (base[p.key]) throw new Error(`${p.id} and ${base[p.key].id} both use ${p.key}`);

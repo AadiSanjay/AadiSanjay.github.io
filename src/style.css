@@ -112,6 +112,12 @@ kbd {
   margin-right: 0.6rem;
 }
 
+.what {
+  margin: 0.5rem 0 0;
+  font-size: 1.15rem;
+  max-width: 38ch;
+}
+
 .looking {
   display: flex;
   align-items: center;
@@ -168,7 +174,7 @@ kbd {
 
 .display {
   /* fixed height so opening a card never shoves the keyboard down the page */
-  height: 13rem;
+  height: 11.5rem;
   margin: 2rem 0 1.5rem;
   display: flex;
   flex-direction: column;
@@ -454,6 +460,14 @@ kbd {
   box-shadow: 0 0 6px currentColor;
 }
 
+/* keys that do something lift a little under the mouse */
+@media (hover: hover) {
+  .cap:is(.has-base, .has-fn, [data-code='Fn']):hover .top {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+}
+
 .cap.down .top,
 .cap:active .top {
   transform: translateY(var(--travel));
@@ -499,6 +513,19 @@ kbd {
   75% {
     transform: translate(2px, var(--travel));
   }
+}
+
+/* ---- shortcuts legend (lives in the bottom bar) ---- */
+
+.hints {
+  display: flex;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+}
+
+.hints kbd + kbd {
+  margin-left: 0.2rem;
 }
 
 /* ---- controls ---- */
@@ -689,25 +716,58 @@ kbd {
   max-width: 64ch;
 }
 
-/* shows which build you're typing on; follows the picker */
-.now-typing {
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.project .shot {
+  width: calc(100% + 2.6rem);
+  margin: -1.2rem -1.3rem 1rem;
+  border-radius: 12px 12px 0 0;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #ffffff0a;
+}
+
+/* fixed bottom bar: the shortcuts that work + which build you're typing on */
+.bottom-bar {
   position: fixed;
   left: 50%;
   bottom: 14px;
   transform: translateX(-50%);
   display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  margin: 0;
-  padding: 0.4rem 0.95rem;
+  align-items: center;
+  gap: 1.1rem;
+  max-width: calc(100vw - 32px);
+  padding: 0.45rem 1rem;
   border-radius: 999px;
-  background: #0d0c0bdd;
+  background: #0d0c0be6;
   border: 1px solid #ffffff1f;
   backdrop-filter: blur(6px);
   font-family: var(--mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   white-space: nowrap;
   z-index: 5;
+}
+
+.bottom-bar .hints {
+  flex-wrap: nowrap;
+  margin: 0;
+  gap: 0.9rem;
+  font-size: inherit;
+  padding-right: 1.1rem;
+  border-right: 1px solid #ffffff1f;
+}
+
+.now-typing {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
 }
 
 .now-label,
@@ -718,6 +778,19 @@ kbd {
 .now-typing strong {
   color: var(--legend);
   font-weight: 600;
+}
+
+/* not enough room for everything: drop the spec, then the shortcuts */
+@media (max-width: 1100px) {
+  .now-spec {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .bottom-bar .hints {
+    display: none;
+  }
 }
 
 .footer {
@@ -735,9 +808,6 @@ kbd {
     margin-bottom: 1.75rem;
   }
 
-  .now-spec {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -754,5 +824,12 @@ kbd {
     height: auto;
     min-height: 6rem;
     margin: 1.5rem 0 1rem;
+  }
+}
+
+/* no keyboard on phones, so no keyboard shortcuts legend */
+@media (hover: none) and (pointer: coarse) {
+  .bottom-bar .hints {
+    display: none;
   }
 }

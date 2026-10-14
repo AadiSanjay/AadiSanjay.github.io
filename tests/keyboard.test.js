@@ -55,6 +55,7 @@ beforeEach(() => {
     <main id="desk">
       <div data-display><p class="idle">type a key</p><p class="echo"></p></div>
       <div data-board></div>
+      <ul data-hints></ul>
       <p><strong data-build-name></strong> <span data-build-spec></span></p>
       <fieldset data-builds></fieldset>
       <button data-sound></button>
@@ -280,6 +281,47 @@ describe('the fn layer', () => {
     cap('KeyC').click();
     expect(showing()).toBe('contact');
     expect(kb.layer).toBe('base');
+  });
+});
+
+describe('browsing with the arrow keys', () => {
+  it('→ opens the first project, then walks forward and wraps', () => {
+    mount();
+    press('ArrowRight');
+    expect(showing()).toBe('sched');
+    press('ArrowRight');
+    expect(showing()).toBe('bot');
+    press('ArrowRight');
+    expect(showing()).toBe('sched');
+  });
+
+  it('← from nothing opens the last project, then walks back', () => {
+    mount();
+    press('ArrowLeft');
+    expect(showing()).toBe('bot');
+    press('ArrowLeft');
+    expect(showing()).toBe('sched');
+  });
+
+  it('→ from a section starts at the first project', () => {
+    mount();
+    press('KeyU', { shiftKey: true });
+    press('ArrowRight');
+    expect(showing()).toBe('sched');
+  });
+
+  it('arrow caps are labeled for screen readers', () => {
+    mount();
+    expect(cap('ArrowRight').getAttribute('aria-label')).toContain('next project');
+    expect(cap('ArrowRight').tabIndex).toBe(0);
+  });
+});
+
+describe('controls legend', () => {
+  it('lists exactly the shortcuts that work, starting with each project key', () => {
+    mount();
+    const items = [...root.querySelectorAll('[data-hints] li')].map((li) => li.textContent);
+    expect(items).toEqual(['S Scheduler', 'B Robot', '←→ browse', 'shift about, contact & more', 'esc back']);
   });
 });
 
