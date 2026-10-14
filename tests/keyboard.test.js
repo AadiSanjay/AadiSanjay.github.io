@@ -203,13 +203,12 @@ describe('typing on the keyboard', () => {
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
   });
 
-  it('shows a thumbnail on the card when the project has an image', () => {
+  // changed on purpose: the screenshot moved to the project card below, so the panel stays short
+  it('panels leave the screenshot to the project card below', () => {
     content.projects[1].image = { src: 'bot.jpg', alt: 'the robot' };
     mount();
     press('KeyB');
-    expect(display().querySelector('img.thumb').alt).toBe('the robot');
-    press('KeyS');
-    expect(display().querySelector('img.thumb')).toBeNull();
+    expect(display().querySelector('img')).toBeNull();
     delete content.projects[1].image;
   });
 
@@ -248,6 +247,67 @@ describe('typing on the keyboard', () => {
     expect(gh.target).toBe('_blank');
     expect(gh.rel).toBe('noopener');
     expect(mail.target).toBe(''); // mailto shouldn't open a blank tab
+  });
+});
+
+describe('panel focus', () => {
+  const heading = () => display().querySelector('h2');
+
+  it('opening a panel with a button (a cap clicked or pressed with enter) moves focus to its heading', () => {
+    mount();
+    cap('KeyS').focus();
+    cap('KeyS').click();
+    expect(heading().tabIndex).toBe(-1);
+    expect(document.activeElement).toBe(heading());
+  });
+
+  it('the same goes for an outside button that taps a key, and closing hands focus back to it', () => {
+    mount();
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    outside.focus();
+    kb.tap('KeyS');
+    expect(document.activeElement).toBe(heading());
+    press('Escape');
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it('opening a panel by typing a letter leaves focus alone', () => {
+    mount();
+    root.querySelector('[data-sound]').focus();
+    press('KeyS');
+    expect(showing()).toBe('sched');
+    expect(document.activeElement).toBe(root.querySelector('[data-sound]'));
+    document.activeElement.blur();
+    press('KeyB');
+    expect(showing()).toBe('bot');
+    expect(document.activeElement).toBe(document.body); // nothing is focused mid-typing
+  });
+
+  it('typing on caps (keys that open nothing) never moves focus', () => {
+    mount();
+    cap('KeyX').focus();
+    cap('KeyX').click();
+    expect(document.activeElement).toBe(cap('KeyX'));
+  });
+
+  it('scrolls the panel into view smoothly, or instantly with reduced motion', () => {
+    const scrolls = [];
+    Element.prototype.scrollIntoView = function (opts) {
+      scrolls.push(opts.behavior);
+    };
+    try {
+      kb = mountKeyboard(root, { content, sound, storage, win: Object.assign(Object.create(window), {
+        addEventListener: window.addEventListener.bind(window),
+        removeEventListener: window.removeEventListener.bind(window),
+        setTimeout: window.setTimeout.bind(window),
+        matchMedia: (q) => ({ matches: q.includes('reduce') }),
+      }) });
+      cap('KeyS').click();
+      expect(scrolls).toEqual(['auto']);
+    } finally {
+      delete Element.prototype.scrollIntoView;
+    }
   });
 });
 

@@ -35,12 +35,12 @@ function project(p, onKey) {
     article.append(img);
   }
   const head = el('div', 'project-head');
-  // the key is a button: it presses that key on the board up top
+  // the key is a button: it scrolls up and presses that key on the board, which opens this
+  // project's panel. it says so, and its name starts with what it shows ("press F")
   const press = el('button', 'press');
   press.type = 'button';
-  press.append(el('kbd', null, keyLabel(p.key)));
-  press.setAttribute('aria-label', `Press ${keyLabel(p.key)} on the keyboard`);
-  press.title = `press ${keyLabel(p.key)} on the keyboard`;
+  press.append('press ', el('kbd', null, keyLabel(p.key)), el('span', 'sr', ` on the keyboard to open ${p.title} there`));
+  press.title = `opens ${p.title} on the keyboard above`;
   press.addEventListener('click', () => onKey?.(p.key));
   head.append(el('h3', null, p.title), press);
   article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));

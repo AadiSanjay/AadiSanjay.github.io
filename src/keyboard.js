@@ -128,18 +128,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [], image, typing = false, compact = false }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], typing = false, compact = false }) {
     const card = document.createElement('article');
     card.className = compact ? 'card compact' : 'card';
-    card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
-    if (image) {
-      const img = document.createElement('img');
-      img.className = 'thumb';
-      img.src = image.src;
-      img.alt = image.alt;
-      card.classList.add('has-thumb');
-      card.prepend(img);
-    }
+    // the close button gets its own column, and only the content scrolls (when it has to), so the
+    // button never scrolls away or sits on top of text
+    card.innerHTML = `<div class="card-inner"><p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p></div>`;
     card.querySelector('.kicker').textContent = kicker;
     card.querySelector('h2').textContent = title;
     card.querySelector('.status').textContent = status ?? '';
@@ -183,6 +177,21 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (!display.contains(document.activeElement)) cardOpener = document.activeElement;
     card.prepend(close);
     display.replaceChildren(card);
+
+    const heading = card.querySelector('h2');
+    heading.tabIndex = -1;
+    if (openedByButton) {
+      // a button press (click, tap, enter/space) is a request to go there: move focus to the panel
+      heading.focus({ preventScroll: true });
+      card.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+    } else if (!document.activeElement || document.activeElement === document.body) {
+      // opened by typing a letter: don't take focus mid-typing, but if nothing else has it, make
+      // the panel the next stop for tab (browsers continue tabbing from where focus last was)
+      card.tabIndex = -1;
+      card.focus({ preventScroll: true });
+      card.blur();
+      card.removeAttribute('tabindex');
+    }
   }
 
   // name the layer key the way you reached it: fn if you tapped fn (phones have no shift), else shift
@@ -208,7 +217,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      // what it does, plus at most one sentence on how. tags and the rest live on the cards below
+      // what it does, plus at most one sentence on how. the screenshot, tags, and the rest live on the
+      // cards below, which keeps panels short enough to never need a scrollbar
       showCard({ kicker: `[${key}] ${p.kind ?? 'project'}`, ...p, body: [p.body, p.how].flat().filter(Boolean), stack: [] });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
@@ -280,6 +290,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- input ---
+  let openedByButton = false;
+  const reducedMotion = () => !!win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  // a cap clicked, tapped, or pressed with enter/space, or a project card's key button
   function tap(code) {
     sound.play(buildId);
     pulse(code);
@@ -288,7 +302,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
       return;
     }
-    act(code, typedBy(code));
+    openedByButton = true;
+    try {
+      act(code, typedBy(code));
+    } finally {
+      openedByButton = false;
+    }
     // clicking fn is one-shot: it only applies to the next key
     if (fnLatched) {
       fnLatched = false;

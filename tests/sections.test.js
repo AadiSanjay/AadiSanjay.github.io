@@ -50,7 +50,9 @@ describe('renderSections (the plain version)', () => {
     const pressed = [];
     renderSections(document.querySelector('main'), { roles: [], projects: content.projects }, { onKey: (code) => pressed.push(code) });
     const btn = document.querySelector('#capsule button.press');
-    expect(btn.getAttribute('aria-label')).toBe('Press C on the keyboard');
+    // changed on purpose: the visible text says what it does, and the name starts with it
+    expect(btn.hasAttribute('aria-label')).toBe(false);
+    expect(btn.textContent).toBe('press C on the keyboard to open Capsule there');
     btn.click();
     expect(pressed).toEqual(['KeyC']);
   });
