@@ -31,6 +31,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   let shiftKeyDown = false; // we saw a real shift keydown
   let shiftInferred = false; // shift only known from event.shiftKey
   let fnLatched = false;
+  let cardOpener = null;
   let buildId = loadBuild(storage);
 
   const layer = () => (shiftHeld || fnLatched ? 'fn' : 'base');
@@ -122,9 +123,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, status, body, stack = [], links = [], image }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [], image, typing = false, compact = false }) {
     const card = document.createElement('article');
-    card.className = 'card';
+    card.className = compact ? 'card compact' : 'card';
     card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
     if (image) {
       const img = document.createElement('img');
@@ -158,8 +159,29 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       }
       card.querySelector('.links').append(a);
     }
+    if (typing) {
+      // right under the description, so long spec lines or tags can never push it out of view
+      const line = document.createElement('p');
+      line.className = 'echo';
+      line.setAttribute('aria-hidden', 'true');
+      line.textContent = typed;
+      card.querySelector('.body').after(line);
+    }
+    // esc closes cards, but phones have no esc and mouse users won't guess it
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'close';
+    close.setAttribute('aria-label', 'Close');
+    close.textContent = '×';
+    close.addEventListener('click', () => run({ type: 'close' }));
+    // remember what opened the card, so closing it can hand focus back there
+    if (!display.contains(document.activeElement)) cardOpener = document.activeElement;
+    card.prepend(close);
     display.replaceChildren(card);
   }
+
+  // name the layer key the way you reached it: fn if you tapped fn (phones have no shift), else shift
+  const layerKey = () => (fnLatched ? 'fn' : 'shift');
 
   // the key that triggers an action on the shift layer, e.g. 'A' for about
   function fnKey(action) {
@@ -184,27 +206,34 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
-      showCard({ kicker: `[shift + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
+      showCard({ kicker: `[${layerKey()} + ${fnKey(action)}] ${action.id}`, title: s.title, body: s.body, links: s.links });
     } else if (action.type === 'build') {
       setBuild(action.id);
       const b = builds[action.id];
       showCard({
-        kicker: `[shift + ${buildIds.indexOf(action.id) + 1}] build`,
+        kicker: `[${layerKey()} + ${buildIds.indexOf(action.id) + 1}] build`,
         title: b.name,
         status: `${b.case} · ${b.switches} · ${b.keycaps}`,
-        body: [b.note, b.soundNote ?? (b.samples.down.length ? 'The sound is recorded from this exact board. Type something.' : 'No recording of this one, so the sound is approximated. Type something.')],
+        body: `${b.note} ${b.soundNote ?? (b.samples.down.length ? 'Sound recorded from this exact board.' : 'No recording of this one, so the sound is approximated.')}`,
         stack: b.mods,
         links: [{ label: b.link.includes('/listing/') ? 'The listing' : 'My old Etsy shop', href: b.link }],
+        typing: true, // build cards are for trying the board, so give typing somewhere to go
+        compact: true,
       });
     } else {
+      // if focus was inside the card (its close button or a link), keyboard users keep their place
+      const hadFocus = display.contains(document.activeElement);
       display.replaceChildren(...idle.map((n) => n.cloneNode(true)));
       typed = '';
+      if (hadFocus && cardOpener?.isConnected && cardOpener !== document.body) cardOpener.focus({ preventScroll: true });
     }
   }
 
   let typed = '';
   function echo(char) {
-    if (display.dataset.showing) return; // only while the idle screen is up
+    if (char !== 'Backspace' && char?.length !== 1) return;
+    // typing always works: build cards have their own line, and any other card steps aside for it
+    if (!display.querySelector('.echo')) run({ type: 'close' });
     if (char === 'Backspace') typed = typed.slice(0, -1);
     else if (char.length === 1) typed = (typed + char).slice(-32);
     else return;
@@ -219,8 +248,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function act(code, char) {
     const action = resolve(keymap, layer(), code);
     if (!action) {
-      nope(code);
-      echo(char);
+      // typing a character is a fine thing to do; only wiggle keys that really do nothing
+      if (char === 'Backspace' || char?.length === 1) echo(char);
+      else nope(code);
       return false;
     }
     run(action);
@@ -257,7 +287,10 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   function onKeyDown(e) {
     const code = codeOf(e);
     const target = e.target;
-    if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
+    // leave real text fields alone. radio buttons (the build picker) aren't text fields: clicking one
+    // focuses it, and typing must keep working. arrows still move between radios natively.
+    if (target?.closest?.('textarea, select, [contenteditable], input:not([type=radio], [type=checkbox])')) return;
+    if (target?.matches?.('input[type=radio]') && code.startsWith('Arrow')) return;
     if ((e.ctrlKey || e.metaKey || e.altKey) && !MODIFIERS.has(code)) return; // leave browser shortcuts alone
     // on a focused button or link, enter/space should activate it natively. the drawn caps are the
     // exception for space: it types a space (enter still activates a focused cap)
@@ -276,7 +309,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
     }
     if (e.repeat) {
+      // held keys: no extra sounds or re-opened cards, but typing repeats like a real keyboard
       if (resolve(keymap, layer(), code)) e.preventDefault();
+      else if (e.key === 'Backspace' || e.key?.length === 1) {
+        echo(e.key);
+        if (code === 'Space') e.preventDefault();
+      }
       return;
     }
 
@@ -357,6 +395,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     picker.append(label);
   });
   setBuild(buildId);
+
+  // once the page has settled, fetch every build's recordings so switching builds sounds right
+  // from the first press (they're small: ~320 KB for all of them)
+  const whenIdle = win.requestIdleCallback?.bind(win) ?? ((f) => win.setTimeout(f, 1500));
+  whenIdle(() => buildIds.forEach((id) => sound.preload?.(id)));
 
   // --- sound toggle ---
   function setSound(on) {

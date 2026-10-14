@@ -24,7 +24,7 @@ function linkButtons(links) {
   return row;
 }
 
-function project(p) {
+function project(p, onKey) {
   const article = el('article', 'project');
   article.id = p.id;
   if (p.image) {
@@ -35,22 +35,27 @@ function project(p) {
     article.append(img);
   }
   const head = el('div', 'project-head');
-  const kbd = el('kbd', null, keyLabel(p.key));
-  kbd.title = `press ${keyLabel(p.key)} on the keyboard above`;
-  head.append(el('h3', null, p.title), kbd);
+  // the key is a button: it presses that key on the board up top
+  const press = el('button', 'press');
+  press.type = 'button';
+  press.append(el('kbd', null, keyLabel(p.key)));
+  press.setAttribute('aria-label', `Press ${keyLabel(p.key)} on the keyboard`);
+  press.title = `press ${keyLabel(p.key)} on the keyboard`;
+  press.addEventListener('click', () => onKey?.(p.key));
+  head.append(el('h3', null, p.title), press);
   article.append(head, el('p', 'status', p.status), el('p', null, [p.body].flat()[0]));
   if (p.links.length) article.append(linkButtons(p.links));
   return article;
 }
 
-export function renderSections(root, content) {
+export function renderSections(root, content, { onKey } = {}) {
   const roles = root.querySelector('[data-roles]');
   for (const { at, what } of content.roles) {
     const li = el('li');
     li.append(el('span', 'at', `@${at}`), el('span', null, what));
     roles.append(li);
   }
-  root.querySelector('[data-work]').append(...content.projects.map(project));
+  root.querySelector('[data-work]').append(...content.projects.map((p) => project(p, onKey)));
 }
 
 // email: the link still works as mailto, the button copies it

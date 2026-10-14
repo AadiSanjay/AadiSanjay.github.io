@@ -109,7 +109,7 @@ export const builds = {
     sound: { thump: 110, body: 1050 },
     samples: clips('matcha', 6, 4),
     // audio-only recordings from Dec 28, 2022, right after this build was listed
-    soundNote: 'The sound is from my December 2022 recordings, which I’m fairly sure are this board.',
+    soundNote: 'Sound from my December 2022 recordings, which I’m fairly sure are this board.',
     colors: {
       case: '#e9e6df',
       alpha: '#ece6d3', alphaSide: '#c7bfa5', alphaInk: '#4a5a33',

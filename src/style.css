@@ -69,7 +69,9 @@ kbd {
 
 .nav {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  white-space: nowrap; /* keep each link's ↗ on its own line */
   margin-bottom: 2.5rem;
   font-family: var(--mono);
   font-size: 0.8rem;
@@ -241,6 +243,37 @@ kbd {
   overflow: hidden;
 }
 
+.card .echo:empty::before {
+  content: 'type something…';
+  color: #1d1b1999;
+}
+
+/* build cards: tags and the button share a row to leave room for the typing line */
+.card.compact .stack,
+.card.compact .links {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-top: 0.5rem;
+}
+
+.card.compact .links {
+  margin-left: 0.6rem;
+}
+
+.card.compact .btn {
+  padding: 0.3rem 0.75rem 0.35rem;
+  font-size: 0.8rem;
+}
+
+.card .echo {
+  margin: 0 0 0.2rem;
+  min-height: 1.4em;
+  font-size: 1rem;
+  color: var(--ink);
+  border-bottom: 1px dashed #1d1b1933;
+  padding-bottom: 0.3rem;
+}
+
 .echo:not(:empty)::after {
   content: '▍';
   color: var(--legend);
@@ -269,6 +302,7 @@ kbd {
 }
 
 .card {
+  position: relative;
   width: 100%;
   max-height: 100%;
   overflow-y: auto;
@@ -279,18 +313,68 @@ kbd {
   animation: rise 160ms ease-out;
 }
 
+.card .close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #6b6357;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.card .close:hover {
+  background: #1d1b1914;
+  color: var(--ink);
+}
+
+.card .close:focus-visible {
+  outline: 2px solid var(--ink);
+}
+
 .card .thumb {
   float: right;
   width: min(42%, 17rem);
   aspect-ratio: 16 / 10;
   object-fit: cover;
-  margin: 0 0 0.5rem 1rem;
+  margin: 0 1.6rem 0.5rem 1rem; /* right: room for the close button */
   border-radius: 6px;
   box-shadow: 0 0 0 1px #0000001a;
 }
 
 @media (max-width: 640px) {
-  .card .thumb {
+  .card .close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #6b6357;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.card .close:hover {
+  background: #1d1b1914;
+  color: var(--ink);
+}
+
+.card .close:focus-visible {
+  outline: 2px solid var(--ink);
+}
+
+.card .thumb {
     display: none;
   }
 }
@@ -404,6 +488,11 @@ kbd {
 /* ---- the board ---- */
 
 .board {
+  /* it's an instrument, not text: no double-tap zoom, no text selection or callout on long press */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   width: max-content;
   margin: 0 auto;
   padding: calc(var(--u) * 0.22);
@@ -691,6 +780,33 @@ kbd {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.project .press {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.project .press kbd {
+  display: inline-block;
+  transition: transform 60ms, box-shadow 60ms;
+}
+
+.project .press:hover kbd {
+  transform: translateY(-1px);
+}
+
+.project .press:active kbd {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.project .press:focus-visible {
+  outline: 2px solid var(--legend);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .project h3 {
