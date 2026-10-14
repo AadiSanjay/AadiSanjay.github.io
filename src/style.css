@@ -919,7 +919,7 @@ kbd {
   font-size: 1.2rem;
 }
 
-.project-text > p:not(.status) {
+.project-text > p:not(.status, .links) {
   margin: 0;
   font-size: 0.95rem;
 }
@@ -933,7 +933,7 @@ kbd {
   font-size: 0.85rem;
 }
 
-.project-text > .how {
+.project .project-text > p.how {
   margin-top: 0.6rem;
   font-size: 0.88rem;
   color: #d9cfbb;
