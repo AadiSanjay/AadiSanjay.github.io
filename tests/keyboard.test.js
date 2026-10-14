@@ -142,6 +142,18 @@ describe('typing on the keyboard', () => {
     expect(sound.play).toHaveBeenCalledTimes(1);
   });
 
+  it('holding a letter or backspace repeats in the typing line, like a real keyboard', () => {
+    mount();
+    press('KeyQ', { key: 'q' });
+    press('KeyQ', { key: 'q', repeat: true });
+    press('KeyQ', { key: 'q', repeat: true });
+    expect(display().querySelector('.echo').textContent).toBe('qqq');
+    press('Backspace', { key: 'Backspace' });
+    press('Backspace', { key: 'Backspace', repeat: true });
+    expect(display().querySelector('.echo').textContent).toBe('q');
+    expect(sound.play).toHaveBeenCalledTimes(2); // one per real press, none for repeats
+  });
+
   it('ignores browser shortcuts like cmd+s and ctrl+b', () => {
     mount();
     const e = press('KeyS', { metaKey: true });
@@ -518,6 +530,14 @@ describe('build picker', () => {
     expect(sound.play).toHaveBeenLastCalledWith('olivia');
     expect(storage.data.get('build')).toBe('olivia');
     expect(display().textContent).toContain('approximated'); // no recording of olivia yet
+  });
+
+  it('fetches every build\'s recordings once the page is idle', () => {
+    vi.useFakeTimers();
+    mount();
+    vi.advanceTimersByTime(2000);
+    for (const id of buildIds) expect(sound.preload).toHaveBeenCalledWith(id);
+    vi.useRealTimers();
   });
 
   it('starts fetching recordings as soon as a build is picked', () => {

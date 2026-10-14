@@ -780,6 +780,33 @@ kbd {
   gap: 1rem;
 }
 
+.project .press {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.project .press kbd {
+  display: inline-block;
+  transition: transform 60ms, box-shadow 60ms;
+}
+
+.project .press:hover kbd {
+  transform: translateY(-1px);
+}
+
+.project .press:active kbd {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.project .press:focus-visible {
+  outline: 2px solid var(--legend);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .project h3 {
   margin: 0;
   font-size: 1.2rem;

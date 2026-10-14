@@ -41,6 +41,16 @@ describe('renderSections (the plain version)', () => {
     expect(document.querySelectorAll('#x img')).toHaveLength(1);
   });
 
+  it('each project\'s key is a button that presses that key on the board', () => {
+    document.querySelector('[data-work]').replaceChildren();
+    const pressed = [];
+    renderSections(document.querySelector('main'), { roles: [], projects: content.projects }, { onKey: (code) => pressed.push(code) });
+    const btn = document.querySelector('#capsule button.press');
+    expect(btn.getAttribute('aria-label')).toBe('Press C on the keyboard');
+    btn.click();
+    expect(pressed).toEqual(['KeyC']);
+  });
+
   it('a project with no links gets no empty button row', () => {
     expect(document.querySelector('#capsule .links')).toBeNull();
   });

@@ -300,7 +300,12 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
       updateLayer();
     }
     if (e.repeat) {
+      // held keys: no extra sounds or re-opened cards, but typing repeats like a real keyboard
       if (resolve(keymap, layer(), code)) e.preventDefault();
+      else if (e.key === 'Backspace' || e.key?.length === 1) {
+        echo(e.key);
+        if (code === 'Space') e.preventDefault();
+      }
       return;
     }
 
@@ -381,6 +386,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     picker.append(label);
   });
   setBuild(buildId);
+
+  // once the page has settled, fetch every build's recordings so switching builds sounds right
+  // from the first press (they're small: ~320 KB for all of them)
+  const whenIdle = win.requestIdleCallback ?? ((f) => win.setTimeout(f, 1500));
+  whenIdle(() => buildIds.forEach((id) => sound.preload?.(id)));
 
   // --- sound toggle ---
   function setSound(on) {
