@@ -165,10 +165,10 @@ describe('typing on the keyboard', () => {
     expect(display().querySelectorAll('.body p')).toHaveLength(2);
   });
 
-  it('renders the stack and links as buttons', () => {
+  it('project cards lead with what it does: no tech-stack chips, links as buttons', () => {
     mount();
     press('KeyS');
-    expect([...display().querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(['JS', 'CSS']);
+    expect(display().querySelectorAll('.stack li')).toHaveLength(0);
     const [gh, mail] = display().querySelectorAll('a.btn');
     expect(gh.target).toBe('_blank');
     expect(gh.rel).toBe('noopener');
@@ -257,6 +257,24 @@ describe('the fn layer', () => {
     press('KeyU', { shiftKey: true });
     expect(showing()).toBe('education');
     press('KeyQ');
+    expect(kb.layer).toBe('base');
+  });
+
+  it('an inferred shift layer ends on that key\'s keyup, even with no shift events at all', () => {
+    mount();
+    press('Digit3', { shiftKey: true });
+    expect(kb.layer).toBe('fn');
+    document.body.dispatchEvent(new KeyboardEvent('keyup', { code: 'Digit3', shiftKey: true, bubbles: true }));
+    expect(kb.layer).toBe('base');
+  });
+
+  it('a real held shift stays on across other keys\' keyups', () => {
+    mount();
+    press('ShiftLeft', { shiftKey: true });
+    press('Digit3', { shiftKey: true });
+    release('Digit3');
+    expect(kb.layer).toBe('fn');
+    release('ShiftLeft');
     expect(kb.layer).toBe('base');
   });
 

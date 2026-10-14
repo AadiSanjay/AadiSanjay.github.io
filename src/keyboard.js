@@ -28,6 +28,8 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   const caps = new Map();
 
   let shiftHeld = false;
+  let shiftKeyDown = false; // we saw a real shift keydown
+  let shiftInferred = false; // shift only known from event.shiftKey
   let fnLatched = false;
   let buildId = loadBuild(storage);
 
@@ -173,7 +175,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, ...p });
+      showCard({ kicker: `[${key}] project`, ...p, stack: [] }); // lead with what it does; the stack is on GitHub
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
@@ -245,8 +247,11 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
     const cap = caps.get(code);
     if (!cap) return;
-    // trust the event's own shift flag too, in case we missed the shift keydown (focus changes, synthetic input)
-    const shift = SHIFTS.has(code) || !!e.shiftKey;
+    // trust the event's own shift flag too, in case we never see shift itself (focus changes,
+    // sticky keys, on-screen keyboards). a layer that was only inferred ends with that key's keyup.
+    if (SHIFTS.has(code)) shiftKeyDown = true;
+    const shift = shiftKeyDown || !!e.shiftKey;
+    shiftInferred = shift && !shiftKeyDown;
     if (shift !== shiftHeld) {
       shiftHeld = shift;
       updateLayer();
@@ -269,7 +274,9 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     const cap = caps.get(code);
     if (cap?.classList.contains('down')) sound.play(buildId, 'up');
     cap?.classList.remove('down');
-    if (SHIFTS.has(code)) {
+    if (SHIFTS.has(code) || shiftInferred) {
+      shiftKeyDown = false;
+      shiftInferred = false;
       shiftHeld = false;
       updateLayer();
     }
@@ -278,7 +285,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   // alt-tabbing away mid-press means we never see the keyup
   function releaseAll() {
     for (const cap of caps.values()) cap.classList.remove('down');
-    shiftHeld = false;
+    shiftHeld = shiftKeyDown = shiftInferred = false;
     updateLayer();
   }
 

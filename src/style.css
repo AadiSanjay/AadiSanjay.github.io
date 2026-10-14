@@ -92,6 +92,30 @@ kbd {
   text-decoration-color: currentColor;
 }
 
+/* wide screens: intro on the left, the card display on the right, keyboard right under both */
+@media (min-width: 900px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 2.5rem;
+    align-items: end;
+    margin-bottom: 1.75rem;
+  }
+
+  .hero .display {
+    height: 16.5rem;
+    margin: 0;
+  }
+
+  .desk {
+    padding-top: 2rem;
+  }
+
+  .nav {
+    margin-bottom: 1.75rem;
+  }
+}
+
 .intro h1 {
   margin: 0;
   font-size: clamp(2rem, 6vw, 3.2rem);
@@ -176,6 +200,7 @@ kbd {
   /* fixed height so opening a card never shoves the keyboard down the page */
   height: 11.5rem;
   margin: 2rem 0 1.5rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
