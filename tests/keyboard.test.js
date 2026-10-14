@@ -4,12 +4,25 @@ import { mountKeyboard } from '../src/keyboard.js';
 
 const content = {
   projects: [
-    { id: 'sched', key: 'KeyS', short: 'sched', title: 'Scheduler', blurb: 'plans things', tags: ['web'], links: [] },
-    { id: 'bot', key: 'KeyB', short: 'bot', title: 'Robot', blurb: '<img src=x>', tags: [], links: [] },
+    {
+      id: 'sched',
+      key: 'KeyS',
+      short: 'sched',
+      title: 'Scheduler',
+      status: 'shipped',
+      body: ['plans things', 'second paragraph'],
+      stack: ['JS', 'CSS'],
+      links: [
+        { label: 'GitHub', href: 'https://github.com/x/y' },
+        { label: 'Email', href: 'mailto:a@b.c' },
+      ],
+    },
+    { id: 'bot', key: 'KeyB', short: 'bot', title: 'Robot', body: '<img src=x>', links: [] },
   ],
   sections: {
     about: { title: 'About me', body: 'hi', links: [] },
     contact: { title: 'Contact', body: '', links: [] },
+    experience: { title: 'Experience', body: '', links: [] },
     resume: { title: 'Resume', body: '', links: [] },
   },
 };
@@ -125,6 +138,17 @@ describe('typing on the keyboard', () => {
     press('KeyB');
     expect(display().querySelector('img')).toBeNull();
     expect(display().querySelector('.body').textContent).toBe('<img src=x>');
+  });
+
+  it('renders every paragraph, the stack, and links as buttons', () => {
+    mount();
+    press('KeyS');
+    expect(display().querySelectorAll('.body p')).toHaveLength(2);
+    expect([...display().querySelectorAll('.stack li')].map((li) => li.textContent)).toEqual(['JS', 'CSS']);
+    const [gh, mail] = display().querySelectorAll('a.btn');
+    expect(gh.target).toBe('_blank');
+    expect(gh.rel).toBe('noopener');
+    expect(mail.target).toBe(''); // mailto shouldn't open a blank tab
   });
 });
 

@@ -86,22 +86,32 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
   }
 
   // --- the display ---
-  function showCard({ kicker, title, body, tags = [], links = [] }) {
+  function showCard({ kicker, title, status, body, stack = [], links = [] }) {
     const card = document.createElement('article');
     card.className = 'card';
-    card.innerHTML = `<p class="kicker"></p><h2></h2><p class="body"></p><ul class="tags"></ul><p class="links"></p>`;
+    card.innerHTML = `<p class="kicker"></p><h2></h2><p class="status"></p><div class="body"></div><ul class="stack"></ul><p class="links"></p>`;
     card.querySelector('.kicker').textContent = kicker;
     card.querySelector('h2').textContent = title;
-    card.querySelector('.body').textContent = body;
-    for (const t of tags) {
+    card.querySelector('.status').textContent = status ?? '';
+    for (const text of [body].flat()) {
+      const para = document.createElement('p');
+      para.textContent = text;
+      card.querySelector('.body').append(para);
+    }
+    for (const t of stack) {
       const li = document.createElement('li');
       li.textContent = t;
-      card.querySelector('.tags').append(li);
+      card.querySelector('.stack').append(li);
     }
     for (const { label, href } of links) {
       const a = document.createElement('a');
+      a.className = 'btn';
       a.href = href;
       a.textContent = `${label} ↗`;
+      if (/^https?:/.test(href)) {
+        a.target = '_blank';
+        a.rel = 'noopener';
+      }
       card.querySelector('.links').append(a);
     }
     display.replaceChildren(card);
@@ -112,7 +122,7 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
     if (action.type === 'project') {
       const p = projects.get(action.id);
       const key = caps.get(p.key).querySelector('.legend').textContent;
-      showCard({ kicker: `[${key}] project`, title: p.title, body: p.blurb, tags: p.tags, links: p.links });
+      showCard({ kicker: `[${key}] project`, ...p });
     } else if (action.type === 'section') {
       const s = content.sections[action.id];
       showCard({ kicker: `[shift] ${action.id}`, title: s.title, body: s.body, links: s.links });
@@ -232,14 +242,16 @@ export function mountKeyboard(root, { content, sound, storage, win = window }) {
 
   for (const p of content.projects) {
     const li = document.createElement('li');
-    li.innerHTML = `<kbd></kbd> <strong></strong> <span></span>`;
+    li.innerHTML = `<kbd></kbd> <strong></strong> <span></span><p></p>`;
     li.querySelector('kbd').textContent = caps.get(p.key).querySelector('.legend').textContent;
     li.querySelector('strong').textContent = p.title;
-    li.querySelector('span').textContent = `- ${p.blurb}`;
+    li.querySelector('span').textContent = p.status ? `· ${p.status}` : '';
+    li.querySelector('p').textContent = [p.body].flat()[0];
     for (const { label, href } of p.links) {
       const a = document.createElement('a');
+      a.className = 'btn';
       a.href = href;
-      a.textContent = ` ${label} ↗`;
+      a.textContent = `${label} ↗`;
       li.append(a);
     }
     list.querySelector('ul').append(li);

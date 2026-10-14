@@ -113,11 +113,23 @@ kbd {
   font-size: 1.5rem;
 }
 
-.card .body {
-  margin: 0;
+.card .status {
+  margin: 0 0 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: #6b6357;
 }
 
-.card .tags {
+.card .status:empty {
+  display: none;
+}
+
+.card .body p {
+  margin: 0 0 0.6rem;
+  max-width: 62ch;
+}
+
+.card .stack {
   display: flex;
   gap: 0.4rem;
   padding: 0;
@@ -127,7 +139,7 @@ kbd {
   font-size: 0.75rem;
 }
 
-.card .tags li {
+.card .stack li {
   border: 1px solid currentColor;
   border-radius: 999px;
   padding: 0 0.5rem;
@@ -135,18 +147,47 @@ kbd {
 
 .card .links {
   display: flex;
-  gap: 1rem;
-  margin: 0.6rem 0 0;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0 0;
 }
 
 .card .links:empty,
-.card .tags:empty {
+.card .stack:empty {
   display: none;
 }
 
-.card a {
-  color: var(--alpha);
-  font-weight: 600;
+/* link buttons look like keycaps: red with yellow legends */
+.btn {
+  display: inline-block;
+  padding: 0.45rem 0.9rem 0.5rem;
+  border-radius: 7px;
+  background: var(--alpha);
+  color: var(--legend);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  box-shadow: 0 4px 0 var(--alpha-side);
+  transition: transform 60ms, box-shadow 60ms;
+}
+
+.btn:hover {
+  filter: brightness(1.08);
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--alpha-side);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.card .btn + .btn {
+  background: var(--mod);
+  box-shadow: 0 4px 0 var(--mod-side);
 }
 
 @keyframes rise {
@@ -397,6 +438,17 @@ kbd {
 
 .work-list li span {
   color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.work-list li p {
+  margin: 0.3rem 0 0.7rem;
+  color: var(--muted);
+}
+
+.work-list .btn {
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,10 +1,37 @@
 import { switches } from './switches.js';
 
-// synthesized for now. TODO: swap for recordings of my actual board.
+// plays recordings of my boards when a switch has them, otherwise synthesizes a press
 export function createSound() {
   let ctx = null;
   let noise = null;
   let enabled = true;
+  const recordings = {}; // switch id -> AudioBuffer[] once loaded, null if loading failed
+
+  async function load(id) {
+    const urls = switches[id].samples ?? [];
+    if (!urls.length) return;
+    recordings[id] = [];
+    try {
+      const files = await Promise.all(
+        urls.map(async (url) => {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`${url}: ${res.status}`);
+          return ctx.decodeAudioData(await res.arrayBuffer());
+        }),
+      );
+      recordings[id] = files;
+    } catch {
+      recordings[id] = null; // fall back to the synth for good
+    }
+  }
+
+  function playRecording(buffers, wobble) {
+    const src = ctx.createBufferSource();
+    src.buffer = buffers[Math.floor(Math.random() * buffers.length)];
+    src.playbackRate.value = wobble;
+    src.connect(ctx.destination);
+    src.start();
+  }
 
   function setup() {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -48,8 +75,11 @@ export function createSound() {
     if (!ctx && !setup()) return;
     if (ctx.state === 'suspended') ctx.resume();
 
-    const s = switches[switchId].sound;
     const wobble = 0.94 + Math.random() * 0.12; // no two presses sound identical
+    if (!(switchId in recordings)) load(switchId);
+    if (recordings[switchId]?.length) return playRecording(recordings[switchId], wobble);
+
+    const s = switches[switchId].sound;
     let t = ctx.currentTime;
 
     if (s.bump) {

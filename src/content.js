@@ -1,53 +1,85 @@
-// TODO: real projects + copy. `key` is the event.code that opens it.
+// `key` is the event.code that opens the project
+const base = import.meta.env?.BASE_URL ?? '/';
+
 export const content = {
   projects: [
     {
-      id: 'project-one',
-      key: 'KeyP',
-      short: 'proj 1',
-      title: 'Project one',
-      blurb: 'One or two lines on what it does and why you built it.',
-      tags: ['web'],
-      links: [{ label: 'code', href: 'https://github.com/' }],
+      id: 'focusticker',
+      key: 'KeyF',
+      short: 'focusticker',
+      title: 'FocusTicker',
+      status: 'live on the Chrome Web Store',
+      body: [
+        'A Chrome extension I built after realizing how easy it was to open LinkedIn or Reddit for “a few minutes” and completely lose track of time. Instead of blocking sites, it adds a subtle live timer to the page so you can see your current session and your total for the day while you browse.',
+        'What started as a simple timer turned into a real browser-engineering project: active-tab and window-focus tracking, idle detection, periodic checkpointing for Manifest V3 service workers, persistent daily usage, background/content-script messaging, favicon rendering, and a draggable Shadow DOM overlay that remembers where you put it.',
+      ],
+      stack: ['JavaScript', 'Manifest V3', 'Chrome APIs', 'Shadow DOM', 'HTML/CSS'],
+      links: [
+        { label: 'Chrome Web Store', href: 'https://chromewebstore.google.com/detail/focusticker/pghicmhngfmldcnoglcodkbaiaknjlah' },
+        { label: 'GitHub', href: 'https://github.com/AadiSanjay/ChromeExt4SocialMedia' },
+      ],
     },
     {
-      id: 'project-two',
-      key: 'KeyM',
-      short: 'proj 2',
-      title: 'Project two',
-      blurb: 'One or two lines on what it does and why you built it.',
-      tags: ['python', 'ml'],
-      links: [{ label: 'code', href: 'https://github.com/' }],
-    },
-    {
-      id: 'project-three',
-      key: 'KeyK',
-      short: 'proj 3',
-      title: 'Project three',
-      blurb: 'One or two lines on what it does and why you built it.',
-      tags: ['hardware'],
+      id: 'capsule',
+      key: 'KeyC',
+      short: 'capsule',
+      title: 'Capsule',
+      status: 'in progress · first full version December 2026',
+      body: [
+        'A pocket journal for the moments you don’t want to forget. Most of the ones I want to remember are small: a line that came to me on a walk, a photo from a night with friends. You write a few lines, add a photo if you like, in about 15 seconds. Later, the app gives those moments back to you.',
+        'You’ll be able to seal an entry like a time capsule so it stays hidden until a date you choose, or pull up what you wrote this time last year. Everything stays on your phone, behind a calm, bookish design in light or dark mode.',
+      ],
+      stack: ['Swift', 'SwiftUI', 'SwiftData', 'PhotosUI', 'UserNotifications'],
       links: [],
+    },
+    {
+      id: 'pnwkeyboards',
+      key: 'KeyK',
+      short: 'pnw kbs',
+      title: 'PNW Keyboards',
+      status: 'my keyboard shop · 4 years on Etsy · 4.9★',
+      body: [
+        'I build and sell custom 65% mechanical keyboards: lubed, modded, and tuned to sound thocky. It started as Floofd Keebs and is now PNW Keyboards, run out of Bellevue, WA.',
+        'The board you’re typing on up there is one of mine, and the sounds are recorded from my builds.',
+      ],
+      stack: ['switch lubing', 'case foam mods', 'soldering', 'sound tuning'],
+      links: [
+        { label: 'Etsy shop', href: 'https://www.etsy.com/shop/PNWKeyboards' },
+        { label: 'Sound test', href: 'https://www.youtube.com/shorts/_28FialngiE' },
+      ],
     },
   ],
   sections: {
     about: {
       title: 'About',
-      body: 'A few sentences about you: school, what you like building, and the keyboard you are typing on right now.',
+      body: [
+        'I’m Aadi, a Computer Science + Economics student at the University of Illinois Urbana-Champaign (class of 2029) and a National Merit Finalist, originally from the Seattle area.',
+        'I like building things people actually use: browser extensions, apps, and keyboards. Right now I’m a software developer on the NOBE Technology Committee, building an investment app for Cline Financial.',
+      ],
+      links: [],
+    },
+    experience: {
+      title: 'Experience',
+      body: [
+        'Software Developer, NOBE Technology Committee × Cline Financial (Sep 2026 – now). React/TypeScript and C#/.NET investment app; I wrote the parser that turns brokerage workbooks into clean transaction and cost-basis data.',
+        'Co-Founder & Web Developer, Educatodos (2024 – 2026). A multilingual site for Spanish-speaking English learners, serving 50+ students.',
+        'Web Developer, GLOW Action (2025 – 2026). Prototyped a disaster-preparedness app for rural communities in Andhra Pradesh.',
+      ],
       links: [],
     },
     contact: {
       title: 'Contact',
-      body: 'Best way to reach me is email.',
+      body: 'Looking for summer 2027 internships. Email is the best way to reach me.',
       links: [
-        { label: 'email', href: 'mailto:you@example.com' },
-        { label: 'linkedin', href: 'https://www.linkedin.com/' },
-        { label: 'github', href: 'https://github.com/' },
+        { label: 'Email', href: 'mailto:aadisanjwa@gmail.com' },
+        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/aadi-sanjay/' },
+        { label: 'GitHub', href: 'https://github.com/AadiSanjay' },
       ],
     },
     resume: {
       title: 'Resume',
-      body: 'Looking for summer 2027 internships.',
-      links: [{ label: 'resume (pdf)', href: '#' }],
+      body: 'One page. Looking for summer 2027 internships.',
+      links: [{ label: 'Open resume (PDF)', href: `${base}resume.pdf` }],
     },
   },
 };

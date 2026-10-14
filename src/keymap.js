@@ -12,6 +12,7 @@ export function buildKeymap(content) {
   const fn = {
     KeyA: { type: 'section', id: 'about' },
     KeyC: { type: 'section', id: 'contact' },
+    KeyE: { type: 'section', id: 'experience' },
     KeyR: { type: 'section', id: 'resume' },
     Digit1: { type: 'switch', id: 'linear' },
     Digit2: { type: 'switch', id: 'tactile' },
