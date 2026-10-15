@@ -63,6 +63,17 @@ npm run build      # production build into dist/
 - **Branch protection on `main`** requires the `check` job to pass before a PR can merge. It's enforced for everyone except repo admins, so as the owner I can still override it (GitHub's branch API shows `required_status_checks: ["check"]`, `enforcement_level: "non_admins"`).
 - **`.github/workflows/deploy.yml`** runs only after CI succeeds on `main`, rebuilds that exact commit, and deploys it to GitHub Pages. (For a `<user>.github.io` repo it builds with base `/`, otherwise `/<repo>/`.)
 
+## Evidence: a failed check, the fix, and a deploy
+
+One pull request, end to end ([PR #1](https://github.com/AadiSanjay/AadiSanjay.github.io/pull/1), "Move Capsule to F"):
+
+1. **The check failed.** The PR moved Capsule onto the F key, which FocusTicker already uses. CI's `npm test` step failed on the keymap test (`tests/keymap.test.js`, "my real content.js builds a valid keymap") with `Error: capsule and focusticker both use KeyF`, so the PR couldn't merge. [Failed run](https://github.com/AadiSanjay/AadiSanjay.github.io/actions/runs/38509171715)
+2. **The fix passed.** The next commit, "Keep Capsule on C", put Capsule back on its own key, and the same checks went green. [Passing run](https://github.com/AadiSanjay/AadiSanjay.github.io/actions/runs/38509416793)
+3. **Merged, rechecked, deployed.** After the merge, CI ran again on `main` ([run](https://github.com/AadiSanjay/AadiSanjay.github.io/actions/runs/38509917358)), and only then did the deploy workflow publish that commit to GitHub Pages ([deploy](https://github.com/AadiSanjay/AadiSanjay.github.io/actions/runs/38509950105)).
+4. **The merge gate.** Branch protection on `main` requires the `check` job to pass before a PR can merge (see CI/CD above).
+
+Every later push to `main` follows the same CI → deploy path; the [Actions tab](https://github.com/AadiSanjay/AadiSanjay.github.io/actions) has the full history. Some later changes were pushed straight to `main` with my admin override of the PR rule; CI still ran on each of them before it deployed.
+
 ## Project layout
 
 ```

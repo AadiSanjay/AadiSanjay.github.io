@@ -8,7 +8,7 @@ Due: technical checkpoint **Thu Oct 15**, final links **Fri Oct 16** (both 11:59
 - [x] GitHub Actions runs checks + tests + build on every PR
 - [x] Branch protection on `main`: require the CI `check` to pass before merging (enforced for non-admins)
 - [x] Auto-deploy verified `main` to the live site (GitHub Pages)
-- [ ] Evidence: a **failed** check on a PR, the **fixed passing** run, and a **main deployment** (screenshot + links)
+- [x] Evidence: a **failed** check on a PR, the **fixed passing** run, and a **main deployment** (links in the README's Evidence section; add screenshots to the submission)
 - [x] README: setup, tests, deployment, material AI use + limitations
 - [ ] Oct 15 submission: repo, tests, pipeline, review evidence
 - [ ] Oct 16 submission: live URL + public repo + pipeline evidence
