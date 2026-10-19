@@ -38,8 +38,8 @@ export const content = {
       short: 'ticker', // sub-legends fit 7 characters on a 1u cap
       title: 'FocusTicker',
       image: { src: `${base}shots/focusticker.jpg`, alt: 'FocusTicker’s timer pill floating over the top corner of LinkedIn, showing 02:34 spent on LinkedIn today' },
-      // 10 users, 5.0★ from 3 ratings on the listing, Oct 14 2026
-      status: 'live on the Chrome Web Store · 10 users · 5.0★',
+      // 30 users (Oct 19 2026, from Aadi), 5.0★ from 3 ratings on the listing (Oct 14 2026)
+      status: 'live on the Chrome Web Store · 30 users · 5.0★',
       body: 'A Chrome extension that puts a small live timer on LinkedIn, Reddit, and other time sinks, so you see how long you’ve been scrolling instead of getting blocked.',
       how: 'Under the hood, a Manifest V3 service worker tracks active-tab time across tab switches, idle, and window focus, and checkpoints to storage every minute so nothing’s lost when Chrome suspends it.',
       stack: ['JavaScript', 'Manifest V3', 'Chrome APIs'],
