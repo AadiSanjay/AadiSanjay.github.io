@@ -44,8 +44,8 @@ function media(p) {
 }
 
 // a project card. what it is and its links are always on the card; the extras (how it works, the
-// tags) show over its image on hover or keyboard focus, or with the details button on touch
-// screens. the extras are always in the page, so screen readers get them either way
+// tags) show over its image on hover or keyboard focus. the extras are always in the page, so
+// screen readers get them either way
 function project(p, onKey) {
   const article = el('article', ['project', p.inProgress && 'in-progress', p.featured && 'featured'].filter(Boolean).join(' '));
   article.id = p.id;
@@ -78,20 +78,6 @@ function project(p, onKey) {
   body.append(head, el('p', 'status', p.status), el('p', 'blurb', [p.body].flat()[0]));
   if (p.links.length) body.append(linkButtons(p.links));
 
-  if (art && extras.childElementCount) {
-    const toggle = el('button', 'details', p.how ? 'how it works' : 'details');
-    const label = toggle.textContent;
-    toggle.type = 'button';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', extras.id);
-    toggle.addEventListener('click', () => {
-      const open = !article.classList.contains('open');
-      article.classList.toggle('open', open);
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.textContent = open ? 'hide' : label;
-    });
-    body.append(toggle);
-  }
   article.append(body);
   return article;
 }

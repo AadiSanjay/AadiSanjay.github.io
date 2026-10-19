@@ -92,23 +92,6 @@ describe('renderSections (the plain version)', () => {
     expect(document.querySelector('#focusticker .media-label')).toBeNull(); // a real screenshot
   });
 
-  it('on touch screens, a button shows and hides the extras', () => {
-    const card = document.querySelector('#focusticker');
-    const toggle = card.querySelector('button.details');
-    expect(toggle.textContent).toBe('how it works');
-    expect(toggle.getAttribute('aria-controls')).toBe('focusticker-extras');
-    expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    toggle.click();
-    expect(card.classList.contains('open')).toBe(true);
-    expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(toggle.textContent).toBe('hide');
-    toggle.click();
-    expect(card.classList.contains('open')).toBe(false);
-    expect(toggle.textContent).toBe('how it works');
-    // no how-it-works sentence, so it's just "details" (the tags)
-    expect(document.querySelector('#capsule button.details').textContent).toBe('details');
-  });
-
   it('links leaving the site say ↗ and open a new tab; links within it say →', () => {
     const external = document.querySelector('#focusticker a.btn');
     expect(external.textContent).toMatch(/↗$/);

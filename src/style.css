@@ -1120,15 +1120,7 @@ kbd {
   padding: 0.05rem 0.55rem;
 }
 
-.project.open .project-extras {
-  opacity: 1;
-}
-
 @media (hover: hover) and (pointer: fine) {
-  .project .details {
-    display: none;
-  }
-
   /* :has(:focus-visible): shown when you tab in, but not left showing just because a button was clicked */
   .project:is(:hover, :has(:focus-visible)) .project-extras {
     opacity: 1;
@@ -1210,20 +1202,6 @@ kbd {
 .project .btn {
   padding: 0.38rem 0.8rem 0.42rem;
   font-size: 0.85rem;
-}
-
-.project .details {
-  display: block;
-  margin-top: 0.9rem;
-  padding: 0.2rem 0.7rem;
-  font: inherit;
-  font-family: var(--mono);
-  font-size: 0.74rem;
-  color: var(--ink);
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: pointer;
 }
 
 /* not shipped yet: dashed, so it reads as "coming", not as a card that failed to load */

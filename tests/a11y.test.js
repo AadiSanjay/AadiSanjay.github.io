@@ -102,10 +102,4 @@ describe('the about page', () => {
     expect(document.querySelector('h1').textContent).toBe('About');
     expect(await violations()).toEqual([]);
   }, AXE_TIMEOUT);
-
-  it('a project card with its drawer open has none', async () => {
-    mountHome();
-    document.querySelector('#capsule .details').click();
-    expect(await violations()).toEqual([]);
-  }, AXE_TIMEOUT);
 });
